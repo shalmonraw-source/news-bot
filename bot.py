@@ -648,6 +648,19 @@ def main():
         print("webhook:", safe)
         tg("sendMessage", chat_id=_chat_id(), text="🔧 webhook: " + json.dumps(safe, ensure_ascii=False)[:900])
         return
+    if mode == "fbcheck":
+        page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
+        if not page or not token:
+            tg("sendMessage", chat_id=_chat_id(), text="⚠️ FB_PAGE_ID או FB_PAGE_TOKEN לא מוגדרים")
+            return
+        r = requests.get(f"https://graph.facebook.com/{FB_VERSION}/{page}", params={"fields": "name,id,fan_count", "access_token": token}, timeout=40).json()
+        if r.get("error"):
+            msg = "❌ חיבור פייסבוק נכשל: " + str(r["error"].get("message", ""))[:200]
+        else:
+            msg = "✅ חיבור פייסבוק תקין: " + str(r.get("name")) + " (" + str(r.get("id")) + ")"
+        print(msg)
+        tg("sendMessage", chat_id=_chat_id(), text=msg)
+        return
     if mode == "fonts":
         done = imgcard.font_sheet("/tmp/fonts.jpg")
         tg_photo("/tmp/fonts.jpg", "🔤 גופנים לבחירה:\n" + "\n".join(f"{n}. {name}" for n, name in done) + "\n\nכתוב לי את המספר או השם.")
