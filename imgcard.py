@@ -270,7 +270,7 @@ def _gradient_bg():
     return bg
 
 
-BG_TOP, BG_BOT, PANEL = (32, 34, 40), (14, 15, 18), (34, 37, 44)
+BG_TOP, BG_BOT, PANEL = (22, 22, 23), (11, 11, 12), (27, 27, 29)
 WHITE, MUTED = (244, 246, 248), (150, 156, 166)
 
 
@@ -319,8 +319,9 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     tf = _font(30)
     tag = label or PAGE_TAG
     tw = _width(d, tag, tf)
-    d.rounded_rectangle([W - m - tw - 44, 62, W - m, 62 + 52], radius=26, outline=accent, width=3)
-    d.text((W - m - 22, 88), _shape(tag), font=tf, fill=accent, anchor="rm", **_kw())
+    d.rectangle([0, 0, W, 10], fill=accent)
+    d.rounded_rectangle([W - m - tw - 44, 62, W - m, 62 + 52], radius=8, fill=accent)
+    d.text((W - m - 22, 88), _shape(tag), font=tf, fill=(12, 12, 13), anchor="rm", **_kw())
 
     # --- אזור התמונה
     pw, phh = ph_box[2] - ph_box[0], ph_box[3] - ph_box[1]

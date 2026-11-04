@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       topic:
-        description: "רק נושא אחד: aviation / mideast / world (ריק = הכול)"
+        description: "רק נושא אחד: security / aviation / politics (ריק = הכול)"
         default: ""
       mode:
         description: "run = רגיל, sample = 72 שעות אחורה, test = הודעת בדיקה, fonts = דף גופנים לבחירה"
