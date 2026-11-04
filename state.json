@@ -1,1 +1,60 @@
-{"seen": [], "pending": {}, "approved": [], "offset": 0, "daily": {"date": "", "count": 0}}
+{
+ "seen": [
+  "b2eeb92af4c1",
+  "ef9ad0505928",
+  "c499f6c10c6e",
+  "f652cb0102af",
+  "3a198768e879",
+  "1cb2b4119057",
+  "d3a3591bf3ce",
+  "b2e96e2d0589",
+  "6882e3de4d2e",
+  "6dab17335395",
+  "1b81da1e9def",
+  "d9d908642869",
+  "5fca624dde6c",
+  "9c293d5280a3"
+ ],
+ "pending": {
+  "8aec5bd77c": {
+   "text": "אבולון סגרה הזמנה ל-140 מטוסי בואינג 737-10\nחברת ההשכרה אבולון סיימה את ההזמנה ל-140 מטוסי 737-10, הגדולה ביותר של חברת השכרה בדגמי ה-737 MAX. בואינג אישרה שההזמנה שהוכרזה בחודש שעבר היא לדגם זה. סך ההזמנות של אבולון ל-MAX עומד על יותר מ-240 מטוסים. ✈️",
+   "links": [
+    "https://www.aviation24.be/manufacturers/boeing/avolon-finalizes-record-order-for-140-boeing-737-10-aircraft/",
+    "https://www.aerotime.aero/articles/avolon-boeing-737-max-10-order",
+    "https://simpleflying.com/avolon-boeing-737-max-10-order/"
+   ],
+   "severity": "low",
+   "ts": 1793792976.2939475
+  },
+  "d3a3591bf3": {
+   "text": "ה-FAA: בדיקות לעשרות מטוסי בואינג 787 בשל מיכלי דלק\nהרשות האמריקאית לתעופה אזרחית פרסמה הנחיה המחייבת בדיקות במיכלי הדלק של 60 מטוסי 787 הרשומים בארה\"ב. לפי ההנחיה, מיכלי הדלק עלולים להתלקח בפגיעת ברק. מספר המטוסים הרשומים מחוץ לארה\"ב שעשויים להיות מושפעים אינו ידוע.",
+   "links": [
+    "https://simpleflying.com/boeing-787-faa-fuel-tank-inspections-lightning-strike/"
+   ],
+   "severity": "medium",
+   "ts": 1793792976.9203944
+  },
+  "b2eeb92af4": {
+   "text": "אינדיגו בדיונים עם אמבראר על הזמנת מטוסים אזוריים\nלפי דיווח של רויטרס, אינדיגו, חברת התעופה הגדולה בהודו, מנהלת מגעים עם יצרנית המטוסים הברזילאית אמבראר על הזמנה אפשרית של 100 מטוסים אזוריים.",
+   "links": [
+    "https://www.aerotime.aero/articles/indigo-explores-large-regional-jet-order-with-embraer-reuters"
+   ],
+   "severity": "low",
+   "ts": 1793792977.4937284
+  },
+  "5fca624dde": {
+   "text": "בריטיש איירווייז חוזרת לטוס לדובאי\nלפי דיווח, טיסות בריטיש איירווייז לדובאי חודשו לאחר השעיה של שמונה חודשים באזור המפרץ.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMikwFBVV95cUxQR1lvZlhhdVJfbXcwaVBUYVhDcjVFZkZFZW1DSGxOTDJhbE1oWkVLaXJLcE9wY3FjQ2ZHM09Hb2duaUN3R2lVQ3JRWDFtVkNnMWhUV0Z6SFVQZDJKMzl6UzB1a1NUS1NoYmlIcEQwSFRWejJESFNUNmRETk9vRDY0LTUtbGZVVzNqOTREQXptSFZNWkE?oc=5"
+   ],
+   "severity": "low",
+   "ts": 1793792977.9951859
+  }
+ },
+ "approved": [],
+ "offset": 0,
+ "daily": {
+  "date": "2026-11-04",
+  "count": 4
+ }
+}
