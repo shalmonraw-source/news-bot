@@ -129,7 +129,7 @@ def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="av
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
     tp = load_topics().get(topic, {})
-    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + "\n\n⏳ הלחיצה נרשמת בתוך עד 10 דקות"
+    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + ""
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
@@ -597,13 +597,23 @@ def fetch_and_propose(st, topic):
 FB_VERSION = os.environ.get("FB_API_VERSION", "v23.0")
 
 
+def page_token(page, token):
+    """אם הוגדר טוקן משתמש, מחליף אותו אוטומטית בטוקן של העמוד (חייבים טוקן עמוד כדי לפרסם)."""
+    try:
+        r = requests.get(f"https://graph.facebook.com/{FB_VERSION}/{page}", params={"fields": "access_token", "access_token": token}, timeout=40).json()
+        return r.get("access_token") or token
+    except Exception:  # noqa: BLE001
+        return token
+
+
 def publish_approved(st):
     """מפרסם לעמוד פייסבוק פוסטים שאושרו. פועל רק אם הוגדרו FB_PAGE_ID ו-FB_PAGE_TOKEN."""
     page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
     if not page or not token:
         return
+    token = page_token(page, token)
     for item in st["approved"]:
-        if item.get("published"):
+        if item.get("published") or item.get("fails", 0) >= 2:
             continue
         caption = item["text"] + ("\n\n📷 צילום ארכיון: " + item["credit"] if item.get("credit") else "")
         try:
@@ -628,6 +638,7 @@ def publish_approved(st):
             tg("sendMessage", chat_id=_chat_id(), text=f"📣 פורסם בפייסבוק\n{item['text'].splitlines()[0]}")
         except Exception as e:  # noqa: BLE001
             print("publish failed:", type(e).__name__, str(e)[:150])
+            item["fails"] = item.get("fails", 0) + 1
             tg("sendMessage", chat_id=_chat_id(), text="⚠️ הפרסום לפייסבוק נכשל: " + (str(e)[:150] if isinstance(e, RuntimeError) else type(e).__name__))
 
 
