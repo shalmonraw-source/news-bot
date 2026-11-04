@@ -8,8 +8,11 @@ on:
       topic:
         description: "רק נושא אחד: facts / security / aviation / politics (ריק = הכול)"
         default: ""
+      decision:
+        description: "לשימוש ה-webhook בלבד: a:<id> לאישור, r:<id> לדחייה (עם mode=decide)"
+        default: ""
       mode:
-        description: "run = רגיל, sample = 72 שעות אחורה, test = הודעת בדיקה, fonts = דף גופנים לבחירה"
+        description: "decide = החלטה מיידית מה-webhook, run = רגיל, sample = 72 שעות אחורה, test = הודעת בדיקה, fonts = דף גופנים לבחירה"
         default: "run"
 
 concurrency:
@@ -35,6 +38,7 @@ jobs:
         env:
           MODE: ${{ inputs.mode || 'run' }}
           ONLY_TOPIC: ${{ inputs.topic }}
+          DECISION: ${{ inputs.decision }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

@@ -193,15 +193,34 @@ def _five(d, cx, cy, h, col):
     d.polygon([(cx + x * k, cy + y * k) for x, y in _FIVE], fill=col)
 
 
-def _wordmark(d, x, y_mid, cap_h, text_col, accent, font):
+def _wordmark(d, x, y_mid, cap_h, text_col, accent, font, join=False, join_col=None):
     """MER בגופן + ה-5 המעוצב, מיושרים לגובה אותיות הקידמה."""
     d.text((x, y_mid), "MER", font=font, fill=text_col, anchor="lm")
     wm = d.textlength("MER", font=font)
     bb = d.textbbox((x, y_mid), "M", font=font, anchor="lm")
     cap_h = bb[3] - bb[1]
     k = cap_h / 92.0
-    _five(d, x + wm + 8 + 26 * k, (bb[1] + bb[3]) / 2, cap_h, accent)
-    return wm + 6 + 52 * k
+    gap = 8 if not join else max(3, int(cap_h * 0.07))
+    cx5 = x + wm + gap + 26 * k
+    _five(d, cx5, (bb[1] + bb[3]) / 2, cap_h, accent)
+    if join:  # הרגל של ה-R מתחברת לקו התחתון של ה-5: פס בגובה הקו התחתון
+        t = 17 * k
+        from PIL import ImageFont
+        wR = d.textlength("ME", font=font)  # R מתחילה כאן; מוצאים את כף הרגל שלה בשורת הפיקסלים התחתונה
+        rm = Image.new("L", (int(cap_h * 2), int(cap_h * 2)), 0)
+        ImageDraw.Draw(rm).text((cap_h * 0.2, cap_h), "R", font=font, fill=255, anchor="lm")
+        rb = rm.getbbox()
+        px = rm.load()
+        yy = rb[3] - 3
+        xr = rb[2] - 1
+        while xr > rb[0] and px[xr, yy] < 128:
+            xr -= 1
+        xl = xr
+        while xl > rb[0] and px[xl - 1, yy] >= 128:
+            xl -= 1  # תחילת הקטע הימני ביותר בשורה התחתונה = כף הרגל
+        foot_l = x + wR + (xl - cap_h * 0.2)
+        d.rectangle([foot_l, bb[3] - t, cx5 - 24 * k + 1, bb[3]], fill=join_col or accent)
+    return wm + gap + 52 * k
 
 
 def logo_mark(size, rgb=(255, 255, 255), alpha=255):
@@ -256,7 +275,7 @@ def logo_lockup(height=160, mark_rgb=(255, 255, 255), text_rgb=(255, 255, 255), 
     out.alpha_composite(m, (0, 0))
     d = ImageDraw.Draw(out)
     ty = height * (0.40 if tagline else 0.5)
-    _wordmark(d, height + gap, ty, height * 0.44, tuple(text_rgb) + (255,), tuple(accent) + (255,), f)
+    _wordmark(d, height + gap, ty, height * 0.44, tuple(text_rgb) + (255,), tuple(accent) + (255,), f, join=True)
     if tagline:
         x = height + gap
         for ch in tag:
@@ -333,7 +352,7 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     # --- שורת מותג עליונה
     canvas.paste(logo_mark(64, accent), (m, 56), logo_mark(64, accent))
     bf = _font(46)
-    _wordmark(d, m + 80, 88, 40, WHITE, accent, bf)
+    _wordmark(d, m + 80, 88, 40, WHITE, accent, bf, join=True)
     tf = _font(30)
     tag = label or PAGE_TAG
     tw = _width(d, tag, tf)

@@ -140,8 +140,43 @@ def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="av
     return res["message_id"]
 
 
+def apply_decision(st, decision):
+    """מיישם החלטה מהפורמט "a:<pid>" (אשר) או "r:<pid>" (דחה). משמש את מצב ה-webhook המיידי."""
+    action, _, pid = (decision or "").partition(":")
+    item = st["pending"].pop(pid, None)
+    if item is None:
+        print("decision: item already handled or expired:", pid)
+        return False
+    if action == "a":
+        st["approved"].append(
+            {
+                "id": pid,
+                "text": item["text"],
+                "links": item["links"],
+                "severity": item.get("severity"),
+                "image": item.get("image"),
+                "credit": item.get("credit"),
+                "approved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "published": False,
+            }
+        )
+    print("decision applied:", action, pid)
+    return True
+
+
+def webhook_active():
+    try:
+        return bool(tg("getWebhookInfo").get("url"))
+    except Exception as e:
+        print("warn: getWebhookInfo", e)
+        return False
+
+
 def process_updates(st):
-    """מטפל בלחיצות על כפתורי אשר/דחה שהצטברו מאז הריצה הקודמת."""
+    """מטפל בלחיצות על כפתורי אשר/דחה שהצטברו מאז הריצה הקודמת (כשאין webhook)."""
+    if webhook_active():
+        print("poll: skipped, webhook is active (decisions arrive via workflow input)")
+        return
     updates = tg(
         "getUpdates", offset=st["offset"], timeout=0, allowed_updates=["callback_query"]
     )
@@ -590,6 +625,13 @@ def main():
         pid = "test" + str(int(time.time()))[-6:]
         send_proposal(pid, "בדיקת מערכת\nאם אתה רואה את ההודעה הזו והכפתורים, החיבור לטלגרם עובד.", ["https://github.com"], "low", 2)
         st["pending"][pid] = {"text": "test", "links": [], "severity": "low", "ts": time.time()}
+    elif mode == "decide":
+        try:
+            apply_decision(st, os.environ.get("DECISION", ""))
+            publish_approved(st)
+        finally:
+            save_state(st)
+        return
     elif mode in ("run", "sample"):
         if mode == "sample":
             os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
