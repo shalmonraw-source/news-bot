@@ -451,12 +451,6 @@
    "image": "images/23514e2c8a.jpg",
    "credit": "Alessandro Ambrosetti from Rome, Italy / Wikimedia Commons / CC BY 2.0",
    "ts": 1793806837.345086
-  },
-  "test813512": {
-   "text": "test",
-   "links": [],
-   "severity": "low",
-   "ts": 1793813512.4826775
   }
  },
  "approved": [
@@ -468,6 +462,16 @@
    ],
    "severity": "high",
    "approved_at": "2026-11-04T13:39:50+00:00",
+   "published": false
+  },
+  {
+   "id": "test813512",
+   "text": "test",
+   "links": [],
+   "severity": "low",
+   "image": null,
+   "credit": null,
+   "approved_at": "2026-11-04T17:33:24+00:00",
    "published": false
   }
  ],
