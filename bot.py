@@ -127,12 +127,18 @@ def keyboard(pid):
     }
 
 
-def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation"):
+def _bar(v):
+    return "●" * v + "○" * (5 - v)
+
+
+def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
     tp = load_topics().get(topic, {})
-    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + ""
+    scores = f"⚡ דחיפות {_bar(urgency)} {urgency}/5 · ⭐ חשיבות וייחודיות {_bar(special)} {special}/5"
+    rec = "🚀 מומלץ להעלות עכשיו" if urgency >= 4 else ("➕ מומלץ להוסיף לתור" if special >= 3 else "🗑 שקול לדחות")
+    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{scores}\n{rec}"
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
@@ -333,7 +339,8 @@ SELECT_SYSTEM = """אתה עורך ראשי של עמוד חדשות תעופה 
 
 אם כמה ידיעות עוסקות באותו אירוע, אחד אותן ל-pick אחד (כל האינדקסים ב-idxs).
 severity: high לאירוע חירום או סכנה, medium לתקלה או שיבוש משמעותי, low לשאר. israel: true אם יש קשר ישראלי ישיר.
-החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
+החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","urgency":3,"special":3,"israel":false}]}   ואם אין: {"picks":[]}"""
 
 WRITE_SYSTEM = """אתה כתב תעופה בכיר בערוץ חדשות ישראלי מוביל, שכותב גם לעמוד הפייסבוק של הערוץ.
 הקורא צריך להרגיש שכתב שטח מנוסה רשם את זה: מקצועי, מדויק, רגוע, בטוח בעצמו, ובכל זאת כזה שאי אפשר להפסיק לקרוא.
@@ -440,7 +447,10 @@ def parse_picks(data, n):
         idxs = [i for i in p.get("idxs", []) if isinstance(i, int) and 0 <= i < n]
         if idxs:
             sev = p.get("severity") if p.get("severity") in ("low", "medium", "high") else "low"
-            picks.append({"idxs": sorted(set(idxs)), "severity": sev, "israel": bool(p.get("israel"))})
+            def score(k):
+                v = p.get(k)
+                return v if isinstance(v, int) and 1 <= v <= 5 else 3
+            picks.append({"idxs": sorted(set(idxs)), "severity": sev, "urgency": score("urgency"), "special": score("special"), "israel": bool(p.get("israel"))})
     return picks
 
 
@@ -466,12 +476,14 @@ SELECT_MIDEAST = """אתה עורך ראשי של MER5, עמוד חדשות יש
 דלג על: שמועות ורשתות חברתיות ללא מקור מזוהה, תעמולה, ידיעות קטנות או חוזרות, ספורט, סלבס, ופרטים מבצעיים של כוחות ישראליים.
 אם כמה ידיעות עוסקות באותו אירוע אחד אותן (כל האינדקסים ב-idxs). עדיפות לאירוע שמופיע ביותר ממקור אחד.
 severity: high להסלמה או אירוע גדול, medium להתפתחות משמעותית, low לשאר. israel: true אם יש קשר ישיר לישראל.
-עדיף רשימה ריקה מפוסט בינוני. החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+עדיף רשימה ריקה מפוסט בינוני. urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
+החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","urgency":3,"special":3,"israel":false}]}   ואם אין: {"picks":[]}"""
 
 SELECT_WORLD = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. מדור "פוליטיקה": תקבל ידיעות פוליטיות מהעולם. בחר רק סיפורים בעלי משקל:
 בחירות ותוצאותיהן, משברים בממשלות וקואליציות, החלטות של מנהיגים ומעצמות, פסגות, סנקציות והסכמים, הפוליטיקה בישראל, בארה"ב ובעולם הערבי, ומהלכים שמשפיעים על המזרח התיכון.
 דלג על: רכילות פוליטית, כתבות דעה, סקרים קטנים, פוליטיקה מקומית זעירה, סלבס וספורט. אחד ידיעות על אותו אירוע. severity לפי חשיבות. israel: true אם יש קשר ישיר לישראל.
-שמור על ניטרליות: דווח על עמדות כעמדות של מי שאמר אותן, בלי הטיה לאף צד. עדיף רשימה ריקה. החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+שמור על ניטרליות: דווח על עמדות כעמדות של מי שאמר אותן, בלי הטיה לאף צד. עדיף רשימה ריקה. urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
+החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","urgency":3,"special":3,"israel":false}]}   ואם אין: {"picks":[]}"""
 
 _base, _tail = WRITE_SYSTEM.rsplit("החזר JSON בלבד", 1)
 WRITE_NEWS = (
@@ -492,7 +504,8 @@ IMAGE_NEWS = """אתה עורך תמונות בעמוד חדשות. תקבל פ�
 SELECT_FACTS = """אתה עורך ראשי של MER5, מדור "ידיעות מהעולם": עובדות, תגליות וסיפורים מעניינים באמת מהעולם: מדע, היסטוריה, טבע, טכנולוגיה, תרבויות ותופעות חריגות. תקבל רשימת כתבות.
 בחר רק סיפור שגורם לקורא לומר "לא ידעתי את זה": פרט מפתיע, מספר שמעורר תדהמה, גילוי חדש או סיפור היסטורי עם תפנית. הסיפור חייב להיות מבוסס על המקור ולא על שמועה או על טענה בלי הוכחה.
 דלג על: חדשות פוליטיות וביטחוניות, סלבס, ספורט, פרסומות, רשימות כלליות ("10 דברים ש..."), וסיפורים שכבר ידועים לכולם. אחד כתבות על אותו נושא. severity תמיד low, israel: true רק אם יש קשר ישיר לישראל.
-עדיף רשימה ריקה. החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+עדיף רשימה ריקה. urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
+החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","urgency":3,"special":3,"israel":false}]}   ואם אין: {"picks":[]}"""
 
 WRITE_FACTS = WRITE_NEWS.replace("אתה כתב בכיר בערוץ חדשות ישראלי מוביל", "אתה כותב בכיר במדור ידע ותגליות של ערוץ חדשות ישראלי מוביל") + """
 
@@ -592,7 +605,7 @@ def fetch_and_propose(st, topic):
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
-        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic)
+        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3))
         st["pending"][pid] = {
             "text": p["text"],
             "links": links,
