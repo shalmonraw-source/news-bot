@@ -59,6 +59,24 @@ def _wrap(draw, text, font, max_w):
 
 
 # --------------------------------------------------------------- commons
+AVIATION = re.compile(r"(aircraft|airplane|aeroplane|airliner|helicopter|boeing|airbus|embraer|atr|bombardier|cessna|jet|airline|airways|airport|aviation|avion|cargo|flight)", re.I)
+STOP = {"the", "and", "for", "with", "from", "airlines", "aircraft"}
+
+
+def _relevance(page, query):
+    """ציון התאמה: חייב להיות קשור לתעופה וחייב להכיל לפחות חצי ממילות החיפוש הייחודיות."""
+    info = (page.get("imageinfo") or [{}])[0]
+    desc = _strip(info.get("extmetadata", {}).get("ImageDescription", {}).get("value"))
+    cats = " ".join(c.get("title", "") for c in page.get("categories", []))
+    hay = f'{page.get("title", "")} {desc} {cats}'.lower()
+    if not AVIATION.search(hay):
+        return 0
+    toks = [t for t in re.findall(r"[a-z0-9]+", query.lower()) if len(t) >= 3 and t not in STOP]
+    if not toks:
+        return 1
+    hits = sum(1 for t in toks if t in hay)
+    return hits if hits >= max(1, (len(toks) + 1) // 2) else 0
+
 def _strip(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
@@ -70,12 +88,17 @@ def commons_photo(query):
     params = {
         "action": "query", "format": "json", "generator": "search",
         "gsrsearch": f"{query} filetype:bitmap", "gsrnamespace": 6, "gsrlimit": 20,
-        "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1600,
+        "prop": "imageinfo|categories", "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1600, "cllimit": "max",
     }
     r = requests.get("https://commons.wikimedia.org/w/api.php", params=params, headers={"User-Agent": UA}, timeout=25)
     r.raise_for_status()
     pages = sorted((r.json().get("query", {}).get("pages", {})).values(), key=lambda p: p.get("index", 99))
+    scored = []
     for p in pages:
+        scored.append((_relevance(p, query), p.get("index", 99), p))
+    scored = [x for x in scored if x[0] > 0]
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    for _, _, p in scored:
         info = (p.get("imageinfo") or [{}])[0]
         meta = info.get("extmetadata", {})
         lic = _strip(meta.get("LicenseShortName", {}).get("value"))
