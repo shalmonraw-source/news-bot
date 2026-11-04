@@ -39,6 +39,7 @@ jobs:
           MODE: ${{ inputs.mode || 'run' }}
           ONLY_TOPIC: ${{ inputs.topic }}
           DECISION: ${{ inputs.decision }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
           FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
           FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

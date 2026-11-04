@@ -164,6 +164,23 @@ def apply_decision(st, decision):
     return True
 
 
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL") or "https://mer5.shalmonraw.workers.dev"
+
+
+def ensure_webhook():
+    """מחבר מחדש את ה-webhook לטלגרם אם הוא נעלם. פועל רק אם הוגדר WEBHOOK_SECRET ב-GitHub."""
+    secret = os.environ.get("WEBHOOK_SECRET")
+    if not secret:
+        return
+    try:
+        if webhook_active():
+            return
+        tg("setWebhook", url=WEBHOOK_URL, secret_token=secret, allowed_updates=["callback_query"])
+        print("webhook was missing: restored")
+    except Exception as e:  # noqa: BLE001
+        print("warn: ensure_webhook", type(e).__name__, str(e)[:120])
+
+
 def webhook_active():
     try:
         return bool(tg("getWebhookInfo").get("url"))
@@ -638,6 +655,7 @@ def main():
     font = os.environ.get("FONT_NAME") or load_settings().get("font")
     if font and not imgcard.use_font(font):
         print("font unavailable, using default:", font)
+    ensure_webhook()
     st = load_state()
     if mode == "test":
         pid = "test" + str(int(time.time()))[-6:]
