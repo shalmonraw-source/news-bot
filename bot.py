@@ -535,7 +535,7 @@ def build_posts(cands, topic="aviation"):
                 print("review fixes:", rev["issues"])
             pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL)
             text = (pol.get("text") or text).strip()
-            posts.append({**pk, "text": clean_hebrew(text)})
+            posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
             print("story failed:", type(e).__name__, str(e)[:200])
     return posts
