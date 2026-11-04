@@ -463,8 +463,23 @@ def fetch_and_propose(st):
 
 
 # ----------------------------------------------------------------- main
+def load_settings():
+    try:
+        with open("settings.json", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "run"
+    if mode == "fonts":
+        done = imgcard.font_sheet("/tmp/fonts.jpg")
+        tg_photo("/tmp/fonts.jpg", "🔤 גופנים לבחירה:\n" + "\n".join(f"{n}. {name}" for n, name in done) + "\n\nכתוב לי את המספר או השם.")
+        return
+    font = os.environ.get("FONT_NAME") or load_settings().get("font")
+    if font and not imgcard.use_font(font):
+        print("font unavailable, using default:", font)
     st = load_state()
     if mode == "test":
         pid = "test" + str(int(time.time()))[-6:]

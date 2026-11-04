@@ -24,9 +24,66 @@ except Exception:  # noqa: BLE001
     get_display = None
 
 
-def _font(size):
-    path = FONT_BOLD if os.path.exists(FONT_BOLD) else FONT_FALLBACK
-    return ImageFont.truetype(path, size)
+G = "https://raw.githubusercontent.com/google/fonts/main/ofl/"
+# שם -> (כתובת, האם גופן משתנה)
+FONTS = {
+    "Heebo": (G + "heebo/Heebo%5Bwght%5D.ttf", True),
+    "Assistant": (G + "assistant/Assistant%5Bwght%5D.ttf", True),
+    "Rubik": (G + "rubik/Rubik%5Bwght%5D.ttf", True),
+    "Frank Ruhl Libre": (G + "frankruhllibre/FrankRuhlLibre%5Bwght%5D.ttf", True),
+    "Secular One": (G + "secularone/SecularOne-Regular.ttf", False),
+    "Suez One": (G + "suezone/SuezOne-Regular.ttf", False),
+    "Alef": (G + "alef/Alef-Bold.ttf", False),
+    "Miriam Libre": (G + "miriamlibre/MiriamLibre%5Bwght%5D.ttf", True),
+    "Noto Sans Hebrew": (G + "notosanshebrew/NotoSansHebrew%5Bwdth%2Cwght%5D.ttf", True),
+}
+_CURRENT = {"name": None}
+
+
+def _slug(name):
+    return re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+
+
+def ensure_font(name, folder="fonts"):
+    """מוריד את הגופן אם חסר ומחזיר נתיב, או None אם נכשל."""
+    if name not in FONTS:
+        return None
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, _slug(name) + ".ttf")
+    if not os.path.exists(path):
+        r = requests.get(FONTS[name][0], headers={"User-Agent": UA}, timeout=40)
+        if r.status_code != 200 or len(r.content) < 5000:
+            return None
+        with open(path, "wb") as f:
+            f.write(r.content)
+    return path
+
+
+def use_font(name, folder="fonts"):
+    try:
+        path = ensure_font(name, folder)
+    except Exception:  # noqa: BLE001
+        path = None
+    _CURRENT["name"] = name if path else None
+    _CURRENT["path"] = path
+    return bool(path)
+
+
+def _font(size, path=None, variable=None):
+    path = path or _CURRENT.get("path") or (FONT_BOLD if os.path.exists(FONT_BOLD) else FONT_FALLBACK)
+    f = ImageFont.truetype(path, size)
+    name = _CURRENT.get("name")
+    is_var = FONTS[name][1] if (name in FONTS and path == _CURRENT.get("path")) else False
+    if variable is not None:
+        is_var = variable
+    if is_var:
+        try:
+            axes = f.get_variation_axes()
+            vals = [700 if a.get("name") in (b"Weight", "Weight") or i == 0 else a.get("default", a["minimum"]) for i, a in enumerate(axes)]
+            f.set_variation_by_axes(vals)
+        except Exception:  # noqa: BLE001
+            pass
+    return f
 
 
 def _shape(text):
@@ -187,3 +244,30 @@ def render_card(title, out_path, photo=None, credit=None):
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     out.save(out_path, "JPEG", quality=90)
     return out_path
+
+
+def font_sheet(out_path, folder="fonts_cache"):
+    """דף השוואה של כל הגופנים עם אותה כותרת. מחזיר רשימת (מספר, שם) שנטענו בהצלחה."""
+    title = "תייר נהרג בהתנגשות שני מסוקים מעל מנחת בגובה 4,200 מטר בנפאל"
+    cell_w, cell_h, cols = 540, 675, 2
+    done = []
+    cells = []
+    for name in FONTS:
+        if not use_font(name, folder):
+            continue
+        p = f"/tmp/_font_{_slug(name)}.jpg"
+        render_card(title, p)
+        im = Image.open(p).resize((cell_w, cell_h), Image.LANCZOS)
+        d = ImageDraw.Draw(im)
+        n = len(done) + 1
+        d.rectangle([0, 0, 190, 42], fill=(0, 0, 0))
+        d.text((10, 8), f"{n}. {name}", font=ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 22), fill=(255, 255, 255))
+        cells.append(im)
+        done.append((n, name))
+    rows = (len(cells) + cols - 1) // cols
+    sheet = Image.new("RGB", (cell_w * cols, cell_h * rows), (0, 0, 0))
+    for i, im in enumerate(cells):
+        sheet.paste(im, ((i % cols) * cell_w, (i // cols) * cell_h))
+    sheet.save(out_path, "JPEG", quality=88)
+    _CURRENT.update({"name": None, "path": None})
+    return done
