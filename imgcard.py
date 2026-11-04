@@ -181,6 +181,28 @@ def commons_photo(query, aviation=True):
 
 
 # ------------------------------------------------------------------ logo
+
+_FIVE = [(-22, -44), (26, -44), (26, -27), (-5, -27), (-5, -12), (8, -12), (26, 6), (26, 32), (10, 48),
+         (-26, 48), (-26, 31), (5, 31), (9, 27), (9, 11), (5, 7), (-22, 7)]
+
+
+def _five(d, cx, cy, h, col):
+    """ספרה 5 גאומטרית בעיצוב מותאם: פינות חתוכות וקווים אחידים, ללא גופן. h = גובה הספרה."""
+    k = h / 92.0
+    d.polygon([(cx + x * k, cy + y * k) for x, y in _FIVE], fill=col)
+
+
+def _wordmark(d, x, y_mid, cap_h, text_col, accent, font):
+    """MER בגופן + ה-5 המעוצב, מיושרים לגובה אותיות הקידמה."""
+    d.text((x, y_mid), "MER", font=font, fill=text_col, anchor="lm")
+    wm = d.textlength("MER", font=font)
+    bb = d.textbbox((x, y_mid), "M", font=font, anchor="lm")
+    cap_h = bb[3] - bb[1]
+    k = cap_h / 92.0
+    _five(d, x + wm + 8 + 26 * k, (bb[1] + bb[3]) / 2, cap_h, accent)
+    return wm + 6 + 52 * k
+
+
 def logo_mark(size, rgb=(255, 255, 255), alpha=255):
     """סמל MER5: כוונת רדאר עם הספרה 5 במרכז. מצויר בהגדלה פי 4 ומוקטן לחלקות."""
     S = 4
@@ -198,8 +220,7 @@ def logo_mark(size, rgb=(255, 255, 255), alpha=255):
         x0, y0 = c + dx * (r - n * 0.09), c + dy * (r - n * 0.09)
         x1, y1 = c + dx * (r + n * 0.07), c + dy * (r + n * 0.07)
         d.line([(x0, y0), (x1, y1)], fill=col, width=tw)
-    f = ImageFont.truetype(FONT_BOLD if os.path.exists(FONT_BOLD) else FONT_FALLBACK, int(n * 0.44))
-    d.text((c, c + n * 0.015), "5", font=f, fill=col, anchor="mm")
+    _five(d, c, c, n * 0.40, col)
     im = im.resize((size, size), Image.LANCZOS)
     if alpha < 255:
         a = im.getchannel("A").point(lambda v: v * alpha // 255)
@@ -219,13 +240,12 @@ def logo_lockup(height=160, mark_rgb=(255, 255, 255), text_rgb=(255, 255, 255), 
     sp = height * 0.02
     tw = sum(probe.textlength(ch, font=tf) + sp for ch in tag)
     gap = int(height * 0.14)
-    total_w = int(height + gap + max(wmer + w5, tw if tagline else 0))
+    total_w = int(height + gap + max(wmer + w5 + 12, tw if tagline else 0))
     out = Image.new("RGBA", (total_w + 8, height), bg or (0, 0, 0, 0))
     out.alpha_composite(m, (0, 0))
     d = ImageDraw.Draw(out)
     ty = height * (0.40 if tagline else 0.5)
-    d.text((height + gap, ty), "MER", font=f, fill=tuple(text_rgb) + (255,), anchor="lm")
-    d.text((height + gap + wmer, ty), "5", font=f, fill=tuple(accent) + (255,), anchor="lm")
+    _wordmark(d, height + gap, ty, height * 0.44, tuple(text_rgb) + (255,), tuple(accent) + (255,), f)
     if tagline:
         x = height + gap
         for ch in tag:
@@ -234,22 +254,10 @@ def logo_lockup(height=160, mark_rgb=(255, 255, 255), text_rgb=(255, 255, 255), 
     return out
 
 
-def _watermark(canvas, x, y, size=62, shadow=True):
-    """סימן מים: סמל + MER5 בפינת התמונה, לבן שקוף למחצה עם צל עדין לקריאות."""
-    mark = logo_mark(size, (255, 255, 255), 215)
-    f = ImageFont.truetype(FONT_BOLD if os.path.exists(FONT_BOLD) else FONT_FALLBACK, int(size * 0.55))
-    layer = Image.new("RGBA", (size * 4, size), (0, 0, 0, 0))
-    ld = ImageDraw.Draw(layer)
-    if shadow:
-        sh = Image.new("RGBA", layer.size, (0, 0, 0, 0))
-        sh.paste((0, 0, 0, 120), (0, 0), Image.new("L", mark.size, 0))
-        sd = ImageDraw.Draw(sh)
-        sd.text((size + 14 + 2, size // 2 + 2), "MER5", font=f, fill=(0, 0, 0, 130), anchor="lm")
-        layer = Image.alpha_composite(layer, sh)
-        ld = ImageDraw.Draw(layer)
-    layer.alpha_composite(mark, (0, 0))
-    ld.text((size + 14, size // 2), "MER5", font=f, fill=(255, 255, 255, 215), anchor="lm")
-    canvas.paste(layer, (x, y), layer)
+def _watermark(canvas, x, y, size=44, shadow=False):
+    """סימן מים עדין: הסמל בלבד, קטן ושקוף בפינת התמונה."""
+    mark = logo_mark(size, (255, 255, 255), 120)
+    canvas.paste(mark, (x, y), mark)
 
 # ----------------------------------------------------------------- render
 def _cover(img, w, h):
@@ -314,8 +322,7 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     # --- שורת מותג עליונה
     canvas.paste(logo_mark(64, accent), (m, 56), logo_mark(64, accent))
     bf = _font(46)
-    d.text((m + 80, 88), "MER", font=bf, fill=WHITE, anchor="lm")
-    d.text((m + 80 + d.textlength("MER", font=bf), 88), "5", font=bf, fill=accent, anchor="lm")
+    _wordmark(d, m + 80, 88, 40, WHITE, accent, bf)
     tf = _font(30)
     tag = label or PAGE_TAG
     tw = _width(d, tag, tf)
@@ -348,7 +355,7 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     ImageDraw.Draw(mask).rounded_rectangle([0, 0, pw, phh], radius=22, fill=255)
     canvas.paste(im, (ph_box[0], ph_box[1]), mask)
     if photo is not None:
-        _watermark(canvas, ph_box[0] + 30, ph_box[3] - 62 - 30)
+        _watermark(canvas, ph_box[2] - 30 - 44, ph_box[1] + 28)
     else:
         big = logo_mark(330, accent, 40)
         canvas.paste(big, (ph_box[0] + pw // 2 - 165, ph_box[1] + phh // 2 - 165), big)
