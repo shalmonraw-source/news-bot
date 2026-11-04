@@ -15,7 +15,24 @@ async function tg(env, method, payload) {
   return r.json();
 }
 
+async function dispatch(env, inputs) {
+  return fetch(`https://api.github.com/repos/${env.GH_REPO}/actions/workflows/bot.yml/dispatches`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${env.GH_TOKEN}`,
+      accept: "application/vnd.github+json",
+      "user-agent": "mer5-worker",
+      "x-github-api-version": "2022-11-28",
+    },
+    body: JSON.stringify({ ref: "main", inputs }),
+  });
+}
+
 export default {
+  // Cron Trigger (כל 5 דקות): מפעיל סריקה ופרסום מהתור, אמין יותר מה-cron של GitHub
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(dispatch(env, { mode: "run" }));
+  },
   async fetch(request, env, ctx) {
     if (request.method !== "POST") return new Response("MER5 ok");
     if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.WEBHOOK_SECRET) {
@@ -30,20 +47,21 @@ export default {
     }
     const data = cq.data || "";
     const [action] = data.split(":");
-    if (action !== "a" && action !== "r") return new Response("ok");
-    const approve = action === "a";
+    if (!["a", "r", "n", "q"].includes(action)) return new Response("ok");
+    const approve = action !== "r";
+    const label = { a: "מתפרסם עכשיו 🚀", n: "מתפרסם עכשיו 🚀", q: "נוסף לתור ➕", r: "נדחה ❌" }[action];
 
     // 1) תגובה מיידית בטלגרם
     await tg(env, "answerCallbackQuery", {
       callback_query_id: cq.id,
-      text: approve ? "אושר ✅ מתפרסם..." : "נדחה ❌",
+      text: label,
     });
     const msg = cq.message || {};
     if (msg.message_id) {
       await tg(env, "editMessageText", {
         chat_id: msg.chat.id,
         message_id: msg.message_id,
-        text: ((msg.text || "") + "\n\n— " + (approve ? "אושר ✅ מתפרסם עכשיו" : "נדחה ❌")).slice(0, 4000),
+        text: ((msg.text || "") + "\n\n— " + label).slice(0, 4000),
         link_preview_options: { is_disabled: true },
       });
     }

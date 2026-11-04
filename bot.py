@@ -41,6 +41,8 @@ def load_state():
     st.setdefault("seen", [])
     st.setdefault("pending", {})
     st.setdefault("approved", [])
+    st.setdefault("queue", [])
+    st.setdefault("slots_done", {})
     st.setdefault("offset", 0)
     st.setdefault("daily", {"date": "", "count": {}})
     legacy = {"mideast": "security", "world": "politics"}
@@ -56,7 +58,7 @@ def save_state(st):
     st["approved"] = st["approved"][-300:]
     cutoff = time.time() - PENDING_TTL_DAYS * 86400
     st["pending"] = {k: v for k, v in st["pending"].items() if v.get("ts", 0) > cutoff}
-    keep = {os.path.basename(x["image"]) for x in list(st["pending"].values()) + st["approved"] if x.get("image")}
+    keep = {os.path.basename(x["image"]) for x in list(st["pending"].values()) + st["approved"] + st["queue"] if x.get("image")}
     if os.path.isdir("images"):
         for fn in os.listdir("images"):
             if fn.endswith(".jpg") and fn not in keep:
@@ -117,9 +119,10 @@ def keyboard(pid):
     return {
         "inline_keyboard": [
             [
-                {"text": "✅ אשר", "callback_data": f"a:{pid}"},
-                {"text": "❌ דחה", "callback_data": f"r:{pid}"},
-            ]
+                {"text": "🚀 העלה עכשיו", "callback_data": f"n:{pid}"},
+                {"text": "➕ הוסף לתור", "callback_data": f"q:{pid}"},
+            ],
+            [{"text": "❌ דחה", "callback_data": f"r:{pid}"}],
         ]
     }
 
@@ -147,7 +150,20 @@ def apply_decision(st, decision):
     if item is None:
         print("decision: item already handled or expired:", pid)
         return False
-    if action == "a":
+    if action == "q":
+        st["queue"].append(
+            {
+                "id": pid,
+                "text": item["text"],
+                "links": item["links"],
+                "severity": item.get("severity"),
+                "image": item.get("image"),
+                "credit": item.get("credit"),
+                "queued_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "published": False,
+            }
+        )
+    elif action in ("a", "n"):
         st["approved"].append(
             {
                 "id": pid,
@@ -642,6 +658,31 @@ def publish_approved(st):
             tg("sendMessage", chat_id=_chat_id(), text="⚠️ הפרסום לפייסבוק נכשל: " + (str(e)[:150] if isinstance(e, RuntimeError) else type(e).__name__))
 
 
+def publish_queue(st):
+    """מפרסם פוסט אחד מהתור בכל חלון זמן מוגדר (settings.json: slots, tz). חלון פעיל עד 60 דקות אחרי השעה."""
+    cfg = load_settings()
+    slots = cfg.get("slots") or ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00", "22:00"]
+    try:
+        from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo(cfg.get("tz", "Asia/Jerusalem")))
+    except Exception:  # noqa: BLE001
+        now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    st["slots_done"] = {today: st["slots_done"].get(today, [])}
+    if not st["queue"]:
+        return
+    mins = now.hour * 60 + now.minute
+    due = [s for s in slots if 0 <= mins - (int(s[:2]) * 60 + int(s[3:])) < 60 and s not in st["slots_done"][today]]
+    if not due:
+        return
+    item = st["queue"].pop(0)
+    item["approved_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    st["approved"].append(item)
+    for s in due:
+        st["slots_done"][today].append(s)
+    publish_approved(st)
+
+
 # ----------------------------------------------------------------- main
 def load_settings():
     try:
@@ -689,6 +730,7 @@ def main():
         try:
             apply_decision(st, os.environ.get("DECISION", ""))
             publish_approved(st)
+            publish_queue(st)
         finally:
             save_state(st)
         return
@@ -698,6 +740,7 @@ def main():
         process_updates(st)
         try:
             publish_approved(st)
+            publish_queue(st)
             for topic in load_topics():
                 if os.environ.get("ONLY_TOPIC") and topic != os.environ["ONLY_TOPIC"]:
                     continue
