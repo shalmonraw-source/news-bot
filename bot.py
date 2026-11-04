@@ -265,7 +265,7 @@ REVIEW_SYSTEM = """אתה עורך לשון ובודק עובדות. תקבל ח
 החזר JSON בלבד: {"text":"הנוסח הסופי","issues":["תיאור קצר של כל תיקון עובדתי שנעשה"]}"""
 
 
-def claude_json(system, user, model, max_tokens=1500):
+def claude_text(system, user, model, max_tokens=3000):
     import anthropic
 
     client = anthropic.Anthropic()
@@ -275,11 +275,20 @@ def claude_json(system, user, model, max_tokens=1500):
         system=system,
         messages=[{"role": "user", "content": user}],
     )
-    raw = "".join(b.text for b in resp.content if b.type == "text")
+    return "".join(b.text for b in resp.content if b.type == "text")
+
+
+def claude_json(system, user, model, max_tokens=3000):
+    raw = claude_text(system, user, model, max_tokens)
     a, b = raw.find("{"), raw.rfind("}")
     if a < 0 or b < 0:
-        raise ValueError("לא התקבל JSON")
-    return json.loads(raw[a : b + 1])
+        print("no JSON in reply, start of reply:", raw[:200].replace("\n", " "))
+        return {"_raw": raw}
+    try:
+        return json.loads(raw[a : b + 1])
+    except json.JSONDecodeError:
+        print("bad JSON in reply, start of reply:", raw[:200].replace("\n", " "))
+        return {"_raw": raw}
 
 
 def fetch_article(url):
@@ -317,18 +326,24 @@ def story_material(cands, idxs):
 
 def build_posts(cands):
     lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
-    picks = parse_picks(claude_json(SELECT_SYSTEM, "\n\n".join(lines), MODEL, 800), len(cands))
+    picks = parse_picks(claude_json(SELECT_SYSTEM, "\n\n".join(lines), MODEL, 2000), len(cands))
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
-        material = story_material(cands, pk["idxs"])
-        draft = (claude_json(WRITE_SYSTEM, material, WRITER_MODEL, 1200).get("text") or "").strip()
-        if not draft:
-            continue
-        rev = claude_json(REVIEW_SYSTEM, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL, 1200)
-        text = (rev.get("text") or draft).strip()
-        if rev.get("issues"):
-            print("review fixes:", rev["issues"])
-        posts.append({**pk, "text": text})
+        try:
+            material = story_material(cands, pk["idxs"])
+            w = claude_json(WRITE_SYSTEM, material, WRITER_MODEL)
+            draft = (w.get("text") or "").strip()
+            if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
+                draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
+            if not draft:
+                continue
+            rev = claude_json(REVIEW_SYSTEM, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL)
+            text = (rev.get("text") or draft).strip()
+            if rev.get("issues"):
+                print("review fixes:", rev["issues"])
+            posts.append({**pk, "text": text})
+        except Exception as e:  # noqa: BLE001
+            print("story failed:", type(e).__name__, str(e)[:200])
     return posts
 
 
