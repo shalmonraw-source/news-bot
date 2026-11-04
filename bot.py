@@ -98,7 +98,7 @@ def send_proposal(pid, text, links, severity, n_sources, israel=False):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
-    msg = f"✈️ הצעה לפוסט\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links)
+    msg = f"✈️ הצעה לפוסט\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + "\n\n⏳ הלחיצה נרשמת בתוך עד 10 דקות"
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
@@ -214,61 +214,121 @@ def fetch_candidates(st):
 
 
 # --------------------------------------------------------------- claude
-SYSTEM = """אתה עורך ראשי של עמוד חדשות תעופה פופולרי בעברית, לקהל ישראלי רחב (לא רק חובבי תעופה).
-תקבל רשימת ידיעות (כותרת, תקציר, מקור). המטרה: פוסטים שאנשים ירצו לקרוא, לשתף ולעקוב אחריהם.
+WRITER_MODEL = os.environ.get("WRITER_MODEL", "claude-opus-5-5")
+
+SELECT_SYSTEM = """אתה עורך ראשי של עמוד חדשות תעופה פופולרי בעברית, לקהל ישראלי רחב (לא רק חובבי תעופה).
+תקבל רשימת ידיעות (כותרת, תקציר, מקור). בחר רק סיפורים שאנשים ירצו לקרוא, לשתף ולעקוב אחריהם.
 
 מה לבחור (רק אם יש בזה משהו באמת יוצא דופן):
 - תקריות ואירועים דרמטיים או מוזרים: נחיתות חירום, תקלות חריגות, כמעט-התנגשויות, מקרים נדירים, שיבושים גדולים.
 - מקרים עם "וואו": שיאים, סיפורים אנושיים, פרטים מפתיעים, ציוד חריג.
-- קשר ישראלי חזק: אל על, ישראייר, ארקיע, נתב"ג, ישראלים שנתקעו, קווים לישראל, סגירות מרחב אווירי באזור. אירוע כזה מקבל עדיפות.
+- קשר ישראלי חזק: אל על, ישראייר, ארקיע, נתב"ג, ישראלים שנתקעו, קווים לישראל, סגירות מרחב אווירי באזור. קודם כל.
 מה לדלג עליו תמיד: הזמנות מטוסים, דוחות כספיים, מינויים, מגעים עסקיים, פתיחת קווים שגרתית, כתבות דעה ורשימות,
-פרסומות, ופעילות צבאית או ביטחונית עם פרטי מיקום או מבצעים. עדיף להחזיר רשימה ריקה מאשר פוסט בינוני.
+פרסומות, ופעילות צבאית או ביטחונית עם פרטי מיקום או מבצעים. עדיף רשימה ריקה מסיפור בינוני.
 
-סגנון הכתיבה (קריטי):
-- עברית רהוטה וטבעית, כמו עיתונאי אנושי ושנון. לא תרגום מילולי מאנגלית, לא סגנון של בוט או הודעה לעיתונות.
-- שורה ראשונה: כותרת קצרה וחדה שמסקרנת בלי לשקר (פרט קונקרטי ולא סיסמה). אחריה 2-4 משפטים קצרים בקצב טוב.
-- פתח בדבר המעניין ביותר. הוסף פרט אחד מפתיע או הקשר שמסביר למה זה חשוב.
-- אפשר לסיים במשפט שמשאיר את הקורא עם מחשבה או מתח, אבל רק אם הוא נשען על עובדה מהידיעה.
-- בלי "דווח כי" בכל משפט: השתמש בו רק פעם אחת כשהאירוע לא מאושר. בלי קלישאות ("בעולם התעופה", "הערב", "שוב").
-- עד 450 תווים. אימוג'י אחד לכל היותר, רק בכותרת ורק אם זה מוסיף. בלי האשטגים ובלי קישורים בטקסט.
-
-דיוק (לא מתפשרים): להסתמך אך ורק על מה שכתוב בידיעות. לא להוסיף פרטים, מספרים, סיבות או נפגעים שלא נכתבו.
-אם כמה ידיעות עוסקות באותו אירוע, אחד לפוסט אחד וציין את כל האינדקסים ב-idxs.
+אם כמה ידיעות עוסקות באותו אירוע, אחד אותן ל-pick אחד (כל האינדקסים ב-idxs).
 severity: high לאירוע חירום או סכנה, medium לתקלה או שיבוש משמעותי, low לשאר. israel: true אם יש קשר ישראלי ישיר.
+החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
 
-החזר JSON בלבד, בלי טקסט נוסף:
-{"posts":[{"idxs":[0,3],"text":"...","severity":"low","israel":false}]}
-אם אין שום דבר ראוי: {"posts":[]}"""
+WRITE_SYSTEM = """אתה כתב תעופה ותיק בעיתון ישראלי גדול, שכותב לעמוד פייסבוק עם מאות אלפי עוקבים.
+תקבל חומר גלם באנגלית או בעברית על אירוע אחד. כתוב פוסט עשיר ומובן, כזה שאדם שלא מבין בתעופה יסיים אותו ויגיד "לא ידעתי את זה".
+
+מבנה (כ-700-1000 תווים):
+1. כותרת של 5-10 מילים עם פרט קונקרטי ומפתיע. לא סיסמה. אימוג'י אחד לכל היותר.
+2. הסיפור: מה קרה, איפה, מתי, למי, ומה עשו. כל הפרטים החשובים מהחומר: מספרים, שעות, סוג המטוס, החברה, המסלול, התוצאה.
+3. "מה זה אומר": פסקה של 2-3 משפטים שמסבירה בשפה פשוטה את המונחים והמנגנון (למשל למה מטוס נחת דווקא שם, מה זה אומר קוד חירום, איך נראית פרוצדורה כזו), ומה המסקנה לנוסעים או לענף.
+4. שורה אחרונה שמגדילה את הראש: זווית רחבה, השוואה, או שאלה שגורמת לקורא לחשוב. היא נשענת על עובדות ולא על ספקולציה.
+
+הבחנה חשובה: עובדות על האירוע מגיעות רק מהחומר. הסברים כלליים על איך התעופה עובדת (נהלים, מונחים, טכנולוגיה מבוססת)
+מותר להוסיף מהידע הכללי שלך, כל עוד הם מוסכמים ולא מכילים מספרים או טענות ספציפיות על האירוע. אל תנחש סיבות לתקלה או לתאונה.
+
+שפה: עברית טבעית ורהוטה, בגובה העיניים, משפטים של עד 20 מילים, פעלים פעילים. אסור תרגום מילולי מאנגלית וסגנון של הודעה לעיתונות.
+מונחים: מנחת, המראה, נחיתה, נחיתת חירום, תא הטייס, צוות הדיילים, מגדל הפיקוח, מסלול, מטוס נוסעים, מסוק.
+בלי קלישאות ("בעולם התעופה", "הערב", "שוב"), בלי "דווח כי" יותר מפעם אחת, בלי האשטגים וקישורים, ובלי סעיפים ממוספרים בטקסט עצמו.
+אירוע שלא אושר מנוסח בזהירות ("לפי הדיווחים"). מספרים ושמות בדיוק כפי שבחומר.
+
+דוגמה לסגנון בלבד (העובדות בדויות, אל תשתמש בהן):
+נחיתת חירום בלי גלגל קדמי
+
+טייסת של מטוס נוסעים עם 96 נוסעים דיווחה למגדל הפיקוח על תקלה במנגנון ההנחתה זמן קצר אחרי ההמראה. היא חגה מעל המסלול שעה שלמה כדי לשרוף דלק, ואז נחתה על שני הגלגלים הראשיים בלבד. האף החליק על המסלול, והנוסעים יצאו במגלשות חירום. כולם בריאים.
+
+למה הטייסים שרפו דלק לפני הנחיתה? מטוס קל יותר נוחת לאט יותר, והסיכוי לשריפה בחיכוך עם המסלול קטן. זו פרוצדורה סטנדרטית, והיא מתורגלת בסימולטור שוב ושוב.
+
+הנחיתה הזו נראית מפחידה, אבל היא בדיוק הסיבה שטייסים מקבלים הכשרה כל חצי שנה. מתי בפעם האחרונה חשבתם על מה קורה אחרי שהמטוס נוחת?
+
+החזר JSON בלבד: {"text":"..."}"""
+
+REVIEW_SYSTEM = """אתה עורך לשון ובודק עובדות. תקבל חומר גלם ואת הטיוטה של פוסט בעברית.
+1. בדוק כל עובדה, מספר, שם ושעה בטיוטה מול החומר. פרט שלא מופיע בחומר חייב להימחק.
+2. תקן עברית ובדוק שההסברים הכלליים נכונים ומקובלים (אחרת מחק אותם): ניסוח מתורגם, מילים לא מדויקות, תחביר מגושם, פעלים סבילים מיותרים, ובעיות במינוח תעופתי.
+3. שמור על המבנה, העומק והסקרנות, ואל תקצר את הפוסט. הסברים כלליים על איך התעופה עובדת מותרים, אבל פרטים ספציפיים על האירוע חייבים להיות מהחומר. עד 1100 תווים.
+החזר JSON בלבד: {"text":"הנוסח הסופי","issues":["תיאור קצר של כל תיקון עובדתי שנעשה"]}"""
 
 
-def ask_claude(cands):
+def claude_json(system, user, model, max_tokens=1500):
     import anthropic
 
-    lines = []
-    for i, c in enumerate(cands):
-        lines.append(f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}')
     client = anthropic.Anthropic()
     resp = client.messages.create(
-        model=MODEL,
-        max_tokens=3000,
-        system=SYSTEM,
-        messages=[{"role": "user", "content": "\n\n".join(lines)}],
+        model=model,
+        max_tokens=max_tokens,
+        system=system,
+        messages=[{"role": "user", "content": user}],
     )
-    return parse_posts("".join(b.text for b in resp.content if b.type == "text"), len(cands))
-
-
-def parse_posts(raw, n):
+    raw = "".join(b.text for b in resp.content if b.type == "text")
     a, b = raw.find("{"), raw.rfind("}")
     if a < 0 or b < 0:
         raise ValueError("לא התקבל JSON")
-    data = json.loads(raw[a : b + 1])
-    posts = []
-    for p in data.get("posts", []):
+    return json.loads(raw[a : b + 1])
+
+
+def fetch_article(url):
+    """מנסה להביא את גוף הכתבה. מחזיר מחרוזת ריקה אם לא הצליח (למשל קישורי Google News)."""
+    try:
+        r = requests.get(url, headers={"User-Agent": UA}, timeout=15)
+        if r.status_code != 200 or "html" not in r.headers.get("content-type", ""):
+            return ""
+        body = re.sub(r"(?is)<(script|style|nav|footer|header|aside).*?</\1>", " ", r.text)
+        paras = [strip_html(x) for x in re.findall(r"(?is)<p[^>]*>(.*?)</p>", body)]
+        text = " ".join(p for p in paras if len(p) > 60)
+        return text[:4000] if len(text) > 300 else ""
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def parse_picks(data, n):
+    picks = []
+    for p in data.get("picks", []):
         idxs = [i for i in p.get("idxs", []) if isinstance(i, int) and 0 <= i < n]
-        text = (p.get("text") or "").strip()
-        if idxs and text:
+        if idxs:
             sev = p.get("severity") if p.get("severity") in ("low", "medium", "high") else "low"
-            posts.append({"idxs": sorted(set(idxs)), "text": text, "severity": sev, "israel": bool(p.get("israel"))})
+            picks.append({"idxs": sorted(set(idxs)), "severity": sev, "israel": bool(p.get("israel"))})
+    return picks
+
+
+def story_material(cands, idxs):
+    parts = []
+    for i in idxs:
+        c = cands[i]
+        art = fetch_article(c["link"])
+        parts.append(f'מקור: {c["source"]}\nכותרת: {c["title"]}\nתקציר: {c["summary"]}\n' + (f"גוף הכתבה: {art}" if art else ""))
+    return "\n\n---\n\n".join(parts)
+
+
+def build_posts(cands):
+    lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
+    picks = parse_picks(claude_json(SELECT_SYSTEM, "\n\n".join(lines), MODEL, 800), len(cands))
+    posts = []
+    for pk in picks[:MAX_POSTS_PER_RUN]:
+        material = story_material(cands, pk["idxs"])
+        draft = (claude_json(WRITE_SYSTEM, material, WRITER_MODEL, 1200).get("text") or "").strip()
+        if not draft:
+            continue
+        rev = claude_json(REVIEW_SYSTEM, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL, 1200)
+        text = (rev.get("text") or draft).strip()
+        if rev.get("issues"):
+            print("review fixes:", rev["issues"])
+        posts.append({**pk, "text": text})
     return posts
 
 
@@ -277,7 +337,7 @@ def fetch_and_propose(st):
     print(f"candidates: {len(cands)}")
     if not cands:
         return
-    posts = ask_claude(cands)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
+    posts = build_posts(cands)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     if st["daily"]["date"] != today:
         st["daily"] = {"date": today, "count": 0}
