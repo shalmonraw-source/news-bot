@@ -344,6 +344,9 @@ def _brackets(d, box, color, ln=54, wd=7):
 def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label=""):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
     accent = tuple(color)
+    import re as _re
+    title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")  # גרשיים תקינים: נתב״ג, צה״ל
+    title = _re.sub(r"(?<=[\u05d0-\u05ea])'(?=\s|$|[,.:])", "\u05f3", title)  # גרש תקין: ג׳ורג׳
     canvas = _pattern(accent)
     d = ImageDraw.Draw(canvas)
     m = 56
