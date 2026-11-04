@@ -182,8 +182,9 @@ def commons_photo(query, aviation=True):
 
 # ------------------------------------------------------------------ logo
 
-_FIVE = [(-22, -44), (26, -44), (26, -27), (-5, -27), (-5, -12), (8, -12), (26, 6), (26, 32), (10, 48),
-         (-26, 48), (-26, 31), (5, 31), (9, 27), (9, 11), (5, 7), (-22, 7)]
+_FIVE = [(-24, -46), (24, -46), (24, -29), (-7, -29), (-7, -14), (6, -14), (24, 4), (24, 30), (8, 46),
+         (-24, 46), (-24, 29), (3, 29), (7, 25), (7, 9), (3, 5), (-24, 5)]
+# הקצה השמאלי של הגזע והקו התחתון על אותו קו (x=-24); הצורה כולה ממורכזת סביב (0,0)
 
 
 def _five(d, cx, cy, h, col):
@@ -210,16 +211,20 @@ def logo_mark(size, rgb=(255, 255, 255), alpha=255):
     im = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
     col = tuple(rgb) + (255,)
+    import math
     c, r, wd = n / 2, n * 0.385, n * 0.075
-    box = [c - r, c - r, c + r, c + r]
     gap = 13
-    for a0 in (0, 90, 180, 270):  # ארבע קשתות עם רווחים בכיוונים הראשיים
-        d.arc(box, a0 + gap, a0 + 90 - gap, fill=col, width=int(wd))
-    tk, tw = n * 0.075, int(n * 0.06)  # סימוני כוונת בתוך הרווחים
-    for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):
-        x0, y0 = c + dx * (r - n * 0.09), c + dy * (r - n * 0.09)
-        x1, y1 = c + dx * (r + n * 0.07), c + dy * (r + n * 0.07)
-        d.line([(x0, y0), (x1, y1)], fill=col, width=tw)
+    for a0 in (0, 90, 180, 270):  # ארבע קשתות זהות, כל אחת כפוליגון מחושב, סימטריה מדויקת
+        angs = [a0 + gap + (90 - 2 * gap) * k / 60 for k in range(61)]
+        outer = [(c + r * math.cos(math.radians(a)), c + r * math.sin(math.radians(a))) for a in angs]
+        inner = [(c + (r - wd) * math.cos(math.radians(a)), c + (r - wd) * math.sin(math.radians(a))) for a in reversed(angs)]
+        d.polygon(outer + inner, fill=col)
+    hw = n * 0.03  # חצי רוחב סימון כוונת
+    for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):  # סימונים בארבעת הכיוונים
+        a, b = r - n * 0.09, r + n * 0.07
+        px, py = -dy, dx
+        d.polygon([(c + dx * a + px * hw, c + dy * a + py * hw), (c + dx * b + px * hw, c + dy * b + py * hw),
+                   (c + dx * b - px * hw, c + dy * b - py * hw), (c + dx * a - px * hw, c + dy * a - py * hw)], fill=col)
     _five(d, c, c, n * 0.40, col)
     im = im.resize((size, size), Image.LANCZOS)
     if alpha < 255:
