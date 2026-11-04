@@ -101,18 +101,21 @@
    ],
    "severity": "high",
    "ts": 1793799394.8500724
-  },
-  "5c2bcbccbb": {
+  }
+ },
+ "approved": [
+  {
+   "id": "5c2bcbccbb",
    "text": "שני מסוקים התנגשו בדרך לאותה מסוקית ליד האוורסט\nשני מסוקי איירבוס AS350 התקרבו לאותו מנחת בכפר פריצ'ה שבנפאל, והתנגשו בשעה 08:11 בבוקר. תייר אחד נהרג ושלושה נפצעו, בהם שני הטייסים.",
    "links": [
     "https://www.aviation24.be/miscellaneous/accidents/tourist-killed-as-two-helicopters-collide-near-mount-everest/"
    ],
    "severity": "high",
-   "ts": 1793799395.2309344
+   "approved_at": "2026-11-04T13:39:50+00:00",
+   "published": false
   }
- },
- "approved": [],
- "offset": 569287811,
+ ],
+ "offset": 569287812,
  "daily": {
   "date": "2026-11-04",
   "count": 7
