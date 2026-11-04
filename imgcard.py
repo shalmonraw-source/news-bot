@@ -214,17 +214,23 @@ def logo_mark(size, rgb=(255, 255, 255), alpha=255):
     import math
     c, r, wd = n / 2, n * 0.385, n * 0.075
     gap = 13
-    for a0 in (0, 90, 180, 270):  # ארבע קשתות זהות, כל אחת כפוליגון מחושב, סימטריה מדויקת
-        angs = [a0 + gap + (90 - 2 * gap) * k / 60 for k in range(61)]
-        outer = [(c + r * math.cos(math.radians(a)), c + r * math.sin(math.radians(a))) for a in angs]
-        inner = [(c + (r - wd) * math.cos(math.radians(a)), c + (r - wd) * math.sin(math.radians(a))) for a in reversed(angs)]
-        d.polygon(outer + inner, fill=col)
-    hw = n * 0.03  # חצי רוחב סימון כוונת
-    for dx, dy in ((0, -1), (1, 0), (0, 1), (-1, 0)):  # סימונים בארבעת הכיוונים
-        a, b = r - n * 0.09, r + n * 0.07
-        px, py = -dy, dx
-        d.polygon([(c + dx * a + px * hw, c + dy * a + py * hw), (c + dx * b + px * hw, c + dy * b + py * hw),
-                   (c + dx * b - px * hw, c + dy * b - py * hw), (c + dx * a - px * hw, c + dy * a - py * hw)], fill=col)
+    q = n // 2
+    quad = Image.new("RGBA", (q, q), (0, 0, 0, 0))  # רבע שמאלי-עליון, שאר הרבעים מראות מדויקות שלו
+    qd = ImageDraw.Draw(quad)
+    angs = [180 + gap + (90 - 2 * gap) * k / 90 for k in range(91)]
+    outer = [(c + r * math.cos(math.radians(a)), c + r * math.sin(math.radians(a))) for a in angs]
+    inner = [(c + (r - wd) * math.cos(math.radians(a)), c + (r - wd) * math.sin(math.radians(a))) for a in reversed(angs)]
+    qd.polygon(outer + inner, fill=col)
+    hw, a, b = n * 0.03, r - n * 0.09, r + n * 0.07
+    qd.polygon([(c - b, c - hw), (c - a, c - hw), (c - a, c + 3), (c - b, c + 3)], fill=col)  # סימון שמאלי
+    qd.polygon([(c - hw, c - b), (c + 3, c - b), (c + 3, c - a), (c - hw, c - a)], fill=col)  # סימון עליון
+    from PIL import ImageChops
+    quad = ImageChops.lighter(quad, quad.transpose(Image.TRANSPOSE))  # סימטריה גם סביב האלכסון
+    im.paste(quad, (0, 0))
+    im.paste(quad.transpose(Image.FLIP_LEFT_RIGHT), (q, 0))
+    im.paste(quad.transpose(Image.FLIP_TOP_BOTTOM), (0, q))
+    im.paste(quad.transpose(Image.ROTATE_180), (q, q))
+    d = ImageDraw.Draw(im)
     _five(d, c, c, n * 0.40, col)
     im = im.resize((size, size), Image.LANCZOS)
     if alpha < 255:
@@ -299,13 +305,13 @@ def _pattern(accent, S=2):
     d = ImageDraw.Draw(ov)
     for x in range(36 * S, w, 44 * S):  # רשת נקודות
         for y in range(36 * S, h, 44 * S):
-            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 255, 255, 16))
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 255, 255, 30))
     cx, cy = int(w * 0.95), int(h * 0.12)  # טבעות מכ"ם
     for r in range(260 * S, 1500 * S, 170 * S):
-        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=accent + (17,), width=2 * S)
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=accent + (38,), width=2 * S)
     for k in range(-6, 12):  # אלכסונים דקים מאוד
         x0 = k * 260 * S
-        d.line([(x0, h), (x0 + 1500 * S, h - 866 * S)], fill=(255, 255, 255, 5), width=S)
+        d.line([(x0, h), (x0 + 1500 * S, h - 866 * S)], fill=(255, 255, 255, 11), width=S)
     return Image.alpha_composite(bg, ov).convert("RGB").resize((W, H), Image.LANCZOS)
 
 

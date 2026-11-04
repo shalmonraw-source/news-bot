@@ -129,5 +129,42 @@
    }
   ],
   "en": "POLITICS"
+ },
+ "facts": {
+  "label": "ידיעות מהעולם",
+  "emoji": "💡",
+  "color": [
+   168,
+   85,
+   247
+  ],
+  "daily_cap": 2,
+  "en": "DID YOU KNOW",
+  "sources": [
+   {
+    "name": "BBC Future",
+    "url": "https://www.bbc.com/future/rss"
+   },
+   {
+    "name": "Atlas Obscura",
+    "url": "https://www.atlasobscura.com/feeds/latest"
+   },
+   {
+    "name": "ScienceAlert",
+    "url": "https://www.sciencealert.com/feed"
+   },
+   {
+    "name": "Live Science",
+    "url": "https://www.livescience.com/feeds/all"
+   },
+   {
+    "name": "Smithsonian",
+    "url": "https://www.smithsonianmag.com/rss/latest_articles/"
+   },
+   {
+    "name": "Google News Science (HE)",
+    "url": "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=he&gl=IL&ceid=IL:he"
+   }
+  ]
  }
 }
