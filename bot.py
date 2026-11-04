@@ -22,12 +22,11 @@ import requests
 import imgcard
 
 STATE_FILE = os.environ.get("STATE_FILE", "state.json")
-SOURCES_FILE = os.environ.get("SOURCES_FILE", "sources.json")
+TOPICS_FILE = os.environ.get("TOPICS_FILE", "topics.json")
 MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
 MAX_AGE_HOURS = int(os.environ.get("MAX_AGE_HOURS", "12"))
 MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "40"))
 MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "3"))
-DAILY_CAP = int(os.environ.get("DAILY_CAP", "8"))
 PENDING_TTL_DAYS = 3
 UA = "Mozilla/5.0 (compatible; news-bot/1.0)"
 
@@ -43,7 +42,7 @@ def load_state():
     st.setdefault("pending", {})
     st.setdefault("approved", [])
     st.setdefault("offset", 0)
-    st.setdefault("daily", {"date": "", "count": 0})
+    st.setdefault("daily", {"date": "", "count": {}})
     return st
 
 
@@ -120,11 +119,12 @@ def keyboard(pid):
     }
 
 
-def send_proposal(pid, text, links, severity, n_sources, israel=False):
+def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation"):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
-    msg = f"✈️ הצעה לפוסט\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + "\n\n⏳ הלחיצה נרשמת בתוך עד 10 דקות"
+    tp = load_topics().get(topic, {})
+    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + "\n\n⏳ הלחיצה נרשמת בתוך עד 10 דקות"
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
@@ -198,9 +198,13 @@ def entry_time(e):
     return datetime(*t[:6], tzinfo=timezone.utc)
 
 
-def fetch_candidates(st):
-    with open(SOURCES_FILE, encoding="utf-8") as f:
-        sources = json.load(f)
+def load_topics():
+    with open(TOPICS_FILE, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def fetch_candidates(st, topic):
+    sources = load_topics()[topic]["sources"]
     sample = os.environ.get("SAMPLE") == "1"
     seen = set() if sample else set(st["seen"])
     cutoff = datetime.now(timezone.utc) - timedelta(hours=72 if sample else MAX_AGE_HOURS)
@@ -373,20 +377,73 @@ def story_material(cands, idxs):
     return "\n\n---\n\n".join(parts)
 
 
-def build_posts(cands):
+SAFETY_NEWS = """כללי בטיחות ואמינות (מחייבים):
+- כל טענה עובדתית מיוחסת למקור מזוהה ("לפי רויטרס", "לפי משרד הבריאות בעזה", "לפי צה"ל", "לפי אל ג'זירה"). אל תאמץ טענה של צד בעימות כעובדה.
+- אין פרטים מבצעיים: מיקום או תנועת כוחות ישראליים, מועדי תקיפה, מיקומי אתרים רגישים, קואורדינטות. תנועת כוחות זרים מותרת רק אם דווחה בכמה כלי תקשורת מרכזיים, עם ייחוס, ובלי מיקום מדויק.
+- אין תיאורים גרפיים של אלימות או גוויות, אין שמות של הרוגים או פצועים, אין סרטונים או תמונות לא מאומתים, ואין הסתה, השמצה או שפה מבזה כלפי קבוצה.
+- מספרי נפגעים: תמיד עם מקורם, ובלי חישובים או הערכות משלך.
+- אל תנחש כוונות או תוצאות. מה שלא ידוע נכתב במפורש כלא ידוע."""
+
+SELECT_MIDEAST = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי על המזרח התיכון והעולם הערבי. תקבל רשימת ידיעות (כותרת, תקציר, מקור, באנגלית, עברית או ערבית).
+בחר רק ידיעות בעלות משקל: התפתחויות במלחמות ובעימותים באזור, החלטות ממשלות, הסכמים ומשברים, מהלכים צבאיים שדווחו בכמה מקורות מרכזיים, אנרגיה וכלכלה באזור,
+וגם ידיעות מהתקשורת הערבית שהקהל הישראלי לא רואה ("מה אומרים בעולם הערבי") כשהן מעניינות באמת.
+דלג על: שמועות ורשתות חברתיות ללא מקור מזוהה, תעמולה, ידיעות קטנות או חוזרות, ספורט, סלבס, ופרטים מבצעיים של כוחות ישראליים.
+אם כמה ידיעות עוסקות באותו אירוע אחד אותן (כל האינדקסים ב-idxs). עדיפות לאירוע שמופיע ביותר ממקור אחד.
+severity: high להסלמה או אירוע גדול, medium להתפתחות משמעותית, low לשאר. israel: true אם יש קשר ישיר לישראל.
+עדיף רשימה ריקה מפוסט בינוני. החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+
+SELECT_WORLD = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. תקבל ידיעות מהעולם. בחר רק סיפורים גדולים או מפתיעים שמעניינים קהל ישראלי רחב:
+אירועים גיאופוליטיים משמעותיים, אסונות ותקריות גדולות, החלטות של מעצמות, כלכלה וטכנולוגיה עם השפעה רחבה, ואירועים חריגים באמת.
+דלג על: פוליטיקה מקומית זרה, סלבס, ספורט, כתבות דעה, וידיעות קטנות. אחד ידיעות על אותו אירוע. severity לפי חומרה. israel: true אם יש קשר ישיר לישראל.
+עדיף רשימה ריקה. החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","israel":false}]}   ואם אין: {"picks":[]}"""
+
+WRITE_ANALYTIC = """אתה כתב ופרשן בכיר בערוץ חדשות ישראלי מוביל, שכותב גם לעמוד הפייסבוק MER5.
+הקוראים הם ישראלים חכמים שרוצים להבין מהר מה קורה, מה בטוח ומה לא, ומה זה אומר. הקול: מקצועי, ענייני וזהיר, בגובה העיניים, כמו פרשן טוב שמדבר ישר.
+
+מבנה (כ-700-1000 תווים, בפסקאות קצרות):
+1. כותרת חדשותית ומדויקת של 6-12 מילים, עם מקור או נתון מרכזי כשחשוב. אימוג'י אחד לכל היותר.
+2. פתיחה: מה מדווח, ועל ידי מי. משפט אחד או שניים.
+3. הפרטים: מה ידוע, מספרים ושמות כפי שמופיעים בחומר, והרקע הדרוש להבנה.
+4. מה לא ברור או שנוי במחלוקת: במשפט או שניים, בנוסח כמו "עם זאת, אין אישור רשמי" או "הצדדים מציגים גרסאות שונות". אל תנחש.
+5. שורה אחרונה: מה כדאי לעקוב אחריו או למה זה חשוב, בנוסח חד ועניני ומבוסס עובדות. לא מוסר השכל, לא שאלה לקורא.
+
+שפה: עברית רהוטה וטבעית, משפטים של עד 20 מילים, פעלים פעילים, התאמת מין ומספר מדויקת, ובלי תרגום מילולי מאנגלית או מערבית.
+מותר "יש דיווחים ש..." ו"אם זה נכון..." כשהן מתאימות, אבל לא בכל משפט. אסור: "תארו לעצמכם", "בעולם התעופה", "לא סתם", התפעלות, פסקת סיכום, מוסר השכל, שאלה רטורית, האשטגים, קישורים.
+שמות: עדיפות לכתיב המקובל בעיתונות הישראלית. מספרים ושמות בדיוק כפי שבחומר.
+
+""" + SAFETY_NEWS + """
+
+החזר JSON בלבד: {"text":"..."}"""
+
+IMAGE_NEWS = """אתה עורך תמונות בעמוד חדשות. תקבל פוסט בעברית. החזר JSON בלבד:
+{"card_title":"...","photo_query":"...","fallback_query":"..."}
+- card_title: כותרת חדה לכרטיס, עד 75 תווים בעברית, בלי נקודה בסוף, בלי עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט.
+- photo_query: חיפוש באנגלית ב-Wikimedia Commons לצילום נייטרלי ומאוזן שמסמל את הנושא: קו רקיע של עיר, ציון דרך, בניין ממשלתי, נמל, סוג ספינה או כלי רכב, דגל, נוף. לדוגמה "Beirut skyline", "Strait of Hormuz", "Aircraft carrier USS Theodore Roosevelt".
+  לעולם לא אנשים סובלים, חיילים בפעולה, נשק בשימוש, הרס, פצועים או פוליטיקאים.
+- fallback_query: חיפוש כללי יותר (למשל "Middle East desert landscape")."""
+
+SELECT_BY = {"aviation": SELECT_SYSTEM, "mideast": SELECT_MIDEAST, "world": SELECT_WORLD}
+WRITE_BY = {"aviation": WRITE_SYSTEM, "mideast": WRITE_ANALYTIC, "world": WRITE_ANALYTIC}
+REVIEW_NEWS = REVIEW_SYSTEM + """
+4. בדוק במיוחד ייחוס: כל טענה על אירוע, מספר נפגעים או כוונה של צד חייבת להיות מיוחסת. טענה בלי ייחוס מקור בחומר: הוסף ייחוס או הסר אותה.
+5. הסר כל פרט מבצעי (מיקום או תנועת כוחות ישראליים, מועדי תקיפה), שמות של הרוגים ופצועים, ותיאור גרפי. החומר שהוסר מופיע ברשימת issues."""
+
+
+def build_posts(cands, topic="aviation"):
     lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
-    picks = parse_picks(claude_json(SELECT_SYSTEM, "\n\n".join(lines), MODEL, 2000), len(cands))
+    picks = parse_picks(claude_json(SELECT_BY[topic], "\n\n".join(lines), MODEL, 2000), len(cands))
+    review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
         try:
             material = story_material(cands, pk["idxs"])
-            w = claude_json(WRITE_SYSTEM, material, WRITER_MODEL)
+            w = claude_json(WRITE_BY[topic], material, WRITER_MODEL)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rev = claude_json(REVIEW_SYSTEM, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL)
+            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
                 print("review fixes:", rev["issues"])
@@ -398,68 +455,110 @@ def build_posts(cands):
     return posts
 
 
-IMAGE_SYSTEM = """אתה עורך תמונות בעמוד חדשות תעופה. תקבל פוסט בעברית. החזר JSON בלבד:
+IMAGE_AVIATION = """אתה עורך תמונות בעמוד חדשות תעופה. תקבל פוסט בעברית. החזר JSON בלבד:
 {"card_title":"...","photo_query":"...","fallback_query":"..."}
-- card_title: כותרת חדה לתמונה, עד 70 תווים בעברית, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט.
+- card_title: כותרת חדה לתמונה, עד 75 תווים בעברית, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט.
 - photo_query: חיפוש באנגלית ב-Wikimedia Commons לצילום ארכיון של סוג המטוס, החברה או שדה התעופה המעורבים (לא של האירוע עצמו). לדוגמה "Airbus AS350 helicopter", "LOT Polish Airlines Boeing 737 MAX". ספציפי ככל האפשר.
 - fallback_query: חיפוש כללי יותר, לדוגמה "Boeing 737 airliner" או "helicopter landing mountains"."""
 
 
-def make_image(pid, text):
+def make_image(pid, text, topic="aviation"):
     """מחזיר (נתיב תמונה, קרדיט או None). אם הכול נכשל, כרטיס טיפוגרפי בלי צילום."""
-    meta = claude_json(IMAGE_SYSTEM, text, MODEL, 600)
+    tp = load_topics()[topic]
+    meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 600)
     title = (meta.get("card_title") or text.split("\n", 1)[0]).strip()
     photo, credit = None, None
     for q in (meta.get("photo_query"), meta.get("fallback_query")):
         try:
-            got = imgcard.commons_photo(q)
+            got = imgcard.commons_photo(q, aviation=(topic == "aviation"))
         except Exception as e:  # noqa: BLE001
             print("commons failed:", type(e).__name__)
             got = None
         if got:
             photo, credit = got
             break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit)
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"])
     return path, credit
 
 
-def fetch_and_propose(st):
-    cands = fetch_candidates(st)
-    print(f"candidates: {len(cands)}")
+def fetch_and_propose(st, topic):
+    tp = load_topics()[topic]
+    cands = fetch_candidates(st, topic)
+    print(f"[{topic}] candidates: {len(cands)}")
     if not cands:
         return
-    posts = build_posts(cands)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
+    posts = build_posts(cands, topic)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    if st["daily"]["date"] != today:
-        st["daily"] = {"date": today, "count": 0}
+    if st["daily"].get("date") != today or not isinstance(st["daily"].get("count"), dict):
+        st["daily"] = {"date": today, "count": {}}
+    sample = os.environ.get("SAMPLE") == "1"
     sent = 0
     for p in posts:
-        if sent >= MAX_POSTS_PER_RUN or (os.environ.get("SAMPLE") != "1" and st["daily"]["count"] >= DAILY_CAP):
+        if sent >= MAX_POSTS_PER_RUN or (not sample and st["daily"]["count"].get(topic, 0) >= tp.get("daily_cap", 4)):
             break
         links = [cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
         pid = hashlib.sha1("".join(links).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"])
+            img_path, credit = make_image(pid, p["text"], topic)
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
-        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False))
+        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic)
         st["pending"][pid] = {
             "text": p["text"],
             "links": links,
             "severity": p["severity"],
+            "topic": topic,
             "image": img_path,
             "credit": credit,
             "ts": time.time(),
         }
         sent += 1
-        if os.environ.get("SAMPLE") != "1":
-            st["daily"]["count"] += 1
+        if not sample:
+            st["daily"]["count"][topic] = st["daily"]["count"].get(topic, 0) + 1
     st["seen"].extend(c["h"] for c in cands)
-    print(f"proposals sent: {sent}")
+    print(f"[{topic}] proposals sent: {sent}")
+
+
+# ------------------------------------------------------------- facebook
+FB_VERSION = os.environ.get("FB_API_VERSION", "v23.0")
+
+
+def publish_approved(st):
+    """מפרסם לעמוד פייסבוק פוסטים שאושרו. פועל רק אם הוגדרו FB_PAGE_ID ו-FB_PAGE_TOKEN."""
+    page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
+    if not page or not token:
+        return
+    for item in st["approved"]:
+        if item.get("published"):
+            continue
+        caption = item["text"] + ("\n\n📷 צילום ארכיון: " + item["credit"] if item.get("credit") else "")
+        try:
+            base = f"https://graph.facebook.com/{FB_VERSION}/{page}"
+            if item.get("image") and os.path.exists(item["image"]):
+                with open(item["image"], "rb") as f:
+                    r = requests.post(base + "/photos", data={"message": caption, "access_token": token}, files={"source": f}, timeout=90)
+            else:
+                r = requests.post(base + "/feed", data={"message": caption, "access_token": token}, timeout=60)
+            data = r.json()
+            fb_id = data.get("post_id") or data.get("id")
+            if not fb_id:
+                raise RuntimeError(str((data.get("error") or {}).get("message", "unknown"))[:150])
+            # מקורות בתגובה הראשונה, כדי לא לפגוע בחשיפה
+            try:
+                requests.post(f"https://graph.facebook.com/{FB_VERSION}/{fb_id}/comments", data={"message": "מקורות:\n" + "\n".join(item["links"]), "access_token": token}, timeout=40)
+            except Exception:  # noqa: BLE001
+                pass
+            item["published"] = True
+            item["fb_id"] = fb_id
+            item["published_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            tg("sendMessage", chat_id=_chat_id(), text=f"📣 פורסם בפייסבוק\n{item['text'].splitlines()[0]}")
+        except Exception as e:  # noqa: BLE001
+            print("publish failed:", type(e).__name__, str(e)[:150])
+            tg("sendMessage", chat_id=_chat_id(), text="⚠️ הפרסום לפייסבוק נכשל: " + (str(e)[:150] if isinstance(e, RuntimeError) else type(e).__name__))
 
 
 # ----------------------------------------------------------------- main
@@ -490,7 +589,14 @@ def main():
             os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
         process_updates(st)
         try:
-            fetch_and_propose(st)
+            publish_approved(st)
+            for topic in load_topics():
+                if os.environ.get("ONLY_TOPIC") and topic != os.environ["ONLY_TOPIC"]:
+                    continue
+                try:
+                    fetch_and_propose(st, topic)
+                except Exception as e:  # noqa: BLE001
+                    print(f"[{topic}] failed:", type(e).__name__, str(e)[:200])
         finally:
             save_state(st)
         return

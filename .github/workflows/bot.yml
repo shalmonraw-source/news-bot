@@ -5,6 +5,9 @@ on:
     - cron: "*/10 * * * *"
   workflow_dispatch:
     inputs:
+      topic:
+        description: "רק נושא אחד: aviation / mideast / world (ריק = הכול)"
+        default: ""
       mode:
         description: "run = רגיל, sample = 72 שעות אחורה, test = הודעת בדיקה, fonts = דף גופנים לבחירה"
         default: "run"
@@ -31,6 +34,9 @@ jobs:
       - name: run bot
         env:
           MODE: ${{ inputs.mode || 'run' }}
+          ONLY_TOPIC: ${{ inputs.topic }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

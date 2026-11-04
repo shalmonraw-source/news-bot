@@ -11,11 +11,12 @@ W, H = 1080, 1350
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT_BOLD = os.path.join(HERE, "fonts", "FreeSansBold.ttf")
 FONT_FALLBACK = os.path.join(HERE, "fonts", "DejaVuSans-Bold.ttf")
-PAGE_TAG = os.environ.get("PAGE_TAG", "חדשות תעופה")
+PAGE_TAG = os.environ.get("PAGE_TAG", "MER5")
 ACCENT = (230, 57, 70)
 UA = "news-bot/1.0 (aviation news page; contact via GitHub repo)"
 OK_LICENSE = re.compile(r"^(cc[ -]by(?!-n)|cc[ -]by-sa|cc0|public domain|pd)", re.I)
 BAD_TITLE = re.compile(r"(diagram|logo|map|schematic|cockpit|interior|cabin|seat|crash|wreck|accident|svg|drawing|livery sketch)", re.I)
+BAD_NEWS = re.compile(r"(dead|killed|victim|corpse|wounded|injur|blood|explosion|bomb|rocket|missile|strike|destroy|ruin|rubble|riot|soldier|troops|fighter|militia|hostage|funeral|refugee|prison|torture|execution|massacre|portrait|politician|minister|president|diagram|logo|map|svg|drawing)", re.I)
 
 USE_RAQM = features.check("raqm")
 try:
@@ -120,13 +121,15 @@ AVIATION = re.compile(r"(aircraft|airplane|aeroplane|airliner|helicopter|boeing|
 STOP = {"the", "and", "for", "with", "from", "airlines", "aircraft"}
 
 
-def _relevance(page, query):
+def _relevance(page, query, aviation=True):
     """ציון התאמה: חייב להיות קשור לתעופה וחייב להכיל לפחות חצי ממילות החיפוש הייחודיות."""
     info = (page.get("imageinfo") or [{}])[0]
     desc = _strip(info.get("extmetadata", {}).get("ImageDescription", {}).get("value"))
     cats = " ".join(c.get("title", "") for c in page.get("categories", []))
     hay = f'{page.get("title", "")} {desc} {cats}'.lower()
-    if not AVIATION.search(hay):
+    if aviation and not AVIATION.search(hay):
+        return 0
+    if not aviation and BAD_NEWS.search(hay):
         return 0
     toks = [t for t in re.findall(r"[a-z0-9]+", query.lower()) if len(t) >= 3 and t not in STOP]
     if not toks:
@@ -138,7 +141,7 @@ def _strip(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
-def commons_photo(query):
+def commons_photo(query, aviation=True):
     """מחזיר (PIL.Image, credit_text) או None. רק רישיונות פתוחים עם שיוך."""
     if not query:
         return None
@@ -152,7 +155,7 @@ def commons_photo(query):
     pages = sorted((r.json().get("query", {}).get("pages", {})).values(), key=lambda p: p.get("index", 99))
     scored = []
     for p in pages:
-        scored.append((_relevance(p, query), p.get("index", 99), p))
+        scored.append((_relevance(p, query, aviation), p.get("index", 99), p))
     scored = [x for x in scored if x[0] > 0]
     scored.sort(key=lambda x: (-x[0], x[1]))
     for _, _, p in scored:
@@ -161,7 +164,7 @@ def commons_photo(query):
         lic = _strip(meta.get("LicenseShortName", {}).get("value"))
         if info.get("mime") != "image/jpeg" or not OK_LICENSE.match(lic):
             continue
-        if BAD_TITLE.search(p.get("title", "")) or info.get("width", 0) < 1200:
+        if (aviation and BAD_TITLE.search(p.get("title", ""))) or info.get("width", 0) < 1200:
             continue
         if _strip(meta.get("Restrictions", {}).get("value")):
             continue
@@ -195,54 +198,54 @@ def _gradient_bg():
     return bg
 
 
-def render_card(title, out_path, photo=None, credit=None):
-    if photo is not None:
-        base = ImageEnhance.Brightness(_cover(photo, W, H)).enhance(0.85)
-    else:
-        base = _gradient_bg()
-    base = base.convert("RGBA")
-    # שכבת הכהיה מדורגת מלמטה לקריאות הכותרת
-    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    od = ImageDraw.Draw(ov)
-    start = int(H * 0.30)
-    for y in range(start, H):
-        a = int(235 * ((y - start) / (H - start)) ** 1.5)
-        od.line([(0, y), (W, y)], fill=(5, 10, 20, a))
-    base = Image.alpha_composite(base, ov)
-    d = ImageDraw.Draw(base)
-
-    margin, max_w = 70, W - 140
-    # כותרת: מקטינים גופן עד שנכנסת ב-5 שורות לכל היותר
-    for size in range(86, 47, -4):
+def render_card(title, out_path, photo=None, credit=None, color=(180, 28, 36), label=""):
+    """כרטיס חדשות: בלוק כותרת צבעוני למעלה, צילום מתחתיו (או רקע כהה כשאין צילום)."""
+    margin, max_w = 64, W - 128
+    scratch = ImageDraw.Draw(Image.new("RGB", (W, 10)))
+    for size in range(84, 47, -4):
         f = _font(size)
-        lines = _wrap(d, title, f, max_w)
-        if len(lines) <= 5:
+        lines = _wrap(scratch, title, f, max_w)
+        if len(lines) <= 4:
             break
-    lh = int(size * 1.28)
-    block_h = lh * len(lines)
-    bottom = H - (150 if photo is not None else 130)
-    y = bottom - block_h
-    d.rectangle([W - margin - 110, y - 36, W - margin, y - 28], fill=ACCENT)  # פס הדגשה
+    lh = int(size * 1.25)
+    chip_h = 56
+    banner_h = 34 + chip_h + 26 + lh * len(lines) + 40
+    color = tuple(color)
+
+    canvas = Image.new("RGB", (W, H), (10, 18, 32))
+    if photo is not None:
+        ph = ImageEnhance.Brightness(_cover(photo, W, H - banner_h)).enhance(0.95)
+        canvas.paste(ph, (0, banner_h))
+    else:
+        bg = _gradient_bg().crop((0, banner_h, W, H))
+        canvas.paste(bg, (0, banner_h))
+    d = ImageDraw.Draw(canvas)
+    d.rectangle([0, 0, W, banner_h], fill=color)
+    d.rectangle([0, banner_h, W, banner_h + 8], fill=tuple(max(0, c - 55) for c in color))
+
+    # תג: MER5 · קטגוריה
+    tf = _font(34)
+    tag = PAGE_TAG + ("  |  " + label if label else "")
+    tw = _width(d, tag, tf)
+    d.rounded_rectangle([W - margin - tw - 44, 34, W - margin, 34 + chip_h], radius=12, fill=(255, 255, 255))
+    d.text((W - margin - 22, 34 + chip_h // 2), _shape(tag), font=tf, fill=color, anchor="rm", **_kw())
+
+    y = 34 + chip_h + 26
     for ln in lines:
         d.text((W - margin, y), _shape(ln), font=f, fill=(255, 255, 255), anchor="ra", **_kw())
         y += lh
 
-    # תג עליון
-    tf = _font(40)
-    tw = _width(d, PAGE_TAG, tf)
-    d.rounded_rectangle([W - margin - tw - 56, 62, W - margin, 62 + 74], radius=14, fill=ACCENT)
-    d.text((W - margin - 28, 62 + 37), _shape(PAGE_TAG), font=tf, fill=(255, 255, 255), anchor="rm", **_kw())
-
-    # שורת תחתית
-    sf = _font(28)
     if photo is not None:
-        d.text((W - margin, H - 92), _shape("צילום ארכיון"), font=sf, fill=(220, 225, 235), anchor="ra", **_kw())
+        strip = Image.new("RGBA", (W, 74), (0, 0, 0, 150))
+        canvas.paste(strip, (0, H - 74), strip)
+        sf = _font(26)
+        d = ImageDraw.Draw(canvas)
+        d.text((W - margin, H - 37), _shape("צילום ארכיון"), font=sf, fill=(235, 238, 245), anchor="rm", **_kw())
         if credit:
-            cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 21)
-            d.text((margin, H - 58), credit[:95], font=cf, fill=(190, 198, 212), anchor="la")
-    out = base.convert("RGB")
+            cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 20)
+            d.text((margin - 20, H - 37), credit[:80], font=cf, fill=(205, 212, 225), anchor="lm")
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
-    out.save(out_path, "JPEG", quality=90)
+    canvas.save(out_path, "JPEG", quality=90)
     return out_path
 
 
