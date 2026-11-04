@@ -275,7 +275,7 @@ def logo_lockup(height=160, mark_rgb=(255, 255, 255), text_rgb=(255, 255, 255), 
     out.alpha_composite(m, (0, 0))
     d = ImageDraw.Draw(out)
     ty = height * (0.40 if tagline else 0.5)
-    _wordmark(d, height + gap, ty, height * 0.44, tuple(text_rgb) + (255,), tuple(accent) + (255,), f, join=True)
+    _wordmark(d, height + gap, ty, height * 0.44, tuple(text_rgb) + (255,), tuple(accent) + (255,), f)
     if tagline:
         x = height + gap
         for ch in tag:
@@ -352,7 +352,7 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     # --- שורת מותג עליונה
     canvas.paste(logo_mark(64, accent), (m, 56), logo_mark(64, accent))
     bf = _font(46)
-    _wordmark(d, m + 80, 88, 40, WHITE, accent, bf, join=True)
+    _wordmark(d, m + 80, 88, 40, WHITE, accent, bf)
     tf = _font(30)
     tag = label or PAGE_TAG
     tw = _width(d, tag, tf)
