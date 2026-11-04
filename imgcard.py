@@ -448,3 +448,57 @@ def font_sheet(out_path, folder="fonts_cache"):
     sheet.save(out_path, "JPEG", quality=88)
     _CURRENT.update({"name": None, "path": None})
     return done
+
+
+def render_cover(out_path, W2=1640, H2=624):
+    """קאבר לעמוד פייסבוק (1640x624). התוכן המרכזי בתוך האזור הבטוח למובייל (כ-1100 פיקסלים באמצע)."""
+    S = 2
+    w, h = W2 * S, H2 * S
+    bg = Image.new("RGB", (w, h))
+    px = ImageDraw.Draw(bg)
+    for x in range(0, w, 4):  # גרדיאנט אופקי עדין, מאט
+        t = abs(x / w - 0.5) * 2
+        v = int(12 + 12 * t)
+        px.rectangle([x, 0, x + 4, h], fill=(v, v, v + 1))
+    ov = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    for x in range(40 * S, w, 44 * S):
+        for y in range(30 * S, h, 44 * S):
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 255, 255, 30))
+    cx, cy = w // 2, int(h * 0.46)
+    cols = [(243, 110, 30), (46, 150, 255), (198, 255, 61), (168, 85, 247)]
+    for i, r in enumerate(range(180 * S, 1500 * S, 150 * S)):  # טבעות מכ"ם מתפשטות, צבעים מתחלפים
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=cols[i % 4] + (85,), width=2 * S)
+    for k in range(-8, 14):
+        x0 = k * 240 * S
+        d.line([(x0, h), (x0 + 900 * S, 0)], fill=(255, 255, 255, 10), width=S)
+    bg = Image.alpha_composite(bg.convert("RGBA"), ov)
+    d = ImageDraw.Draw(bg)
+    # פס ארבעת המדורים בראש ובתחתית
+    seg = w // 4
+    for i, col in enumerate(cols):
+        d.rectangle([i * seg, 0, (i + 1) * seg, 10 * S], fill=col)
+        d.rectangle([i * seg, h - 10 * S, (i + 1) * seg, h], fill=col)
+    # לוגו מלא במרכז
+    lock = logo_lockup(230 * S, accent=(243, 110, 30))
+    lock = lock.resize((lock.width // 1, lock.height // 1))
+    bg.alpha_composite(lock, ((w - lock.width) // 2, int(h * 0.46) - lock.height // 2 - 26 * S))
+    # שורת המדורים בעברית עם נקודות צבע
+    d = ImageDraw.Draw(bg)
+    f = _font(34 * S)
+    names = ["ביטחון וטרור", "תעופה", "פוליטיקה", "ידיעות מהעולם"]
+    pill = [(n, cols[i]) for i, n in enumerate(names)]
+    widths = [d.textlength(_shape(n), font=f, **_kw()) if False else _width(d, n, f) for n, _ in pill]
+    gap = 54 * S
+    total = sum(widths) + gap * 3 + 4 * 28 * S
+    x = (w + total) // 2  # RTL: מתחילים מהצד הימני
+    y = int(h * 0.84)
+    for (n, col), wd in zip(pill, widths):
+        d.ellipse([x - 16 * S, y - 8 * S, x, y + 8 * S], fill=col)
+        x -= 28 * S
+        d.text((x, y), _shape(n), font=f, fill=(222, 225, 230), anchor="rm", **_kw())
+        x -= wd + gap
+    bg = bg.convert("RGB").resize((W2, H2), Image.LANCZOS)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    bg.save(out_path, "PNG")
+    return out_path
