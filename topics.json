@@ -3,9 +3,9 @@
   "label": "תעופה",
   "emoji": "✈️",
   "color": [
-   24,
-   95,
-   170
+   61,
+   139,
+   255
   ],
   "daily_cap": 4,
   "sources": [
@@ -33,15 +33,16 @@
     "name": "Google News (HE)",
     "url": "https://news.google.com/rss/search?q=%D7%AA%D7%A2%D7%95%D7%A4%D7%94%20%D7%A0%D7%97%D7%99%D7%AA%D7%AA%20%D7%97%D7%99%D7%A8%D7%95%D7%9D%20OR%20%D7%97%D7%91%D7%A8%D7%AA%20%D7%AA%D7%A2%D7%95%D7%A4%D7%94%20OR%20%D7%A0%D7%AA%D7%91%22%D7%92%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
    }
-  ]
+  ],
+  "en": "AVIATION"
  },
  "mideast": {
   "label": "מזרח תיכון",
   "emoji": "🧭",
   "color": [
-   180,
-   28,
-   36
+   255,
+   122,
+   26
   ],
   "daily_cap": 5,
   "sources": [
@@ -81,15 +82,16 @@
     "name": "Google News Arab world (AR)",
     "url": "https://news.google.com/rss/search?q=%D8%A7%D9%84%D8%B3%D8%B9%D9%88%D8%AF%D9%8A%D8%A9%20OR%20%D9%85%D8%B5%D8%B1%20OR%20%D8%A7%D9%84%D8%A5%D9%85%D8%A7%D8%B1%D8%A7%D8%AA%20OR%20%D9%82%D8%B7%D8%B1%20OR%20%D8%A5%D9%8A%D8%B1%D8%A7%D9%86%20OR%20%D9%84%D8%A8%D9%86%D8%A7%D9%86%20OR%20%D8%B3%D9%88%D8%B1%D9%8A%D8%A7%20when%3A1d&hl=ar&gl=SA&ceid=SA:ar"
    }
-  ]
+  ],
+  "en": "MIDDLE EAST"
  },
  "world": {
   "label": "עולם",
   "emoji": "🌍",
   "color": [
-   20,
-   110,
-   110
+   198,
+   255,
+   61
   ],
   "daily_cap": 3,
   "sources": [
@@ -105,6 +107,7 @@
     "name": "Google News World (HE)",
     "url": "https://news.google.com/rss/headlines/section/topic/WORLD?hl=he&gl=IL&ceid=IL:he"
    }
-  ]
+  ],
+  "en": "WORLD"
  }
 }

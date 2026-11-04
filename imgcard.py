@@ -198,54 +198,112 @@ def _gradient_bg():
     return bg
 
 
-def render_card(title, out_path, photo=None, credit=None, color=(180, 28, 36), label=""):
-    """כרטיס חדשות: בלוק כותרת צבעוני למעלה, צילום מתחתיו (או רקע כהה כשאין צילום)."""
-    margin, max_w = 64, W - 128
+BG_TOP, BG_BOT, PANEL = (32, 34, 40), (14, 15, 18), (34, 37, 44)
+WHITE, MUTED = (244, 246, 248), (150, 156, 166)
+
+
+def _pattern(accent, S=2):
+    """רקע דק: רשת נקודות, טבעות מכ"ם וקווים אלכסוניים. מצויר בהגדלה פי 2 ומוקטן לחלקות."""
+    w, h = W * S, H * S
+    bg = Image.new("RGBA", (w, h))
+    px = ImageDraw.Draw(bg)
+    for y in range(0, h, 4):  # גרדיאנט אנכי
+        t = y / h
+        px.rectangle([0, y, w, y + 4], fill=tuple(int(BG_TOP[i] + (BG_BOT[i] - BG_TOP[i]) * t) for i in range(3)) + (255,))
+    ov = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    for x in range(36 * S, w, 44 * S):  # רשת נקודות
+        for y in range(36 * S, h, 44 * S):
+            d.ellipse([x - 2, y - 2, x + 2, y + 2], fill=(255, 255, 255, 16))
+    cx, cy = int(w * 0.95), int(h * 0.12)  # טבעות מכ"ם
+    for r in range(260 * S, 1500 * S, 170 * S):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=accent + (17,), width=2 * S)
+    for k in range(-6, 12):  # אלכסונים דקים מאוד
+        x0 = k * 260 * S
+        d.line([(x0, h), (x0 + 1500 * S, h - 866 * S)], fill=(255, 255, 255, 5), width=S)
+    return Image.alpha_composite(bg, ov).convert("RGB").resize((W, H), Image.LANCZOS)
+
+
+def _brackets(d, box, color, ln=54, wd=7):
+    x0, y0, x1, y1 = box
+    for (x, y, sx, sy) in ((x0, y0, 1, 1), (x1, y0, -1, 1), (x0, y1, 1, -1), (x1, y1, -1, -1)):
+        d.line([(x, y), (x + sx * ln, y)], fill=color, width=wd)
+        d.line([(x, y), (x, y + sy * ln)], fill=color, width=wd)
+
+
+def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label=""):
+    """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
+    accent = tuple(color)
+    canvas = _pattern(accent)
+    d = ImageDraw.Draw(canvas)
+    m = 56
+    ph_box = (m, 150, W - m, 780)
+
+    # --- שורת מותג עליונה
+    bf = _font(46)
+    d.rectangle([m, 62, m + 14, 62 + 52], fill=accent)
+    d.text((m + 32, 88), "MER5", font=bf, fill=WHITE, anchor="lm")
+    tf = _font(30)
+    tag = label or PAGE_TAG
+    tw = _width(d, tag, tf)
+    d.rounded_rectangle([W - m - tw - 44, 62, W - m, 62 + 52], radius=26, outline=accent, width=3)
+    d.text((W - m - 22, 88), _shape(tag), font=tf, fill=accent, anchor="rm", **_kw())
+
+    # --- אזור התמונה
+    pw, phh = ph_box[2] - ph_box[0], ph_box[3] - ph_box[1]
+    if photo is not None:
+        im = _cover(photo, pw, phh)
+        im = ImageEnhance.Color(im).enhance(0.82)
+        im = ImageEnhance.Contrast(im).enhance(1.06)
+        im = ImageEnhance.Brightness(im).enhance(0.9)
+        tint = Image.new("RGB", im.size, accent)
+        im = Image.blend(im, tint, 0.07)
+        fade = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        fd = ImageDraw.Draw(fade)
+        for y in range(phh // 2, phh):
+            fd.line([(0, y), (pw, y)], fill=(8, 9, 11, int(170 * ((y - phh // 2) / (phh // 2)) ** 1.6)))
+        im = Image.alpha_composite(im.convert("RGBA"), fade).convert("RGB")
+    else:
+        im = Image.new("RGB", (pw, phh), PANEL)
+        pd = ImageDraw.Draw(im)
+        for r in range(120, 1000, 120):
+            pd.ellipse([pw // 2 - r, phh // 2 - r, pw // 2 + r, phh // 2 + r], outline=tuple(int(c * 0.35 + 30 * 0.65) for c in accent), width=2)
+        wf = _font(150)
+        pd.text((pw // 2, phh // 2), en_label or "MER5", font=wf, fill=(44, 48, 56), anchor="mm")
+    mask = Image.new("L", im.size, 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, pw, phh], radius=22, fill=255)
+    canvas.paste(im, (ph_box[0], ph_box[1]), mask)
+    d = ImageDraw.Draw(canvas)
+    _brackets(d, (ph_box[0] - 10, ph_box[1] - 10, ph_box[2] + 10, ph_box[3] + 10), accent)
+
+    # --- כותרת
+    margin, max_w = m + 8, W - 2 * (m + 8)
     scratch = ImageDraw.Draw(Image.new("RGB", (W, 10)))
-    for size in range(84, 47, -4):
+    for size in range(80, 47, -4):
         f = _font(size)
         lines = _wrap(scratch, title, f, max_w)
         if len(lines) <= 4:
             break
-    lh = int(size * 1.25)
-    chip_h = 56
-    banner_h = 34 + chip_h + 26 + lh * len(lines) + 40
-    color = tuple(color)
-
-    canvas = Image.new("RGB", (W, H), (10, 18, 32))
-    if photo is not None:
-        ph = ImageEnhance.Brightness(_cover(photo, W, H - banner_h)).enhance(0.95)
-        canvas.paste(ph, (0, banner_h))
-    else:
-        bg = _gradient_bg().crop((0, banner_h, W, H))
-        canvas.paste(bg, (0, banner_h))
-    d = ImageDraw.Draw(canvas)
-    d.rectangle([0, 0, W, banner_h], fill=color)
-    d.rectangle([0, banner_h, W, banner_h + 8], fill=tuple(max(0, c - 55) for c in color))
-
-    # תג: MER5 · קטגוריה
-    tf = _font(34)
-    tag = PAGE_TAG + ("  |  " + label if label else "")
-    tw = _width(d, tag, tf)
-    d.rounded_rectangle([W - margin - tw - 44, 34, W - margin, 34 + chip_h], radius=12, fill=(255, 255, 255))
-    d.text((W - margin - 22, 34 + chip_h // 2), _shape(tag), font=tf, fill=color, anchor="rm", **_kw())
-
-    y = 34 + chip_h + 26
+    lh = int(size * 1.26)
+    y = 830
+    d.rectangle([W - margin - 120, y, W - margin, y + 8], fill=accent)
+    y += 34
     for ln in lines:
-        d.text((W - margin, y), _shape(ln), font=f, fill=(255, 255, 255), anchor="ra", **_kw())
+        d.text((W - margin, y), _shape(ln), font=f, fill=WHITE, anchor="ra", **_kw())
         y += lh
 
+    # --- תחתית
+    d.line([(m, H - 84), (W - m, H - 84)], fill=(60, 65, 74), width=2)
+    sf = _font(24)
     if photo is not None:
-        strip = Image.new("RGBA", (W, 74), (0, 0, 0, 150))
-        canvas.paste(strip, (0, H - 74), strip)
-        sf = _font(26)
-        d = ImageDraw.Draw(canvas)
-        d.text((W - margin, H - 37), _shape("צילום ארכיון"), font=sf, fill=(235, 238, 245), anchor="rm", **_kw())
+        d.text((W - m, H - 46), _shape("צילום ארכיון"), font=sf, fill=MUTED, anchor="rm", **_kw())
         if credit:
-            cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 20)
-            d.text((margin - 20, H - 37), credit[:80], font=cf, fill=(205, 212, 225), anchor="lm")
+            cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 19)
+            d.text((m, H - 46), credit[:78], font=cf, fill=MUTED, anchor="lm")
+    else:
+        d.text((m, H - 46), "MER5 · חדשות מהמזרח התיכון והעולם", font=sf, fill=MUTED, anchor="lm") if False else None
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
-    canvas.save(out_path, "JPEG", quality=90)
+    canvas.save(out_path, "JPEG", quality=92)
     return out_path
 
 
