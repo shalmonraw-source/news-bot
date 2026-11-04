@@ -56,7 +56,47 @@
   "7ebbbb59442d",
   "cfd081b4f02b",
   "febf1814b45f",
-  "d79ba10c6043"
+  "d79ba10c6043",
+  "8de8bfa0629a",
+  "da5049e556d0",
+  "3b6ee5dc3796",
+  "d0747346f9f9",
+  "bf212f1e1811",
+  "b2eeb92af4c1",
+  "ef9ad0505928",
+  "c499f6c10c6e",
+  "f652cb0102af",
+  "3a198768e879",
+  "1cb2b4119057",
+  "d3a3591bf3ce",
+  "b2e96e2d0589",
+  "6882e3de4d2e",
+  "6dab17335395",
+  "1b81da1e9def",
+  "d9d908642869",
+  "5fca624dde6c",
+  "1a7508d505b4",
+  "a85b45d52f41",
+  "b22bd23f287f",
+  "42129717f6ff",
+  "684cd69ef4b3",
+  "b15e7a8804c8",
+  "08ef89fdaa90",
+  "7379a27fc7c3",
+  "70eb715cf936",
+  "3913ed5d39a5",
+  "976dfb20065d",
+  "5c2bcbccbb30",
+  "7ebbbb59442d",
+  "febf1814b45f",
+  "d79ba10c6043",
+  "4b45572b5bc5",
+  "c576991dfb7b",
+  "ebf7e43344dc",
+  "488ce9710661",
+  "2b5db960ed05",
+  "fd07d6403ec0",
+  "10e24c4d8938"
  ],
  "pending": {
   "8aec5bd77c": {
@@ -101,6 +141,19 @@
    ],
    "severity": "high",
    "ts": 1793799394.8500724
+  },
+  "01db5bc47c": {
+   "text": "שבע דקות מהאיום ועד הנחיתה: גל איומי פצצה באירופה\n\nביום שלישי, 3 בנובמבר, היו לפחות שש טיסות באירופה יעד לאיומי פצצה בתוך שעות ספורות. בטיסה LO286 של LOT מהית'רו בלונדון לוורשה דווח על איום ב-09:54. הבואינג 737 MAX הוסט לשדה מודלין ונחת שם כבר ב-10:01, עם 181 איש על הסיפון. מודלין נסגר לכשעתיים, והנוסעים הועברו באוטובוסים לשדה שופן.\n\nבאותו בוקר נבדקו גם טיסת SAS מקופנהגן לוורשה וטיסת ריינאייר ממנצ'סטר למורסיה, עם 114 נוסעים ושבעה אנשי צוות. ברומא נבדקו שתי טיסות ריינאייר, מליסבון ומדבלין, ומטוסי קרב של חיל האוויר האיטלקי ליוו את הטיסה מדבלין. בסופיה נבדקו טיסה של ויז אייר מברגמו וטיסה מדבלין. דיווחים ראשונים דיברו על טיסה מישראל, אבל לפי AFP מדובר בטיסה מברגמו. יום קודם הוסטה טיסת ויז אייר מלוטון לסופיה לבודפשט, בליווי מטוסי גריפן הונגריים. בשום מקום לא נמצאו חומרי נפץ.\n\nמה זה אומר? כל איום מטופל כאמיתי עד שמוכח אחרת. בדרך כלל הטייסים נוחתים בשדה המתאים הקרוב, והמטוס עובר לחניה מבודדת הרחק מהטרמינל. שם חבלנים בודקים את המטוס, את המטען ואת הנוסעים. מטוסי הקרב מלווים את מטוס הנוסעים מקרוב עד הנחיתה.\n\nהרשויות עדיין לא יודעות אם האיומים קשורים זה לזה. אבל גם בלי פצצה אחת, איום אחד הספיק כדי לסגור שדה תעופה לכשעתיים.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5IbFItSUNNMGZnNWNfaW50a05YUjZVSUpHeFhfRURWTGd1alI0ZTJqMkJKbXNsRENTNG1SS1FvY2d5Z01LMk1XR21wTERiOWk0WFpRbjFhV01vTUk?oc=5",
+    "https://www.aviation24.be/airlines/multiple-bomb-threats-target-european-passenger-flights-prompting-diversions-and-fighter-jet-escort/",
+    "https://www.aerotime.aero/articles/ryanair-wizz-air-lot-polish-sas-targeted-bomb-threat",
+    "https://news.google.com/rss/articles/CBMiX0FVX3lxTE1NdW9ObW9DVFhaVmZxMXNfM1d3MjFoQUZkZGc2dFdLV190R3BMTDJUblpzR3ZLUFBJNTJXS0l2V2xfdXRlSlA5TEtfTWRFYi1TVnlta2ZyTlpIbi1TUkc0?oc=5",
+    "https://airlive.net/incident/2026/11/03/wave-of-bomb-threats-targets-european-flights-across-multiple-countries/",
+    "https://news.google.com/rss/articles/CBMiZkFVX3lxTFBLNjhONjh0b01LeWRBNlI2OWRnbFg0NVhkWkw2UnlkUWQwVlVBenBDZXVEamlDekhtRGkyLTh5WjVaU1BpalVMUUFOZnFvVktRZDhIVjhseUdlQ2dyZUhubmlxUzZTUQ?oc=5"
+   ],
+   "severity": "high",
+   "ts": 1793799806.631277
   }
  },
  "approved": [
@@ -118,6 +171,6 @@
  "offset": 569287812,
  "daily": {
   "date": "2026-11-04",
-  "count": 7
+  "count": 8
  }
 }
