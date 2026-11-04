@@ -457,12 +457,6 @@
    "links": [],
    "severity": "low",
    "ts": 1793814657.8129163
-  },
-  "test817208": {
-   "text": "test",
-   "links": [],
-   "severity": "low",
-   "ts": 1793817209.3834379
   }
  },
  "approved": [
@@ -484,6 +478,16 @@
    "image": null,
    "credit": null,
    "approved_at": "2026-11-04T17:33:24+00:00",
+   "published": false
+  },
+  {
+   "id": "test817208",
+   "text": "test",
+   "links": [],
+   "severity": "low",
+   "image": null,
+   "credit": null,
+   "approved_at": "2026-11-04T18:48:59+00:00",
    "published": false
   }
  ],
