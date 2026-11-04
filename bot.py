@@ -19,6 +19,8 @@ from datetime import datetime, timedelta, timezone
 import feedparser
 import requests
 
+import imgcard
+
 STATE_FILE = os.environ.get("STATE_FILE", "state.json")
 SOURCES_FILE = os.environ.get("SOURCES_FILE", "sources.json")
 MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
@@ -50,6 +52,14 @@ def save_state(st):
     st["approved"] = st["approved"][-300:]
     cutoff = time.time() - PENDING_TTL_DAYS * 86400
     st["pending"] = {k: v for k, v in st["pending"].items() if v.get("ts", 0) > cutoff}
+    keep = {os.path.basename(x["image"]) for x in list(st["pending"].values()) + st["approved"] if x.get("image")}
+    if os.path.isdir("images"):
+        for fn in os.listdir("images"):
+            if fn.endswith(".jpg") and fn not in keep:
+                try:
+                    os.remove(os.path.join("images", fn))
+                except OSError:
+                    pass
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(st, f, ensure_ascii=False, indent=1)
 
@@ -81,6 +91,22 @@ def tg(method, **payload):
     if not data.get("ok"):
         raise RuntimeError(f"telegram {method} error: {data.get('description')}")
     return data["result"]
+
+
+def tg_photo(path, caption):
+    try:
+        with open(path, "rb") as f:
+            r = requests.post(
+                f"https://api.telegram.org/bot{_token()}/sendPhoto",
+                data={"chat_id": _chat_id(), "caption": caption[:1000]},
+                files={"photo": f},
+                timeout=60,
+            )
+        data = r.json()
+    except Exception as e:  # noqa: BLE001
+        raise RuntimeError(f"telegram sendPhoto failed: {type(e).__name__}") from None
+    if not data.get("ok"):
+        raise RuntimeError(f"telegram sendPhoto error: {data.get('description')}")
 
 
 def keyboard(pid):
@@ -137,6 +163,8 @@ def process_updates(st):
                             "text": item["text"],
                             "links": item["links"],
                             "severity": item.get("severity"),
+                            "image": item.get("image"),
+                            "credit": item.get("credit"),
                             "approved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                             "published": False,
                         }
@@ -370,6 +398,31 @@ def build_posts(cands):
     return posts
 
 
+IMAGE_SYSTEM = """אתה עורך תמונות בעמוד חדשות תעופה. תקבל פוסט בעברית. החזר JSON בלבד:
+{"card_title":"...","photo_query":"...","fallback_query":"..."}
+- card_title: כותרת חדה לתמונה, עד 70 תווים בעברית, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט.
+- photo_query: חיפוש באנגלית ב-Wikimedia Commons לצילום ארכיון של סוג המטוס, החברה או שדה התעופה המעורבים (לא של האירוע עצמו). לדוגמה "Airbus AS350 helicopter", "LOT Polish Airlines Boeing 737 MAX". ספציפי ככל האפשר.
+- fallback_query: חיפוש כללי יותר, לדוגמה "Boeing 737 airliner" או "helicopter landing mountains"."""
+
+
+def make_image(pid, text):
+    """מחזיר (נתיב תמונה, קרדיט או None). אם הכול נכשל, כרטיס טיפוגרפי בלי צילום."""
+    meta = claude_json(IMAGE_SYSTEM, text, MODEL, 600)
+    title = (meta.get("card_title") or text.split("\n", 1)[0]).strip()
+    photo, credit = None, None
+    for q in (meta.get("photo_query"), meta.get("fallback_query")):
+        try:
+            got = imgcard.commons_photo(q)
+        except Exception as e:  # noqa: BLE001
+            print("commons failed:", type(e).__name__)
+            got = None
+        if got:
+            photo, credit = got
+            break
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit)
+    return path, credit
+
+
 def fetch_and_propose(st):
     cands = fetch_candidates(st)
     print(f"candidates: {len(cands)}")
@@ -386,11 +439,20 @@ def fetch_and_propose(st):
         links = [cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
         pid = hashlib.sha1("".join(links).encode()).hexdigest()[:10]
+        img_path, credit = None, None
+        try:
+            img_path, credit = make_image(pid, p["text"])
+            tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
+        except Exception as e:  # noqa: BLE001
+            print("image failed:", type(e).__name__, str(e)[:150])
+            img_path = None
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False))
         st["pending"][pid] = {
             "text": p["text"],
             "links": links,
             "severity": p["severity"],
+            "image": img_path,
+            "credit": credit,
             "ts": time.time(),
         }
         sent += 1
