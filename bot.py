@@ -625,6 +625,12 @@ def load_settings():
 
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "run"
+    if mode == "webhookinfo":
+        info = tg("getWebhookInfo")
+        safe = {k: info.get(k) for k in ("url", "pending_update_count", "last_error_date", "last_error_message", "allowed_updates", "has_custom_certificate")}
+        print("webhook:", safe)
+        tg("sendMessage", chat_id=_chat_id(), text="🔧 webhook: " + json.dumps(safe, ensure_ascii=False)[:900])
+        return
     if mode == "fonts":
         done = imgcard.font_sheet("/tmp/fonts.jpg")
         tg_photo("/tmp/fonts.jpg", "🔤 גופנים לבחירה:\n" + "\n".join(f"{n}. {name}" for n, name in done) + "\n\nכתוב לי את המספר או השם.")
