@@ -358,7 +358,7 @@ def fetch_and_propose(st):
         st["daily"] = {"date": today, "count": 0}
     sent = 0
     for p in posts:
-        if sent >= MAX_POSTS_PER_RUN or st["daily"]["count"] >= DAILY_CAP:
+        if sent >= MAX_POSTS_PER_RUN or (os.environ.get("SAMPLE") != "1" and st["daily"]["count"] >= DAILY_CAP):
             break
         links = [cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
@@ -371,7 +371,8 @@ def fetch_and_propose(st):
             "ts": time.time(),
         }
         sent += 1
-        st["daily"]["count"] += 1
+        if os.environ.get("SAMPLE") != "1":
+            st["daily"]["count"] += 1
     st["seen"].extend(c["h"] for c in cands)
     print(f"proposals sent: {sent}")
 
