@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "run = שאיבה ושליחה, test = הודעת בדיקה"
+        description: "run = רגיל, sample = 72 שעות אחורה, test = הודעת בדיקה"
         default: "run"
 
 concurrency:

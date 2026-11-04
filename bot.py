@@ -3,6 +3,7 @@
 מצבים:
   python bot.py run    # מעבד לחיצות על כפתורים, ואז שואב חדשות ושולח הצעות
   python bot.py test   # שולח הודעת בדיקה עם כפתורים
+  python bot.py sample # כמו run, אבל בודק 72 שעות אחורה ומתעלם ממה שכבר נראה
 
 סודות נדרשים (משתני סביבה): TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, ANTHROPIC_API_KEY
 """
@@ -172,8 +173,9 @@ def entry_time(e):
 def fetch_candidates(st):
     with open(SOURCES_FILE, encoding="utf-8") as f:
         sources = json.load(f)
-    seen = set(st["seen"])
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=MAX_AGE_HOURS)
+    sample = os.environ.get("SAMPLE") == "1"
+    seen = set() if sample else set(st["seen"])
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=72 if sample else MAX_AGE_HOURS)
     out, failed = [], []
     in_run = set()
     for src in sources:
@@ -307,7 +309,9 @@ def main():
         pid = "test" + str(int(time.time()))[-6:]
         send_proposal(pid, "בדיקת מערכת\nאם אתה רואה את ההודעה הזו והכפתורים, החיבור לטלגרם עובד.", ["https://github.com"], "low", 2)
         st["pending"][pid] = {"text": "test", "links": [], "severity": "low", "ts": time.time()}
-    elif mode == "run":
+    elif mode in ("run", "sample"):
+        if mode == "sample":
+            os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
         process_updates(st)
         try:
             fetch_and_propose(st)
