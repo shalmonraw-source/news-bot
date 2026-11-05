@@ -828,7 +828,7 @@ def fetch_and_propose(st, topic):
         pid = hashlib.sha1("".join(links0).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
+            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
