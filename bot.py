@@ -173,19 +173,36 @@ def _bar(v):
     return "●" * v + "○" * (5 - v)
 
 
-def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3):
+AUTO_TOPICS = {"facts", "aviation"}
+AUTO_DAILY_CAP = 4
+SENSITIVE = re.compile(r"הרוג|נהרג|נהרגו|פצוע|נפצע|נפצעו|התרסק|התרסקות|קורבנ|מת\b|מתו|אסון|תאונה|חטיפ|פיגוע|מלחמ|ירי|טיל")
+
+
+def auto_ok(st, topic, p, n_sources):
+    """אישור אוטומטי לתור: רק ידע ותעופה, חומרה נמוכה, בלי נפגעים/ביטחון, ובתעופה לפחות 2 מקורות."""
+    if topic not in AUTO_TOPICS or p.get("severity") != "low" or p.get("israel"):
+        return False
+    if SENSITIVE.search(p["text"]):
+        return False
+    if topic == "aviation" and n_sources < 2:
+        return False
+    return st["daily"].get("auto", 0) < AUTO_DAILY_CAP
+
+
+def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3, auto=False):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
     tp = load_topics().get(topic, {})
     scores = f"⚡ דחיפות {_bar(urgency)} {urgency}/5 · ⭐ חשיבות וייחודיות {_bar(special)} {special}/5"
     rec = "🚀 מומלץ להעלות עכשיו" if urgency >= 4 else ("➕ מומלץ להוסיף לתור" if special >= 3 else "🗑 שקול לדחות")
-    msg = f"{tp.get('emoji', '📰')} הצעה לפוסט · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{scores}\n{rec}"
+    head = "🤖 אושר אוטומטית ונכנס לתור (אפשר לבטל)" if auto else "הצעה לפוסט"
+    msg = f"{tp.get('emoji', '📰')} {head} · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{scores}\n{rec}"
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
         text=msg[:4000],
-        reply_markup=keyboard(pid),
+        reply_markup=({"inline_keyboard": [[{"text": "🛑 בטל פרסום", "callback_data": f"r:{pid}"}]]} if auto else keyboard(pid)),
         link_preview_options={"is_disabled": True},
     )
     return res["message_id"]
@@ -195,6 +212,12 @@ def apply_decision(st, decision):
     """מיישם החלטה מהפורמט "a:<pid>" (אשר) או "r:<pid>" (דחה). משמש את מצב ה-webhook המיידי."""
     action, _, pid = (decision or "").partition(":")
     item = st["pending"].pop(pid, None)
+    if item is None and action == "r":  # ביטול פריט שאושר אוטומטית ועדיין בתור
+        before = len(st["queue"])
+        st["queue"] = [x for x in st["queue"] if not (x.get("id") == pid and not x.get("published"))]
+        if len(st["queue"]) < before:
+            print("decision: auto-approved item cancelled:", pid)
+            return True
     if item is None:
         print("decision: item already handled or expired:", pid)
         return False
@@ -687,18 +710,26 @@ def fetch_and_propose(st, topic):
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
-        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3))
         with STATE_LOCK:
-            st["pending"][pid] = {
-                "text": p["text"],
-                "links": links,
-                "severity": p["severity"],
-                "topic": topic,
-                "image": img_path,
-                "credit": credit,
-                "urgency": p.get("urgency", 3),
-                "ts": time.time(),
-            }
+            auto = (not sample) and auto_ok(st, topic, p, n_sources)
+            if auto:
+                st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
+        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto)
+        with STATE_LOCK:
+            if auto:
+                st["queue"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit,
+                                    "queued_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "published": False, "auto": True})
+            else:
+                st["pending"][pid] = {
+                    "text": p["text"],
+                    "links": links,
+                    "severity": p["severity"],
+                    "topic": topic,
+                    "image": img_path,
+                    "credit": credit,
+                    "urgency": p.get("urgency", 3),
+                    "ts": time.time(),
+                }
             if not sample:
                 st["daily"]["count"][topic] = st["daily"]["count"].get(topic, 0) + 1
             checkpoint(st)  # נשמר מיד אחרי כל הצעה, כך שלחיצה בטלגרם תמיד תמצא אותה
