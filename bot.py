@@ -25,7 +25,7 @@ STATE_FILE = os.environ.get("STATE_FILE", "state.json")
 TOPICS_FILE = os.environ.get("TOPICS_FILE", "topics.json")
 MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
 MAX_AGE_HOURS = int(os.environ.get("MAX_AGE_HOURS", "12"))
-MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "40"))
+MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "70"))
 MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "3"))
 PENDING_TTL_DAYS = 3
 
@@ -400,6 +400,26 @@ def load_topics():
         return json.load(f)
 
 
+
+def fetch_telegram(src):
+    """קורא ערוץ טלגרם ציבורי דרך תצוגת t.me/s/ ומחזיר רשימת פריטים [(id, text, iso_time, image)]."""
+    r = requests.get(src["url"], headers={"User-Agent": "Mozilla/5.0"}, timeout=25)
+    r.raise_for_status()
+    items = []
+    for blk in re.split(r'(?=<div class="tgme_widget_message_wrap)', r.text)[1:]:
+        post = re.search(r'data-post="([^"]+)"', blk)
+        txt = re.search(r'<div class="tgme_widget_message_text[^>]*>(.*?)</div>', blk, re.S)
+        tm = re.search(r'<time[^>]+datetime="([^"]+)"', blk)
+        img = re.search(r"tgme_widget_message_photo_wrap[^>]+background-image:url\('([^']+)'\)", blk)
+        if not post or not txt:
+            continue
+        text = strip_html(re.sub(r"<br\s*/?>", "\n", txt.group(1)))
+        if len(text) < 40:
+            continue
+        items.append((post.group(1), text, tm.group(1) if tm else "", img.group(1) if img else ""))
+    return items
+
+
 def fetch_candidates(st, topic):
     sources = load_topics()[topic]["sources"]
     sample = os.environ.get("SAMPLE") == "1"
@@ -408,6 +428,25 @@ def fetch_candidates(st, topic):
     out, failed = [], []
     in_run = set()
     for src in sources:
+        if src.get("type") == "telegram":
+            try:
+                for post, text, iso, img in fetch_telegram(src):
+                    link = f"https://t.me/{post}"
+                    h = hashlib.sha1(link.encode()).hexdigest()[:12]
+                    if h in seen or h in in_run:
+                        continue
+                    in_run.add(h)
+                    try:
+                        ts = datetime.fromisoformat(iso) if iso else None
+                    except ValueError:
+                        ts = None
+                    if ts and ts < cutoff:
+                        continue
+                    out.append({"h": h, "source": src["name"], "title": text.split("\n")[0][:140], "summary": text[:500], "link": link,
+                                "image": img, "ts": ts.astimezone(timezone.utc).isoformat(timespec="minutes") if ts else ""})
+            except Exception as e:  # noqa: BLE001
+                failed.append(f'{src["name"]} ({type(e).__name__})')
+            continue
         try:
             r = requests.get(src["url"], headers={"User-Agent": UA}, timeout=25)
             if r.status_code >= 400:  # חלק מהאתרים חוסמים בוטים: ניסיון חוזר עם דפדפן
