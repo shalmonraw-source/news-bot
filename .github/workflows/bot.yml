@@ -16,7 +16,7 @@ on:
         default: "run"
 
 concurrency:
-  group: bot-state
+  group: ${{ inputs.mode == 'decide' && format('decide-{0}', github.run_id) || 'scan' }}
   cancel-in-progress: false
 
 permissions:
@@ -25,7 +25,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -51,7 +51,7 @@ jobs:
         run: |
           git config user.name "news-bot"
           git config user.email "news-bot@users.noreply.github.com"
-          git add -A state.json images fonts settings.json
+          git add -A state.json images fonts settings.json decisions
           if ! git diff --staged --quiet; then
             git commit -m "update state"
             git pull --rebase

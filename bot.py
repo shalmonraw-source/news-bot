@@ -32,7 +32,36 @@ UA = "Mozilla/5.0 (compatible; news-bot/1.0)"
 
 
 # ---------------------------------------------------------------- state
-def load_state():
+DECISIONS_DIR = "decisions"
+
+
+def apply_decision_files(st):
+    """מיישם החלטות מיידיות (קבצים קטנים שנכתבים בהרצת ה-webhook) על המצב הראשי, בלי התנגשויות בגיט."""
+    if not os.path.isdir(DECISIONS_DIR):
+        return
+    for fn in sorted(os.listdir(DECISIONS_DIR)):
+        if not fn.endswith(".json"):
+            continue
+        path = os.path.join(DECISIONS_DIR, fn)
+        try:
+            with open(path, encoding="utf-8") as f:
+                d = json.load(f)
+        except (OSError, ValueError):
+            continue
+        st["pending"].pop(d.get("pid"), None)
+        item = d.get("item")
+        if item and d.get("action") == "q":
+            st["queue"].append(item)
+        elif item and d.get("action") in ("a", "n"):
+            if not any(x.get("id") == item.get("id") for x in st["approved"]):
+                st["approved"].append(item)
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+
+def load_state(apply_decisions=True):
     try:
         with open(STATE_FILE, encoding="utf-8") as f:
             st = json.load(f)
@@ -45,6 +74,8 @@ def load_state():
     st.setdefault("slots_done", {})
     st.setdefault("offset", 0)
     st.setdefault("daily", {"date": "", "count": {}})
+    if apply_decisions:
+        apply_decision_files(st)
     legacy = {"mideast": "security", "world": "politics"}
     for coll in (st["pending"].values(), st["approved"]):
         for it in coll:
@@ -697,6 +728,25 @@ def publish_queue(st):
 
 
 # ----------------------------------------------------------------- main
+def checkpoint(st):
+    """שומר ומעלה את המצב לגיט מיד (רק ב-Actions), כדי שהצעות שנשלחו לטלגרם לא יאבדו אם ההרצה נעצרת."""
+    save_state(st)
+    if not os.environ.get("GITHUB_ACTIONS"):
+        return
+    import subprocess
+    try:
+        run = lambda *a: subprocess.run(a, check=False, capture_output=True, timeout=120)  # noqa: E731
+        run("git", "config", "user.name", "news-bot")
+        run("git", "config", "user.email", "news-bot@users.noreply.github.com")
+        run("git", "add", "-A", "state.json", "images", "decisions")
+        if run("git", "diff", "--staged", "--quiet").returncode != 0:
+            run("git", "commit", "-m", "checkpoint state")
+            run("git", "pull", "--rebase")
+            run("git", "push")
+    except Exception as e:  # noqa: BLE001
+        print("warn: checkpoint", type(e).__name__)
+
+
 def load_settings():
     try:
         with open("settings.json", encoding="utf-8") as f:
@@ -734,18 +784,32 @@ def main():
     if font and not imgcard.use_font(font):
         print("font unavailable, using default:", font)
     ensure_webhook()
-    st = load_state()
+    st = load_state(apply_decisions=(mode != "decide"))
     if mode == "test":
         pid = "test" + str(int(time.time()))[-6:]
         send_proposal(pid, "בדיקת מערכת\nאם אתה רואה את ההודעה הזו והכפתורים, החיבור לטלגרם עובד.", ["https://github.com"], "low", 2)
         st["pending"][pid] = {"text": "test", "links": [], "severity": "low", "ts": time.time()}
     elif mode == "decide":
-        try:
-            apply_decision(st, os.environ.get("DECISION", ""))
+        decision = os.environ.get("DECISION", "")
+        action, _, pid = decision.partition(":")
+        already = any(fn.endswith(f"_{pid}.json") for fn in (os.listdir(DECISIONS_DIR) if os.path.isdir(DECISIONS_DIR) else []))
+        if already:
+            print("decision: already decided:", pid)
+            return
+        known = pid in st["pending"]
+        before_a, before_q = len(st["approved"]), len(st["queue"])
+        apply_decision(st, decision)
+        item = None
+        if len(st["approved"]) > before_a:
             publish_approved(st)
-            publish_queue(st)
-        finally:
-            save_state(st)
+            item = st["approved"][-1]
+        elif len(st["queue"]) > before_q:
+            item = st["queue"][-1]
+        if not known and action != "x":
+            tg("sendMessage", chat_id=_chat_id(), text="⚠️ ההחלטה לא נקלטה: ההצעה כבר לא בזיכרון הבוט (נשלחה לפני עדכון או פגה). חכה להצעה חדשה.")
+        os.makedirs(DECISIONS_DIR, exist_ok=True)
+        with open(os.path.join(DECISIONS_DIR, f"{int(time.time())}_{pid}.json"), "w", encoding="utf-8") as f:
+            json.dump({"pid": pid, "action": action, "item": item}, f, ensure_ascii=False)
         return
     elif mode in ("run", "sample"):
         if mode == "sample":
@@ -757,10 +821,13 @@ def main():
             for topic in load_topics():
                 if os.environ.get("ONLY_TOPIC") and topic != os.environ["ONLY_TOPIC"]:
                     continue
+                t0 = time.time()
                 try:
                     fetch_and_propose(st, topic)
                 except Exception as e:  # noqa: BLE001
                     print(f"[{topic}] failed:", type(e).__name__, str(e)[:200])
+                print(f"[{topic}] took {int(time.time() - t0)}s")
+                checkpoint(st)
         finally:
             save_state(st)
         return
