@@ -509,6 +509,7 @@ def fetch_candidates(st, topic):
 
 # --------------------------------------------------------------- claude
 WRITER_MODEL = os.environ.get("WRITER_MODEL", "claude-opus-5-5")
+CHEAP_MODEL = os.environ.get("CHEAP_MODEL", "claude-haiku-5-5")  # עבודה מכנית: כפילויות ושאלות לקוראים
 
 SELECT_SYSTEM = """אתה עורך ראשי של עמוד חדשות תעופה פופולרי בעברית, לקהל ישראלי רחב (לא רק חובבי תעופה).
 תקבל רשימת ידיעות (כותרת, תקציר, מקור). בחר רק סיפורים שאנשים ירצו לקרוא, לשתף ולעקוב אחריהם.
@@ -601,7 +602,7 @@ def claude_text(system, user, model, max_tokens=3000):
         resp = client.messages.create(
             model=model,
             max_tokens=max_tokens,
-            system=system,
+            system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],  # שמירת ההנחיות הארוכות בין קריאות: חיסכון גדול
             messages=[{"role": "user", "content": user}],
         )
     except Exception as e:  # noqa: BLE001
@@ -819,7 +820,7 @@ def llm_duplicate(st, text):
     if not prev:
         return False
     try:
-        r = claude_json(DEDUP_SYSTEM, "פוסט חדש:\n" + text[:600] + "\n\nכבר נשלחו:\n" + "\n".join("- " + x for x in prev), MODEL, 300)
+        r = claude_json(DEDUP_SYSTEM, "פוסט חדש:\n" + text[:600] + "\n\nכבר נשלחו:\n" + "\n".join("- " + x for x in prev), CHEAP_MODEL, 300)
         return bool(r.get("duplicate"))
     except Exception as e:  # noqa: BLE001
         print("dedup llm failed:", str(e)[:100])
@@ -1129,7 +1130,7 @@ def publish_approved(st):
             try:
                 q = ""
                 try:
-                    qj = claude_json('כתוב שאלה אחת קצרה (עד 12 מילים) בעברית שמזמינה את הקוראים להגיב על הידיעה, בלי להטות לצד פוליטי ובלי נושא כואב אם יש נפגעים (אז החזר ריק). החזר JSON: {"q":"..."}', item["text"][:600], MODEL, 150)
+                    qj = claude_json('כתוב שאלה אחת קצרה (עד 12 מילים) בעברית שמזמינה את הקוראים להגיב על הידיעה, בלי להטות לצד פוליטי ובלי נושא כואב אם יש נפגעים (אז החזר ריק). החזר JSON: {"q":"..."}', item["text"][:600], CHEAP_MODEL, 150)
                     q = (qj.get("q") or "").strip()
                 except Exception:  # noqa: BLE001
                     q = ""
