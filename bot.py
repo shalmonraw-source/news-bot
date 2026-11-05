@@ -1461,6 +1461,11 @@ def main():
         print(msg)
         tg("sendMessage", chat_id=_chat_id(), text=msg)
         return
+    if mode == "chtest":
+        ch = load_settings().get("tg_channel")
+        r = requests.post(f"https://api.telegram.org/bot{_token()}/sendMessage", data={"chat_id": ch, "text": "✅ בדיקת חיבור: ערוץ MER5 מחובר"}, timeout=30).json()
+        tg("sendMessage", chat_id=_chat_id(), text=("✅ הערוץ מחובר ומקבל הודעות: " if r.get("ok") else "❌ הערוץ לא קיבל: " + str(r.get("description"))[:200] + " ") + str(ch))
+        return
     if mode == "insights":
         page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
         token = page_token(page, token)
