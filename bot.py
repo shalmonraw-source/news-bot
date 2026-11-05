@@ -1170,7 +1170,8 @@ def checkpoint(st):
         run("git", "add", "-A", "state.json", "images", "decisions")
         if run("git", "diff", "--staged", "--quiet").returncode != 0:
             run("git", "commit", "-m", "checkpoint state")
-            run("git", "pull", "--rebase")
+            if run("git", "pull", "--rebase", "-X", "theirs").returncode != 0:  # בהתנגשות, גרסת המצב שלנו גוברת
+                run("git", "rebase", "--abort")
             run("git", "push")
     except Exception as e:  # noqa: BLE001
         print("warn: checkpoint", type(e).__name__)

@@ -54,6 +54,7 @@ jobs:
           git add -A state.json images fonts settings.json decisions
           if ! git diff --staged --quiet; then
             git commit -m "update state"
-            git pull --rebase
+            git rebase --abort 2>/dev/null || true
+            git pull --rebase -X theirs || { git rebase --abort 2>/dev/null; git status | head -5; }
             git push
           fi
