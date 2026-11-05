@@ -3750,8 +3750,10 @@
    "topic": "security",
    "urgency": 4,
    "approved_at": "2026-11-05T08:39:09+00:00",
-   "published": false,
-   "fast": true
+   "published": true,
+   "fast": true,
+   "fb_id": "1322211944302986_122130390567473720",
+   "published_at": "2026-11-05T08:39:18+00:00"
   }
  ],
  "offset": 569287812,
