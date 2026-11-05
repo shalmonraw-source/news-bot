@@ -190,6 +190,56 @@
     "type": "telegram",
     "handle": "OSINTLive",
     "url": "https://t.me/s/OSINTLive"
+   },
+   {
+    "name": "Walla חדשות",
+    "url": "https://rss.walla.co.il/feed/1?type=main"
+   },
+   {
+    "name": "Times of Israel",
+    "url": "https://www.timesofisrael.com/feed/"
+   },
+   {
+    "name": "Kan News",
+    "url": "https://www.kan.org.il/Rss/news.xml"
+   },
+   {
+    "name": "GN משטרה ופלילים",
+    "url": "https://news.google.com/rss/search?q=%D7%9E%D7%A9%D7%98%D7%A8%D7%94%20OR%20%D7%A4%D7%99%D7%92%D7%95%D7%A2%20OR%20%D7%99%D7%A8%D7%99%20OR%20%D7%93%D7%A7%D7%99%D7%A8%D7%94%20OR%20%D7%AA%D7%90%D7%95%D7%A0%D7%94%20%D7%A7%D7%98%D7%9C%D7%A0%D7%99%D7%AA%20OR%20%D7%A9%D7%A8%D7%99%D7%A4%D7%94%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN מד״א ורשות הכבאות",
+    "url": "https://news.google.com/rss/search?q=%D7%9E%D7%93%22%D7%90%20OR%20%D7%9B%D7%99%D7%91%D7%95%D7%99%20%D7%90%D7%A9%20OR%20%D7%A4%D7%99%D7%A0%D7%95%D7%99%20OR%20%D7%A0%D7%A4%D7%92%D7%A2%D7%99%D7%9D%20OR%20%22%D7%90%D7%99%D7%A8%D7%95%D7%A2%20%D7%97%D7%A8%D7%99%D7%92%22%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN אזעקות וירי",
+    "url": "https://news.google.com/rss/search?q=%D7%90%D7%96%D7%A2%D7%A7%D7%95%D7%AA%20OR%20%D7%99%D7%99%D7%A8%D7%95%D7%98%20OR%20%D7%A8%D7%A7%D7%98%D7%95%D7%AA%20OR%20%D7%9B%D7%98%D7%91%22%D7%9D%20OR%20%22%D7%A4%D7%99%D7%A7%D7%95%D7%93%20%D7%94%D7%A2%D7%95%D7%A8%D7%A3%22%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN יהודה ושומרון",
+    "url": "https://news.google.com/rss/search?q=%D7%99%D7%94%D7%95%D7%93%D7%94%20%D7%95%D7%A9%D7%95%D7%9E%D7%A8%D7%95%D7%9F%20OR%20%D7%A2%D7%96%D7%94%20OR%20%D7%9C%D7%91%D7%A0%D7%95%D7%9F%20OR%20%D7%A1%D7%95%D7%A8%D7%99%D7%94%20OR%20%D7%AA%D7%99%D7%9E%D7%9F%20%D7%A4%D7%99%D7%92%D7%95%D7%A2%20OR%20%D7%97%D7%99%D7%A1%D7%95%D7%9C%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN Israel incidents EN",
+    "url": "https://news.google.com/rss/search?q=Israel%20police%20OR%20attack%20OR%20shooting%20OR%20rocket%20OR%20sirens%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "Telegram חדשות 12",
+    "type": "telegram",
+    "handle": "newsisrael12",
+    "url": "https://t.me/s/newsisrael12"
+   },
+   {
+    "name": "Telegram Abu Ali Express",
+    "type": "telegram",
+    "handle": "englishabuali",
+    "url": "https://t.me/s/englishabuali"
+   },
+   {
+    "name": "Telegram Israel Alerts",
+    "type": "telegram",
+    "handle": "IsraelAlerts",
+    "url": "https://t.me/s/IsraelAlerts"
    }
   ],
   "en": "SECURITY"
