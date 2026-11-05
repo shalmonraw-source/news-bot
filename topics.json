@@ -18,16 +18,16 @@
     "url": "https://www.aljazeera.com/xml/rss/all.xml"
    },
    {
-    "name": "Times of Israel",
-    "url": "https://www.timesofisrael.com/feed/"
+    "name": "Times of Israel (via Google News)",
+    "url": "https://news.google.com/rss/search?q=site:timesofisrael.com+when:1d&hl=en-US&gl=US&ceid=US:en"
    },
    {
     "name": "Ynet",
     "url": "https://www.ynet.co.il/Integration/StoryRss2.xml"
    },
    {
-    "name": "Al Arabiya",
-    "url": "https://www.alarabiya.net/feed/rss2/ar.xml"
+    "name": "Al Arabiya (via Google News)",
+    "url": "https://news.google.com/rss/search?q=site:english.alarabiya.net+when:1d&hl=en-US&gl=US&ceid=US:en"
    },
    {
     "name": "Asharq Al-Awsat",
@@ -116,8 +116,8 @@
     "url": "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
    },
    {
-    "name": "Times of Israel",
-    "url": "https://www.timesofisrael.com/feed/"
+    "name": "Times of Israel (via Google News)",
+    "url": "https://news.google.com/rss/search?q=site:timesofisrael.com+when:1d&hl=en-US&gl=US&ceid=US:en"
    },
    {
     "name": "Google News Politics (EN)",
@@ -142,8 +142,8 @@
   "en": "DID YOU KNOW",
   "sources": [
    {
-    "name": "BBC Future",
-    "url": "https://www.bbc.com/future/rss"
+    "name": "BBC Future (via Google News)",
+    "url": "https://news.google.com/rss/search?q=site:bbc.com/future+when:7d&hl=en-US&gl=US&ceid=US:en"
    },
    {
     "name": "Atlas Obscura",
@@ -179,8 +179,8 @@
   "en": "ISRAELIS ABROAD",
   "sources": [
    {
-    "name": "Times of Israel",
-    "url": "https://www.timesofisrael.com/feed/"
+    "name": "Times of Israel (via Google News)",
+    "url": "https://news.google.com/rss/search?q=site:timesofisrael.com+when:1d&hl=en-US&gl=US&ceid=US:en"
    },
    {
     "name": "Google News Israelis Abroad (EN)",

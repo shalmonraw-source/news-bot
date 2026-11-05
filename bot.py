@@ -410,6 +410,8 @@ def fetch_candidates(st, topic):
     for src in sources:
         try:
             r = requests.get(src["url"], headers={"User-Agent": UA}, timeout=25)
+            if r.status_code >= 400:  # חלק מהאתרים חוסמים בוטים: ניסיון חוזר עם דפדפן
+                r = requests.get(src["url"], headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"}, timeout=25)
             r.raise_for_status()
             feed = feedparser.parse(r.content)
         except Exception as e:  # noqa: BLE001
