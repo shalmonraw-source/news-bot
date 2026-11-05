@@ -466,27 +466,11 @@
   "347316fcaf3c",
   "088fc877c632",
   "9858f91e2062",
-  "d6197c0648ae"
+  "d6197c0648ae",
+  "6ba64d3bfd85",
+  "d4ad9a48d21b"
  ],
  "pending": {
-  "8aec5bd77c": {
-   "text": "אבולון סגרה הזמנה ל-140 מטוסי בואינג 737-10\nחברת ההשכרה אבולון סיימה את ההזמנה ל-140 מטוסי 737-10, הגדולה ביותר של חברת השכרה בדגמי ה-737 MAX. בואינג אישרה שההזמנה שהוכרזה בחודש שעבר היא לדגם זה. סך ההזמנות של אבולון ל-MAX עומד על יותר מ-240 מטוסים. ✈️",
-   "links": [
-    "https://www.aviation24.be/manufacturers/boeing/avolon-finalizes-record-order-for-140-boeing-737-10-aircraft/",
-    "https://www.aerotime.aero/articles/avolon-boeing-737-max-10-order",
-    "https://simpleflying.com/avolon-boeing-737-max-10-order/"
-   ],
-   "severity": "low",
-   "ts": 1793792976.2939475
-  },
-  "d3a3591bf3": {
-   "text": "ה-FAA: בדיקות לעשרות מטוסי בואינג 787 בשל מיכלי דלק\nהרשות האמריקאית לתעופה אזרחית פרסמה הנחיה המחייבת בדיקות במיכלי הדלק של 60 מטוסי 787 הרשומים בארה\"ב. לפי ההנחיה, מיכלי הדלק עלולים להתלקח בפגיעת ברק. מספר המטוסים הרשומים מחוץ לארה\"ב שעשויים להיות מושפעים אינו ידוע.",
-   "links": [
-    "https://simpleflying.com/boeing-787-faa-fuel-tank-inspections-lightning-strike/"
-   ],
-   "severity": "medium",
-   "ts": 1793792976.9203944
-  },
   "05b19dbd21": {
    "text": "181 נוסעים, שדה תעופה לא נכון, ואוטובוס לסיום\n\nתארו לעצמכם שאתם בטיסה מלונדון לוורשה, כמעט בבית. פתאום המטוס נוחת בשדה אחר לגמרי. זה מה שעבר על 181 האנשים בטיסה LO286 של LOT.\n\nבשדה מודלין פינו אותם מהמטוס, ואנשי הביטחון סרקו אותו. לא נמצא כלום. את סוף הדרך לשדה שופן הם עשו באוטובוס, ומודלין נסגר לכשעתיים.\n\nוזה היה רק מטוס אחד. ביום שלישי, 3 בנובמבר, כוונו איומי פצצה ללפחות שש טיסות בפולין, ספרד, איטליה ובולגריה. במורסיה ירדו 114 נוסעים ושבעה אנשי צוות לבדיקה. טיסת ריינאייר מדבלין לרומא קיבלה ליווי של מטוסי קרב איטלקיים, כמו טיסה של נשיא.\n\nלמה מטוסי קרב? הם נצמדים למטוס הנוסעים, עוקבים אחריו ומוודאים שהוא מגיע בדיוק לאן שצריך.\n\nבשום מקום לא נמצאו חומרי נפץ. לפי דיווחים ראשונים גם טיסה מישראל לסופיה הייתה מטרה, אבל בבולגריה הבהירו שמדובר בטיסה מברגמו. עדיין לא ידוע אם האיומים קשורים זה לזה.\n\nכמה מאמץ צריך כדי לשלוח איום? ועכשיו תחשבו כמה אנשים, מטוסים ושעות צריך כדי להתייחס אליו ברצינות.",
    "links": [
@@ -728,6 +712,21 @@
    "image": "images/d6197c0648.jpg",
    "credit": "ESO/M. Tarenghi / Wikimedia Commons / CC BY 4.0",
    "ts": 1793840219.2650173
+  },
+  "983b2170eb": {
+   "text": "טראמפ איבד את הקונגרס, וסגנו ונס מאשים את המלחמה באיראן\n\nבעוד האבק שוקע אחרי בחירות האמצע, החשבון הרשמי של הבית הלבן פרסם ב-X תמונה של טראמפ עומד, חמור סבר, מאחורי שולחנו בחדר הסגלגל. לפי ה-BBC, הדמוקרטים זכו ברוב בבית הנבחרים ובסנאט בבחירות שנערכו ביום שלישי.\n\nהביקורת הבולטת הגיעה מבפנים. סגן הנשיא ג׳יי די ונס כתב בפוסט ארוך ברשתות החברתיות שהמלחמה באיראן, שטראמפ פתח בה יחד עם ישראל, היא שהובילה להפסד. \"כולם יודעים למה הפסדנו\", כתב. לפי CBS News, טראמפ שואל יועצים קרובים אם להחליף את שר ההגנה פיט הגסת׳, מאדריכלי המלחמה. טראמפ הכחיש.\n\nלפי ניתוח של ה-BBC, בשנתיים האחרונות של כהונתו נותרו בידי טראמפ סמכויות רחבות, ובהן צווים נשיאותיים וזכות וטו. הרוב שיהיה לדמוקרטים לא יספיק כדי לעקוף וטו, והמכשולים הגדולים ביותר עשויים לצוץ דווקא מתוך מפלגתו.\n\nלפי ה-BBC, הפעם האחרונה שבה זכו הדמוקרטים ברוב בהיקף כזה בבחירות אמצע הייתה ב-2006. אז החליף ג׳ורג׳ וו. בוש את שר ההגנה דונלד רמספלד, מהכוחות המניעים של מלחמת עיראק.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiggFBVV95cUxQS1dhbGdEUklRVFQteWlpakFoa2FBT21ybFFSdnZJYThaTGVTc3BuWWxJTHNBYWxqSzEwRVdnMlRBVHVMRlFnZS1OcW15RXRmUW1RUWZUczdUV0hjY3VmU09NNHdibXVRUGNYZWdMbDMzU3dXMDN1ejRCZnJpZElLbExR?oc=5",
+    "https://news.google.com/rss/articles/CBMifkFVX3lxTFBQMmdXRDY4SkxCc0NSNXBTQTZiQktjSlk4ekJabWJlQVJNYk9jdEdsS21tN1Ffa0U5UGt2TFlIR1M3djFSSjIwdHZCb04wRVRld0pVVFNuWXkzcjVSZmpJRW0yNkc2Ti01cnQ3ZUNQMlZxVnNrd3U0eG5haHlFUdIBgwFBVV95cUxNdGtMbm10WmRZNDkwMXBSWno0VmhpaXh0NGVYbXhXSHlWbzdBWmwyTEd4SlZCN2tCQTBxOXpxWm1IM09uWnZWdm5OWWcyUlJGQ0dJd2FodWVscjNuUHNIaXItdVJHRW5JekJKeXV4UmQ0WXpVRVJSSlE4Zjd2Zk9BMGI3dw?oc=5",
+    "https://news.google.com/rss/articles/CBMiggFBVV95cUxOTlRHckk4bFA0QmdHUnQ5WTYxVDZLMzBnMUhrV294cDVHZlZ3X1VHMlJSVF8ycnJ4REZabGdPRFpwU3BENkJhdnBQRmZTYnZLVU8xaU1EQ0lrVmpHTENocjY3SVV1T1hUNG9ZVGE2OE9YWEJ1ZW5xVVN4eUxXWElKQlBB?oc=5",
+    "https://www.bbc.co.uk/news/articles/cmpdg093e589o?at_medium=RSS&at_campaign=rss"
+   ],
+   "severity": "high",
+   "topic": "politics",
+   "image": "images/983b2170eb.jpg",
+   "credit": "Diliff / Wikimedia Commons / CC BY 2.5",
+   "urgency": 4,
+   "ts": 1793840963.8109083
   }
  },
  "approved": [
@@ -774,7 +773,7 @@
   "count": {
    "security": 3,
    "aviation": 3,
-   "politics": 3,
+   "politics": 4,
    "facts": 2
   }
  },
