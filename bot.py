@@ -592,11 +592,48 @@ HEBREW_SYSTEM = """אתה עורך לשון בכיר בעיתון ישראלי �
 
 
 _CREDIT_ALERT = 0
+_BUDGET_ALERT = 0
+# מחירים בדולר למיליון טוקנים, מוערכים בגבוה כדי להיות בצד הבטוח (קלט, פלט)
+_PRICE = {"opus": (15, 75), "sonnet": (3, 15), "haiku": (1, 5)}
+
+
+def _spend_state():
+    st = _STATE_REF.get("st")
+    if st is None:
+        return None
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    sp = st.get("spend")
+    if not sp or sp.get("date") != today:
+        sp = st["spend"] = {"date": today, "usd": 0.0}
+    return sp
+
+
+def _budget():
+    return float(load_settings().get("daily_budget_usd", 2.0))
+
+
+def _charge(model, usage):
+    sp = _spend_state()
+    if sp is None or usage is None:
+        return
+    pin, pout = next((v for k, v in _PRICE.items() if k in model), (15, 75))
+    inp = getattr(usage, "input_tokens", 0) or 0
+    out = getattr(usage, "output_tokens", 0) or 0
+    cw = getattr(usage, "cache_creation_input_tokens", 0) or 0
+    cr = getattr(usage, "cache_read_input_tokens", 0) or 0
+    sp["usd"] = round(sp["usd"] + (inp * pin + cw * pin * 1.25 + cr * pin * 0.1 + out * pout) / 1e6, 4)
 
 
 def claude_text(system, user, model, max_tokens=3000):
     import anthropic
 
+    sp = _spend_state()
+    if sp is not None and sp["usd"] >= _budget():
+        global _BUDGET_ALERT
+        if time.time() - _BUDGET_ALERT > 6 * 3600:
+            _BUDGET_ALERT = time.time()
+            tg("sendMessage", chat_id=_chat_id(), text=f"⏸ הגעתי לתקרת ההוצאה היומית (${_budget():.2f}). הבוט לא כותב פוסטים נוספים עד חצות UTC. אפשר להעלות ב-settings.json (daily_budget_usd).")
+        raise RuntimeError("daily budget reached")
     client = anthropic.Anthropic()
     try:
         resp = client.messages.create(
@@ -612,6 +649,7 @@ def claude_text(system, user, model, max_tokens=3000):
                 _CREDIT_ALERT = time.time()
                 tg("sendMessage", chat_id=_chat_id(), text="🚨 נגמרו קרדיטים ב-Claude API. הבוט לא יכול לכתוב פוסטים עד שתטען ב-console.anthropic.com ← Billing.")
         raise
+    _charge(model, getattr(resp, "usage", None))
     return "".join(b.text for b in resp.content if b.type == "text")
 
 
@@ -906,6 +944,7 @@ def judge_photo(img, info, subject, post):
             {"type": "text", "text": f"נושא נדרש: {subject}\nכותרת הקובץ: {info}\nהפוסט:\n{post[:700]}"},
         ]}],
     )
+    _charge(MODEL, getattr(resp, "usage", None))
     raw = "".join(b.text for b in resp.content if b.type == "text")
     try:
         v = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
