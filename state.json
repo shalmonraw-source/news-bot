@@ -468,7 +468,47 @@
   "9858f91e2062",
   "d6197c0648ae",
   "6ba64d3bfd85",
-  "d4ad9a48d21b"
+  "d4ad9a48d21b",
+  "7bf3a158e62d",
+  "dc5eb4e6dd8b",
+  "daaab058c82b",
+  "ded8a2516883",
+  "f546e112f873",
+  "eb8fc2466419",
+  "d3b36aa29569",
+  "7e02bc5aabfe",
+  "808376bb3dcc",
+  "8a652e314e91",
+  "9da7a41aff22",
+  "bf51009377fa",
+  "e5b4f5b988e5",
+  "2ce26f9a3ed9",
+  "c7ec8dff2123",
+  "4a266dfd94ba",
+  "75017f178378",
+  "519f83ed6e19",
+  "4bb618b10a6f",
+  "8ce6ca7f8770",
+  "e6c09f2edcbc",
+  "562288c038c0",
+  "fb392f088f61",
+  "f92b6bfd3a20",
+  "356beaa13984",
+  "63fea1b56b04",
+  "b1c7e6022269",
+  "892382c02669",
+  "a3e2b24eafb5",
+  "6228ef5f5354",
+  "a75d3d00a002",
+  "88a8eb2952f0",
+  "6986e579c54e",
+  "a87edb1e4ab7",
+  "b58d70cf4bd8",
+  "cb341cfc9bbb",
+  "1586b8f20483",
+  "f544997b7e48",
+  "3b13c249cde6",
+  "98c30f199ee5"
  ],
  "pending": {
   "05b19dbd21": {
@@ -727,6 +767,21 @@
    "credit": "Diliff / Wikimedia Commons / CC BY 2.5",
    "urgency": 4,
    "ts": 1793840963.8109083
+  },
+  "d18a6496c6": {
+   "text": "אחרי התבוסה בבחירות האמצע: ואנס נראה כמי שמטיל ספק במלחמה באיראן\n\nלפי אתר אקסיוס, אחרי התבוסה בבחירות האמצע ניצב הנשיא טראמפ בעיקר בפני אפשרויות גרועות בסוגיית איראן. אל ג׳זירה מדווחת כי ואנס, המבקש להתמודד על הנשיאות, נראה כמי שמטיל ספק במלחמה באיראן אחרי המפלה בקלפי.\n\nאתר אל ג׳זירה נט מביא דיווח של CNN, ולפיו טראמפ מרגיש שהוטעה בנוגע למלחמה באיראן וחושש לאבד את השפעתו. הדיווחים אינם מפרטים מה בדיוק אמר ואנס ואילו צעדים שוקל הבית הלבן.\n\nאתר ארם ניוז תוהה אם דברי ואנס יבלמו את מה שהוא מכנה ״מלחמת טראמפ באיראן״ אחרי ״התבוסה הכואבת״.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMif0FVX3lxTE4xLW5GUVNsM0M5N3czNGNCaUxWQVNfamtLbFFBdEVzZlEydFJEY3E2TkhJQTN6c3g0LWtaZmJ4bXlOY2FtV0d1c0ROd1JFc045OENVWnpLSGxrbm9sTHJVTzlwQnNUeEJKdE9RT21ValNvUkZRRldSVGVDNHVwTDg?oc=5",
+    "https://news.google.com/rss/articles/CBMitwFBVV95cUxPNFdoTi1INVRLRUdkTG9SY3pPQ1dQcTgwTzVjMWQySGdBWUJLczFfMWV1anNEbElxY29VSy1ieGh5dzlCTUhFdEtIMUViLWNURVFEWUw2X3lsbXJVM2dCWW9jQnV2Slg3bm5NMW1iU3JzeHlja2xOSFN6U0ZUR3hwVVRuaU1zV1FmR2p3bTQtczVmMU5VS3NWR2d5d0pzdEpVcFAzNzB6VXc1MUdfVExXX0RwOXRyVEXSAbwBQVVfeXFMTUlnRGFpN3h6WmRvdWJNS1pDdkV3WGJKSC1xNFZtSjNLMWIxRjBweTZYcDZRRzVmdDYxXzNaenQxMzQwUVRqNlpuRW9MaGxHakxsV011NkVTUXZ6LXVjWGItOFZUVzRkTklkOTFYa25oRnNvZTItTWdFLTZpUkwzR3E5ZGpQMzlZdXJNdXRwc2NNRXlYQnQ4LTI0YnExc2RscHhKWEw2ZzdHOHVyWEZaZDFNelVkOGlLOGI4eDM?oc=5",
+    "https://news.google.com/rss/articles/CBMiwwJBVV95cUxOc0gyTklzQjludGlIdGNmQWtmX25qN1lpT29UbmwwMmZVOFZwb0dCTFBHampYanN5czFiMjV4VzNpeXVpWk9tRlFzTmF1LXdOanpWeFVnVzZaWWl0SS1uSFM1Z0s3RUZoVDNsN0sxTy1sQlV5UEZfNHM1cHNrbWk4TS0tQkZtd0dwQ0xJUUdmd2QzdEJDc3JkNU84YkoyZ3FncnR6ZV9NdVhoYV9iU29vZ3U1MUZuaTNKa1lwYmdBenRvVENEUU1EZHlXbWdSaHFVenllLUJ6aWtCQ1lKcFpuQi13SXBNLTRXX0xmdUh0U1JRSDZNbm1oeGFwcEhPdF82WmtNTUVrcElMQ3p0M19GMDNBLVM2WkZfZU5UY3pWVFVHMFgxWkhhREVnY1g2YlBCOWFxa2U2M0NCc0U1U3NIaHg2Yw?oc=5",
+    "https://news.google.com/rss/articles/CBMiVkFVX3lxTE40TjU4SnllWkhYRlFfQ1phYkFHWW41VzRQR25neEZpdGtrZFg4ekR6aHB2dEg3YUtXRWEyVVhQd0dUQ3NNNGZfLWRnSjBfWVBUSVBxRkVn?oc=5"
+   ],
+   "severity": "medium",
+   "topic": "security",
+   "image": "images/d18a6496c6.jpg",
+   "credit": null,
+   "urgency": 4,
+   "ts": 1793841005.9092185
   }
  },
  "approved": [
@@ -771,7 +826,7 @@
  "daily": {
   "date": "2026-11-05",
   "count": {
-   "security": 3,
+   "security": 4,
    "aviation": 3,
    "politics": 4,
    "facts": 2
