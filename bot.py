@@ -592,6 +592,7 @@ HEBREW_SYSTEM = """אתה עורך לשון בכיר בעיתון ישראלי �
 
 
 _CREDIT_ALERT = 0
+_PATTERN = set()
 _BUDGET_ALERT = 0
 # מחירים בדולר למיליון טוקנים, מוערכים בגבוה כדי להיות בצד הבטוח (קלט, פלט)
 _PRICE = {"opus": (15, 75), "sonnet": (3, 15), "haiku": (1, 5)}
@@ -658,22 +659,24 @@ def gemini_text(system, user, max_tokens=2000):
     key = os.environ.get("GEMINI_API_KEY")
     if not key:
         return None
-    try:
-        r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{os.environ.get('GEMINI_MODEL', 'gemini-3.8-flash')}:generateContent",
-            headers={"x-goog-api-key": key},
-            json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"role": "user", "parts": [{"text": user}]}],
-                  "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.2, "responseMimeType": "application/json"}},
-            timeout=120,
-        )
-        j = r.json()
-        if "candidates" not in j:
-            print("gemini error:", r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:300])
-            return None
-        return "".join(p.get("text", "") for p in j["candidates"][0]["content"]["parts"])
-    except Exception as e:  # noqa: BLE001
-        print("gemini failed:", type(e).__name__, str(e)[:120])
-        return None
+    models = [os.environ.get("GEMINI_MODEL", "gemini-3.8-flash"), "gemini-flash-latest", "gemini-3.8-flash-lite"]
+    for m in models:
+        try:
+            r = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent",
+                headers={"x-goog-api-key": key},
+                json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"role": "user", "parts": [{"text": user}]}],
+                      "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.2, "responseMimeType": "application/json"}},
+                timeout=45,
+            )
+            j = r.json()
+            if "candidates" not in j:
+                print("gemini error:", m, r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:200])
+                continue
+            return "".join(p.get("text", "") for p in j["candidates"][0]["content"]["parts"])
+        except Exception as e:  # noqa: BLE001
+            print("gemini failed:", m, type(e).__name__, str(e)[:100])
+    return None
 
 
 def cheap_json(system, user, model, max_tokens=2000):
@@ -858,6 +861,7 @@ def clean_hebrew(t):
     """ניקוי טיפוגרפי דטרמיניסטי אחרי כל בדיקות ה-AI: גרשיים, רווחים, מילים כפולות."""
     t = re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", t)
     t = re.sub(r"(?<=[\u05d0-\u05ea])'(?=[\s,.:;!?]|$)", "\u05f3", t)
+    t = t.replace("**", "").replace("__", "")
     t = re.sub(r"[ \t]{2,}", " ", t)
     t = re.sub(r" +([,.:;!?])", r"\1", t)
     t = re.sub(r"(?<![\w])([\u05d0-\u05ea]{2,})\s+\1(?![\w])", r"\1", t)  # מילה כפולה
@@ -1009,6 +1013,8 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
     typo_only = topic == "explain" or (not urgent and not badge and int(hashlib.sha1(pid.encode()).hexdigest(), 16) % 5 == 0)
     if typo_only:  # פוסטי מערכת וידיעות רגישות: כרטיס טיפוגרפי עם הפטרנים, בלי צילום
         queries, sources = [], ()
+    if typo_only:
+        _PATTERN.add(pid)
     for q in queries:
         try:
             cands = imgcard.commons_candidates(q, aviation=(topic == "aviation"), limit=3)
@@ -1101,7 +1107,7 @@ def fetch_and_propose(st, topic):
         img_path, credit = None, None
         try:
             img_path, credit = make_image(pid, p["text"], topic, overlay=True, urgent=int(p.get("urgency") or 3) >= 5 and int(p.get("traffic") or 3) >= 4, sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
-            tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
+            tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else ("\n🎨 כרטיס מותג עם פטרן (מכוון)" if pid in _PATTERN else "\n⚠️ לא נמצאה תמונה, כרטיס מותג")))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
@@ -1122,7 +1128,8 @@ def fetch_and_propose(st, topic):
                     st["daily"]["auto_politics"] = st["daily"].get("auto_politics", 0) + 1
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto, when_line(cands, p["idxs"]))
         if fast:
-            tg("sendMessage", chat_id=_chat_id(), text="🚨 מתפרצת: פורסמה אוטומטית בפייסבוק כדיווח ראשוני (בבדיקה). אפשר למחוק בפייסבוק אם צריך.")
+            _pp = [x.strip() for x in p["text"].split("\n\n") if x.strip()]
+            tg("sendMessage", chat_id=_chat_id(), text="🚨 מתפרצת, פורסמה אוטומטית כדיווח ראשוני:\n\n" + "\n\n".join(_pp[:3])[:900] + "\n\n(אפשר למחוק בפייסבוק אם צריך)")
             with STATE_LOCK:
                 st["approved"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit, "topic": topic, "urgency": p.get("urgency", 3),
                                        "approved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "published": False, "fast": True})
