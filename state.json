@@ -1285,7 +1285,12 @@
   "df33fb92b46f",
   "c0737a3699fe",
   "f26e8fdd29a8",
-  "24f01063c026"
+  "24f01063c026",
+  "28beae309b96",
+  "b779cadabb90",
+  "87e8a468517d",
+  "744fbf4c185c",
+  "c5787752db7c"
  ],
  "pending": {
   "da5049e556": {
@@ -1308,35 +1313,6 @@
    "image": "images/1427051029.jpg",
    "credit": "Stockstill, Tiffany / Wikimedia Commons / CC BY-SA 4.0",
    "ts": 1793806843.2915251
-  },
-  "20cb2d8d87": {
-   "text": "מטוס מטען של אמזון התרסק: חמישה הרוגים וחמישה פצועים\n\n\"הרס מוחלט\". הציטוט מופיע בכותרת הדיווח של רשת ABC על התרסקות מטוס מטען של אמזון, שבה נהרגו חמישה בני אדם. חמישה נוספים נפצעו. הוועדה הלאומית האמריקאית לבטיחות בתחבורה, ה-NTSB, פתחה בחקירה.\n\nהדיווח הראשוני אינו מפרט את סוג המטוס, את חברת התעופה שהפעילה אותו ואת נסיבות ההתרסקות. גם לא צוין מי היו ההרוגים והפצועים, ואם שהו על הסיפון או על הקרקע.\n\nאת רוב צי המטען של אמזון מפעילות חברות תעופה קבלניות הטסות עבורה. בחקירות מסוג זה מגיע צוות של ה-NTSB לזירה, ממפה את השברים ומאתר את רשם נתוני הטיסה ואת רשם השיחות בתא הטייס. דוח ראשוני מתפרסם בדרך כלל בתוך כמה שבועות, ואילו הדוח הסופי עשוי להתפרסם רק כעבור שנה או יותר. עד אז אין הוועדה קובעת את סיבת ההתרסקות.\n\nמלבד הרשמים והשברים, בוחנים החוקרים בדרך כלל גם את התקשורת עם בקרת התנועה האווירית, את נתוני המכ\"ם, את רישומי התחזוקה ואת העדויות.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMiowFBVV95cUxNa0l3THFWXzJhcHI1ZkZaeGV4bmxoTXJ4MXhxMUpyWk9NeFZrYlpzQWliVkJxWWNPT3YySjRJZ19pMFM2eDFGdWVGMlZaQm81RWZYaVgzcXYyeG5rZEs1V1dmSWdNaE9TOF80U0UtcERSSFlsU1FtNlBSSjBzUkxPeXJmTC1pVXZ1TDNuWGstR0dFOFN4ZHd1dEFOWVBzMjhsZTgw0gGoAUFVX3lxTE13WG1Ya21iZUJjU0M4LUdZbVVmVDdsY3UzWml4Nk1iRXUxUU9UTFl1VHRmM0xFc3FZMXZiVWN3MjJrN0JpRjdyd2dZM3lEdmFUTlc2dTIxM0dnVGtMM2hoZGh3RDF2TG5ycllybkRTN1Ezc2pha0MzWWk5clZURXc0ZE5JY1oyNDczRHNocloxaW9pUXZUMmRwT2F3LUtUMEdXRlRKQktlWA?oc=5"
-   ],
-   "severity": "high",
-   "image": "images/20cb2d8d87.jpg",
-   "credit": "EEJCC / Wikimedia Commons / CC BY-SA 4.0",
-   "ts": 1793806531.6757922
-  },
-  "958c44f372": {
-   "text": "איומי פצצה כוזבים בטיסות ברחבי אירופה: מטוסי קרב איטלקיים ליוו מטוס של ריינאייר\n\nביום שלישי, 3 בנובמבר, כוונו איומי פצצה לשורת טיסות בפולין, בספרד, באיטליה ובבולגריה. באף אחד מהמטוסים לא נמצא חומר נפץ. טיסה LO286 של לוט הפולנית מהית'רו לוורשה הוסטה לנמל התעופה מודלין. האיום דווח ב-09:54, והבואינג 737 MAX נחת בשלום ב-10:01 ועל סיפונו 181 איש. הנוסעים פונו, השדה נסגר לכשעתיים, ובתום הבדיקה הוסעו הנוסעים באוטובוסים לנמל התעופה שופן.\n\nבטיסת ריינאייר ממנצ'סטר למורסיה ירדו מהמטוס 114 נוסעים ושבעה אנשי צוות לצורך בדיקה ביטחונית. מטוסי קרב של חיל האוויר האיטלקי ליוו את טיסה FR9611 של ריינאייר מדבלין לרומא. איומים כוונו גם לטיסת SAS מקופנהגן לוורשה ולשתי טיסות לסופיה. דיווח ראשוני שלפיו מדובר במטוס של אל על תוקן: לדברי דובר משרד הפנים הבולגרי, היה זה מטוס של ויז אייר מברגמו. טרם הוברר אם האיומים קשורים זה לזה.\n\nכל איום מטופל כאמיתי עד שיוכח אחרת. המטוס נוחת ביעדו או מוסט לשדה קרוב, ומשם מועבר לעמדה מבודדת. לאחר שהנוסעים יורדים, חבלנים בודקים את תא הנוסעים ואת המטען. גם איום כוזב עלול להביא לסגירת מסלולים ושדות תעופה, ומומחים מזהירים מפני עיכובים משמעותיים.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMikAFBVV95cUxOV1NrMER4Z3FTa1hfdDd3b0RNV0pGUEtQS3BHZ2RBbklBbUhMMjhKdlVSVm5Gcy12TGFlZzBKOU9QM3dmdVNBNkdNV2hrRVVqTFlndllJcGg5ckpXSVhKb1pScEVzXzFKaXQyY0tRdF9LaG1lVkhMM2x2d2JINk9KaDR5TUVMZjgwSTZjZExfd0M?oc=5",
-    "https://news.google.com/rss/articles/CBMioAFBVV95cUxPRHJ3ZWwwYUE2ODFnWEpjdXBON2pQUkFuZkVuLWVCZVZzelVrVkpqRGVVcHpXc0hEVnd4M2ZQTF81TTZvRGZLUWg2MDV4YTZlMXkwNXl0UmVmSnNRWlluc2FadEF1b2wwcXNoQjN2Tk9XQXl6czlIVzRJcWt3RW5nMVVyWDhuWFFfaXJmWEEtUXU2R0VZMnk1ekphZG9zNkt60gGmAUFVX3lxTFBEVXJzN094RTJYbkJuVUhpUFNyQ1F6OHZwSlp5QXVVM2tEWWNPbE5CRWJtNDlCYk96Zmh3eGtEWi1RNVV2NkRaeThsZ2Y5aWh0LUpVd1lPT0MtVmhMclZIZ1lZUXNiS215VUZBdGREV085QnVFU21SRUxwMXpveVBvb1BfLTJIUkhUWE51SEkxUWtrOGZ5ZXJFc2oxM3NYRHdrSVpuWWc?oc=5",
-    "https://news.google.com/rss/articles/CBMigwFBVV95cUxQTzBXQWEyei1LSENlN08wMGUzYV94US1PNHYxR2dYOGVDOF9Gc2ctdlhJV2R3MU9UdXVLdnB3dkU1bHVYcXBES1ZNQ0M3VVFzRzhGOGFTUTBDWHpydkpNUEk2RmtDTWZrc1psUVlXV3I0S1VVT2lXYTY2ZUpUdnhybXA2QQ?oc=5",
-    "https://news.google.com/rss/articles/CBMiW0FVX3lxTE5IbFItSUNNMGZnNWNfaW50a05YUjZVSUpHeFhfRURWTGd1alI0ZTJqMkJKbXNsRENTNG1SS1FvY2d5Z01LMk1XR21wTERiOWk0WFpRbjFhV01vTUk?oc=5",
-    "https://news.google.com/rss/articles/CBMinAFBVV95cUxNcFU0dlJCbVJqbzRrMFJSVEltV1BQQkxtTGVrYVNPMFN4NHIyN09pSW5YazhsV0V6NkJzakhwaTM0NXJxd0RzOFZUSkJZT3ZhU3ZpdzVHUC1SVmJSbDJfR0pMaWxjMVRzMG5UU3Z5WkxYdDhLNUo5al8teFpMQnlPMjF3bmdXNjc0UnNaTy1PUWM5YkJGaFhNUDZaaWU?oc=5",
-    "https://news.google.com/rss/articles/CBMisAFBVV95cUxOZzRsZXJWNEl5Uk1GY0VGOXNNbm1MRUlEakczTUYwNkdRMTBzRHUxaGhhNFg2dmZHWDZLX2hvSnJkcm5UY294QlNFT3IxYVBidkJ1T0FqT2NpU1NUcWRXNEhWb05iZDJQUnVQSUZxTTRjN2l5RGxQRnh1NHR5bENJZkpVQTFGVDBNNHRsTzhtR2IwMVdYelNKaTZhcHlDbUJMTTRuaGJodFV2VjdMX21tRw?oc=5",
-    "https://news.google.com/rss/articles/CBMilgFBVV95cUxQeDlTU3NwYnp1eG0zSGQ0RnJVOEtzRHo4Q3BiUDFqNFExSUMwMFh4Z0xmVjBVUW5OYkJ4V3pnYXpEOWI2c0tuREpicnAxUFMtRUJMYmwwWkx6UThtXzRyYmtGdTVBLWttSDE4X2xicjE1SUkyb2tSRlNYb1pLM21SR3luUzlEWUtZUHMtcW1LMWcyclZQVWc?oc=5",
-    "https://www.aviation24.be/airlines/multiple-bomb-threats-target-european-passenger-flights-prompting-diversions-and-fighter-jet-escort/",
-    "https://news.google.com/rss/articles/CBMirAFBVV95cUxQMl82Y2pyZDV6c2FGcS1UbTI4WjZaMUM0aS0xbzgzN1NtdzVLME5teHAwS25YQzdwSllBVTNfQkJSR3k2TGVBQW8tMkxMbTRBSjA3M2YwLWZwdlFHekNOeFRybmpyZ2ZOdWdrVV9xcUdWY25fdVJuNzl1d0huRWNPRDdsak5sVmxMNHUybmdJckxiT3ZJeDRJUzFYMDEwV3ZvRFBERXBQdFg5WVVU0gGyAUFVX3lxTE9QbjhPRlZneEx1VW9fYUNNQ1UzTEllN0pPcmRIZTN6M2NOZFdLd1YzM1RfZ0Y2cjl6ZlV4YUNMbnRYRmFNZXQ1SzRRUmE2VFZBVTlzcEQzVjdqcVBZQldtejEzVC12dlY0eGVZQzZoM2tHZ2JjZ3V5VVBQb2tkLXlYeF9LQUM5bjljb2dtS3IzOWtrYzBrVnJleU5LVk1xUzZldDVzdFpiSW9DR0ZSMjFZYkE?oc=5",
-    "https://www.aerotime.aero/articles/ryanair-wizz-air-lot-polish-sas-targeted-bomb-threat"
-   ],
-   "severity": "medium",
-   "image": "images/958c44f372.jpg",
-   "credit": "Hugo LUC / Wikimedia Commons / CC BY-SA 4.0",
-   "ts": 1793806539.800181
   },
   "23514e2c8a": {
    "text": "גל איומי פצצה באירופה: לפחות שש טיסות נבדקו, אחת לוּותה במטוסי קרב\n\nטיסה FR9611 של ריינאייר מדבלין לרומא נחתה בשדה פיומיצ'ינו בליווי מטוסי קרב של חיל האוויר האיטלקי, לאחר שהתקבלה הודעה אנונימית על פצצה. זו הייתה אחת מלפחות שש טיסות נוסעים שהיו יעד לאיומי פצצה ביום שלישי, 3 בנובמבר, בפולין, בספרד, באיטליה ובבולגריה. באף אחד מהמקרים לא נמצאו חומרי נפץ.\n\nבפולין הוסטה טיסה LO286 של LOT מהית'רו לשדה מודלין, ונחתה שם ב-10:01 ועל סיפונה 181 בני אדם. השדה נסגר לכשעתיים. טיסת SAS מקופנהגן נחתה כסדרה בשדה שופן בוורשה. במורסיה ירדו לבדיקה 114 נוסעים ושבעה אנשי צוות מטיסת ריינאייר ממנצ'סטר. בסופיה נבדקו טיסה של וויז אייר מברגמו וטיסה מדבלין. לפי סוכנות הידיעות AFP, הדיווחים הראשונים על טיסה מישראל לסופיה התייחסו בפועל לטיסה מברגמו. הרשויות טרם קבעו אם יש קשר בין האיומים, ובבולגריה פועלים לאתר את שולחיהם.\n\nכל איום פצצה מטופל כאמיתי עד שיוכח אחרת. בדרך כלל מכוונים את המטוס לעמדת חניה מבודדת ומפנים את הנוסעים, וחבלנים סורקים את המטוס, את הנוסעים ואת המטען. גם כשמתברר שהאיום היה שווא, הוא גורם לעיכובים, ולעיתים אף לסגירת שדות תעופה.\n\nנוסעי הטיסה מהית'רו הגיעו בסופו של דבר ליעדם המקורי, שדה שופן – באוטובוס.",
