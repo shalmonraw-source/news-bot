@@ -653,6 +653,37 @@ def claude_text(system, user, model, max_tokens=3000):
     return "".join(b.text for b in resp.content if b.type == "text")
 
 
+def gemini_text(system, user, max_tokens=2000):
+    """מודל זול (Gemini Flash) לעבודה מכנית: בחירה וכפילויות. מחזיר None אם אין מפתח או שנכשל, ואז חוזרים ל-Claude."""
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return None
+    try:
+        r = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')}:generateContent",
+            headers={"x-goog-api-key": key},
+            json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"role": "user", "parts": [{"text": user}]}],
+                  "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.2, "responseMimeType": "application/json"}},
+            timeout=60,
+        )
+        j = r.json()
+        return "".join(p.get("text", "") for p in j["candidates"][0]["content"]["parts"])
+    except Exception as e:  # noqa: BLE001
+        print("gemini failed:", type(e).__name__, str(e)[:120])
+        return None
+
+
+def cheap_json(system, user, model, max_tokens=2000):
+    raw = gemini_text(system, user, max_tokens)
+    if raw:
+        a, b = raw.find("{"), raw.rfind("}")
+        try:
+            return json.loads(raw[a : b + 1])
+        except Exception:  # noqa: BLE001
+            print("gemini bad JSON, falling back to claude")
+    return claude_json(system, user, model, max_tokens)
+
+
 def claude_json(system, user, model, max_tokens=3000):
     raw = claude_text(system, user, model, max_tokens)
     a, b = raw.find("{"), raw.rfind("}")
@@ -858,7 +889,7 @@ def llm_duplicate(st, text):
     if not prev:
         return False
     try:
-        r = claude_json(DEDUP_SYSTEM, "פוסט חדש:\n" + text[:600] + "\n\nכבר נשלחו:\n" + "\n".join("- " + x for x in prev), CHEAP_MODEL, 300)
+        r = cheap_json(DEDUP_SYSTEM, "פוסט חדש:\n" + text[:600] + "\n\nכבר נשלחו:\n" + "\n".join("- " + x for x in prev), CHEAP_MODEL, 300)
         return bool(r.get("duplicate"))
     except Exception as e:  # noqa: BLE001
         print("dedup llm failed:", str(e)[:100])
@@ -877,10 +908,11 @@ TRAFFIC_RULE = """
 
 
 def build_posts(cands, topic="aviation", st=None):
-    lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
+    cands = cands[:24]  # חיסכון: רק החדשות ביותר (הרשימה ממוינת מהחדש לישן)
+    lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"][:220]}' for i, c in enumerate(cands)]
     sent = recent_sent(st) if st else []
     extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
-    picks = parse_picks(claude_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
+    picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
         picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
     wmodel = WRITER_MODEL if topic in ("security", "aviation", "politics") else MODEL
