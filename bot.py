@@ -231,6 +231,15 @@ def auto_ok(st, topic, p, n_sources):
     return st["daily"].get("auto", 0) < AUTO_DAILY_CAP
 
 
+FAST_TOPICS = {"security", "aviation", "abroad", "politics"}
+FAST_DAILY_CAP = 15
+
+
+def FAST_OK(st, topic, p):
+    """מתפרצת (דחיפות 4+) עולה מיד לפייסבוק כדיווח ראשוני. תקרה יומית נגד ספאם/חסימה."""
+    return topic in FAST_TOPICS and int(p.get("urgency") or 3) >= 4 and st["daily"].get("fast", 0) < FAST_DAILY_CAP and not load_settings().get("no_fast")
+
+
 def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3, auto=False, when=""):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
@@ -691,7 +700,7 @@ SAFETY_NEWS = """כללי בטיחות ואמינות (מחייבים):
 - מספרי נפגעים: תמיד עם מקורם, ובלי חישובים או הערכות משלך.
 - אל תנחש כוונות או תוצאות. מה שלא ידוע נכתב במפורש כלא ידוע."""
 
-SELECT_MIDEAST = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. מדור "ביטחון וטרור": ביטחון וטרור בעולם ובפרט במזרח התיכון והעולם הערבי. כולל מלחמות, פיגועים, סיכול טרור והתפתחויות צבאיות. תקבל רשימת ידיעות (כותרת, תקציר, מקור, באנגלית, עברית או ערבית).
+SELECT_MIDEAST = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. מדור "ביטחון, ישראל והמזרח התיכון": עדיפות ראשונה לכל מה שקורה בתוך ישראל ובסביבתה (פיגועים, ירי, אזעקות, תקריות משטרה וביטחון, תאונות ואסונות, שריפות, פשיעה חריגה, אירועים שמעניינים את הציבור הרחב), ואחר כך מזרח תיכון והעולם הערבי, מלחמות, סיכול טרור והתפתחויות צבאיות. תקריות בתוך ישראל נבחרות גם כשהן קטנות יחסית, כל עוד הן מעניינות את הציבור וזוכות לתשומת לב (מקור אחד מספיק לדיווח ראשוני). תקבל רשימת ידיעות (כותרת, תקציר, מקור, באנגלית, עברית או ערבית).
 בחר רק ידיעות בעלות משקל: התפתחויות במלחמות ובעימותים באזור, החלטות ממשלות, הסכמים ומשברים, מהלכים צבאיים שדווחו בכמה מקורות מרכזיים, אנרגיה וכלכלה באזור,
 וגם ידיעות מהתקשורת הערבית שהקהל הישראלי לא רואה ("מה אומרים בעולם הערבי") כשהן מעניינות באמת.
 דלג על: שמועות ורשתות חברתיות ללא מקור מזוהה, תעמולה, ידיעות קטנות או חוזרות, ספורט, סלבס, ופרטים מבצעיים של כוחות ישראליים.
@@ -963,12 +972,28 @@ def fetch_and_propose(st, topic):
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
         with STATE_LOCK:
-            auto = (not sample) and auto_ok(st, topic, p, n_sources)
+            fast = (not sample) and FAST_OK(st, topic, p)
+            if fast:
+                st["daily"]["fast"] = st["daily"].get("fast", 0) + 1
+                p["text"] = p["text"].rstrip() + "\n\n⏳ דיווח ראשוני. הפרטים בבדיקה ויעודכנו."
+            auto = (not sample) and not fast and auto_ok(st, topic, p, n_sources)
             if auto:
                 st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
                 if topic == "politics":
                     st["daily"]["auto_politics"] = st["daily"].get("auto_politics", 0) + 1
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto, when_line(cands, p["idxs"]))
+        if fast:
+            tg("sendMessage", chat_id=_chat_id(), text="🚨 מתפרצת: פורסמה אוטומטית בפייסבוק כדיווח ראשוני (בבדיקה). אפשר למחוק בפייסבוק אם צריך.")
+            with STATE_LOCK:
+                st["approved"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit, "topic": topic, "urgency": p.get("urgency", 3),
+                                       "approved_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "published": False, "fast": True})
+                if not sample:
+                    st["daily"]["count"][topic] = st["daily"]["count"].get(topic, 0) + 1
+                checkpoint(st)
+                publish_approved(st)
+                checkpoint(st)
+            sent += 1
+            continue
         with STATE_LOCK:
             if auto:
                 st["queue"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit, "topic": topic, "urgency": p.get("urgency", 3),
