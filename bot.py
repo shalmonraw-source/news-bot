@@ -982,6 +982,22 @@ def page_token(page, token):
         return token
 
 
+
+def mirror_to_channel(item):
+    """משכפל פוסט שפורסם לערוץ הטלגרם הציבורי (settings.json: tg_channel, למשל "@mer5news"). הבוט חייב להיות מנהל בערוץ."""
+    ch = load_settings().get("tg_channel")
+    if not ch:
+        return
+    try:
+        text = item["text"] + ("\n\n" + "\n".join(item.get("links", [])[:2]) if item.get("links") else "")
+        if item.get("image") and os.path.exists(item["image"]):
+            with open(item["image"], "rb") as f:
+                requests.post(f"https://api.telegram.org/bot{_token()}/sendPhoto", data={"chat_id": ch}, files={"photo": f}, timeout=60)
+        requests.post(f"https://api.telegram.org/bot{_token()}/sendMessage", data={"chat_id": ch, "text": text[:4000], "disable_web_page_preview": "true"}, timeout=30)
+    except Exception as e:  # noqa: BLE001
+        print("channel mirror failed:", type(e).__name__)
+
+
 def publish_approved(st):
     """מפרסם לעמוד פייסבוק פוסטים שאושרו. פועל רק אם הוגדרו FB_PAGE_ID ו-FB_PAGE_TOKEN."""
     page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
@@ -1012,10 +1028,20 @@ def publish_approved(st):
                 raise RuntimeError(str(err.get("message", "unknown"))[:150])
             # מקורות בתגובה הראשונה, כדי לא לפגוע בחשיפה
             try:
-                requests.post(f"https://graph.facebook.com/{FB_VERSION}/{fb_id}/comments", data={"message": "מקורות:\n" + "\n".join(item["links"]), "access_token": token}, timeout=40)
+                q = ""
+                try:
+                    qj = claude_json('כתוב שאלה אחת קצרה (עד 12 מילים) בעברית שמזמינה את הקוראים להגיב על הידיעה, בלי להטות לצד פוליטי ובלי נושא כואב אם יש נפגעים (אז החזר ריק). החזר JSON: {"q":"..."}', item["text"][:600], MODEL, 150)
+                    q = (qj.get("q") or "").strip()
+                except Exception:  # noqa: BLE001
+                    q = ""
+                body = ("מקורות:\n" + "\n".join(item["links"])) if item.get("links") else ""
+                body = (q + "\n\n" + body).strip()
+                if body:
+                    requests.post(f"https://graph.facebook.com/{FB_VERSION}/{fb_id}/comments", data={"message": body, "access_token": token}, timeout=40)
             except Exception:  # noqa: BLE001
                 pass
             item["published"] = True
+            mirror_to_channel(item)
             item["fb_id"] = fb_id
             item["published_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
             tg("sendMessage", chat_id=_chat_id(), text=f"📣 פורסם בפייסבוק\n{item['text'].splitlines()[0]}")
@@ -1168,6 +1194,24 @@ def publish_reel(st):
     tg("sendMessage", chat_id=_chat_id(), text=f"🎬 רילס עלה לפייסבוק\n{head}")
 
 
+
+DIGEST_SYSTEM = """אתה עורך ב-MER5 - מהשטח. תקבל את כותרות הפוסטים שפורסמו היום. כתוב פוסט סיכום ערב: "הידיעות החשובות של היום" עם 4-5 נקודות קצרות (שורה אחת לכל ידיעה, עם אימוג'י מתאים בתחילת השורה), פתיח של משפט אחד וסיום של משפט אחד. רק מה שמופיע ברשימה, בלי להוסיף עובדות. עברית טבעית ורהוטה.
+החזר JSON בלבד: {"text":"..."}"""
+
+
+def todays_published(st):
+    now = time.time()
+    return [x for x in st["approved"] if x.get("published_at") and now - datetime.fromisoformat(x["published_at"]).timestamp() < 20 * 3600 and x.get("topic") != "explain"]
+
+
+def links_post_text():
+    """פוסט יומי עם קישורים לכל הפלטפורמות, מתוך settings.json: links = {"שם": "כתובת"}."""
+    links = load_settings().get("links") or {}
+    if not links:
+        return ""
+    return "מעדכנים אתכם בזמן אמת, בכל מקום:\n" + "\n".join(f"{name}: {url}" for name, url in links.items()) + "\n\nעקבו כדי לא לפספס."
+
+
 def daily_jobs(st):
     """משימות יומיות לפי שעון ישראל: דוח בוקר, 2 פוסטי הסברה ופוסט הזמנה לעקוב. כל אחת פעם ביום."""
     cfg = load_settings()
@@ -1180,7 +1224,7 @@ def daily_jobs(st):
     st["jobs"] = {today: st.get("jobs", {}).get(today, [])}
     done = st["jobs"][today]
     mins = now.hour * 60 + now.minute
-    plan = [("report", "08:00"), ("reel1", "09:30"), ("explain1", "10:30"), ("follow", "13:00"), ("reel2", "14:00"), ("explain2", "18:30"), ("reel3", "20:00")]
+    plan = [("report", "08:00"), ("reel1", "09:30"), ("explain1", "10:30"), ("follow", "13:00"), ("reel2", "14:00"), ("explain2", "18:30"), ("reel3", "20:00"), ("digest", "21:30"), ("links", "19:30")]
     for name, hhmm in plan:
         start = int(hhmm[:2]) * 60 + int(hhmm[3:])
         force = os.environ.get("FORCE_JOBS") == "1"
@@ -1199,6 +1243,16 @@ def daily_jobs(st):
                 if text:
                     pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 4000)
                     propose_custom(st, "explain", clean_hebrew((pol.get("text") or text).strip()), urgency=1, special=3)
+            elif name == "digest":
+                heads = [x["text"].split("\n")[0] for x in todays_published(st)]
+                if len(heads) >= 3:
+                    w = claude_json(DIGEST_SYSTEM, "\n".join(heads), WRITER_MODEL, 2000)
+                    if (w.get("text") or "").strip():
+                        propose_custom(st, "explain", clean_hebrew(w["text"].strip()), urgency=2, special=3)
+            elif name == "links":
+                txt = links_post_text()
+                if txt:
+                    propose_custom(st, "explain", txt, urgency=1, special=2)
             elif name == "follow":
                 w = claude_json(FOLLOW_SYSTEM, "כתוב פוסט הזמנה לעקוב להיום.", WRITER_MODEL, 1500)
                 text = (w.get("text") or "").strip()
@@ -1400,7 +1454,7 @@ def main():
                 with STATE_LOCK:
                     checkpoint(st)
                 # סריקה חוזרת באותה ריצה כדי שלא יהיו פערים בין ריצות (עד כ-5 דקות לריצה)
-                if mode == "sample" or time.time() - started > 200 or loops >= 4:
+                if True:  # ריצה אחת לכל הפעלה, כדי לחסוך דקות GitHub Actions
                     break
                 time.sleep(30)
         finally:
