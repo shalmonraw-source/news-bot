@@ -664,7 +664,7 @@ def gemini_text(system, user, max_tokens=2000):
     key = os.environ.get("GEMINI_API_KEY")
     if not key or time.time() < _GEM_DOWN[0]:
         return None
-    models = [os.environ.get("GEMINI_MODEL", "gemini-3.8-flash"), "gemini-flash-latest", "gemini-3.8-flash-lite"]
+    models = [os.environ.get("GEMINI_MODEL", "gemini-3.8-flash"), "gemini-flash-latest"]  # 3.8-flash-lite לא קיים (404)
     for m in models:
         try:
             r = requests.post(
@@ -676,7 +676,10 @@ def gemini_text(system, user, max_tokens=2000):
             )
             j = r.json()
             if "candidates" not in j:
-                print("gemini error:", m, r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:200])
+                print("gemini error:", m, r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:120])
+                if r.status_code == 429:  # נגמרה המכסה: אין טעם לנסות שוב כמה דקות
+                    _GEM_DOWN[0] = time.time() + 1800
+                    return None
                 continue
             um = j.get("usageMetadata", {})
             print(f"GEM {m} in={um.get('promptTokenCount')} out={um.get('candidatesTokenCount')} think={um.get('thoughtsTokenCount')}")
@@ -953,8 +956,8 @@ def build_posts(cands, topic="aviation", st=None):
                 continue
             wmodel = WRITER_MODEL if (pk["traffic"] >= 5 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
             if topic in ("facts", "abroad") and os.environ.get("GEMINI_API_KEY"):  # ניסוי חיסכון: ידיעות קלות נכתבות בגמיני, אותן הוראות. אם נכשל, חוזרים ל-Claude
-                w = cheap_json(WRITE_BY[topic], material, wmodel, 6000)
-                print(f"[{topic}] written via gemini-first path")
+                w = cheap_json(WRITE_BY[topic], material, CHEAP_MODEL, 6000)  # גימיני אם זמין, אחרת הייקו
+                print(f"[{topic}] written via gemini-or-haiku path")
             else:
                 w = claude_json(WRITE_BY[topic], material, wmodel, 6000)
             draft = (w.get("text") or "").strip()
