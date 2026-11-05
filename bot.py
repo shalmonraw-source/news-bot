@@ -636,7 +636,7 @@ def parse_picks(data, n):
             def score(k):
                 v = p.get(k)
                 return v if isinstance(v, int) and 1 <= v <= 5 else 3
-            picks.append({"idxs": sorted(set(idxs)), "severity": sev, "urgency": score("urgency"), "special": score("special"), "israel": bool(p.get("israel"))})
+            picks.append({"idxs": sorted(set(idxs)), "severity": sev, "urgency": score("urgency"), "special": score("special"), "traffic": score("traffic"), "israel": bool(p.get("israel"))})
     return picks
 
 
@@ -806,11 +806,22 @@ def llm_duplicate(st, text):
         return False
 
 
+TRAFFIC_RULE = """
+
+בנוסף לכל pick הוסף שדה traffic (1-5): הערכה כמה טראפיק, שיתופים ותגובות הידיעה תגרום בעמוד חדשות ישראלי בפייסבוק.
+5 = אירוע בתוך ישראל שכולם מדברים עליו (פיגוע, ירי, אזעקות, תקרית משטרה גדולה, אסון, חטיפה, תאונה קשה), או סיפור עם "וואו" ויראלי.
+4 = התפתחות ביטחונית או מדינית משמעותית, פרט מפתיע ומשתף, סיפור אנושי חזק, נושא שהציבור הישראלי חי איתו.
+3 = ידיעה טובה ורלוונטית לקהל הרחב.
+2 = מעניין לנישה (חובבי תעופה או פוליטיקה זרה), לא לקהל הרחב.
+1 = כמעט אף אחד לא יקרא.
+הוסף את "traffic" לכל אובייקט ב-picks."""
+
+
 def build_posts(cands, topic="aviation", st=None):
     lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
     sent = recent_sent(st) if st else []
     extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
-    picks = parse_picks(claude_json(SELECT_BY[topic], "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
+    picks = parse_picks(claude_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
     review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -964,6 +975,11 @@ def fetch_and_propose(st, topic):
         if dup:
             print("skip duplicate story:", p["text"][:60].replace("\n", " "))
             continue
+        tr = int(p.get("traffic") or 3)
+        tg_only = (not sample) and tr <= 2 and int(p.get("urgency") or 3) < 4 and topic != "explain"
+        if tg_only and not load_settings().get("tg_channel"):
+            print("skip low-traffic (no tg channel):", p["text"][:50].replace("\n", " "))
+            continue
         links0 = [cands[i]["link"] for i in p["idxs"]]
         links = [cands[i].get("link_real") or cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
@@ -975,6 +991,11 @@ def fetch_and_propose(st, topic):
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
+        if tg_only:  # תנועה נמוכה: רק לערוץ הטלגרם, לא לפייסבוק ולא לאישור שלך
+            mirror_to_channel({"text": p["text"], "image": img_path})
+            print("telegram-only:", p["text"][:50].replace("\n", " "))
+            sent += 1
+            continue
         with STATE_LOCK:
             fast = (not sample) and FAST_OK(st, topic, p)
             if fast:
