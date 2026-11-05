@@ -2384,7 +2384,15 @@
   "164ce4b33b38",
   "5eedca443f10",
   "c6ce75785999",
-  "990c05dcc637"
+  "990c05dcc637",
+  "b3a2a341f8b2",
+  "e6314e463a2e",
+  "ca5f5c849f07",
+  "036812f35dd4",
+  "4a699128312d",
+  "5fed8a705dbb",
+  "8e2ba69c9484",
+  "210b20c611fe"
  ],
  "pending": {
   "f793550a3e": {
@@ -2669,6 +2677,22 @@
    "published": true,
    "fb_id": "1322211944302986_122130334455473720",
    "published_at": "2026-11-05T04:28:04+00:00"
+  },
+  {
+   "id": "526e9201a0",
+   "text": "לפי אל-מוניטור: הדמוקרטים נערכים להתעמת עם טראמפ בסוגיית איראן ובסוגיית הקשרים העסקיים במפרץ\n\nהמפלגה הדמוקרטית בארצות הברית נערכת להתעמת עם הנשיא דונלד טראמפ בשתי סוגיות: המלחמה עם איראן והקשרים העסקיים עם המפרץ. כך מדווח אתר החדשות אל-מוניטור, המתאר את הדמוקרטים כמי שפועלים מתוך ביטחון גובר.\n\nבדיווח לא פורט אילו צעדים נשקלים, מי מוביל אותם ומה חיזק את ביטחונם של הדמוקרטים. גם לוח הזמנים לא פורסם.\n\nלפי החוקה האמריקנית, הסמכות להכריז על מלחמה נתונה לקונגרס. חוק סמכויות המלחמה מ-1973 מאפשר לקונגרס לדרוש להפסיק פעולה צבאית שלא אישר. בפועל, יכולתה של מפלגת האופוזיציה לבלום את הנשיא תלויה בכוחה בשני בתי הקונגרס.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUlhZUjEzb0cxZUxCMTZMN295TFB3WFlJemhFR01wWXpKLV9Jblo4TGdGMGo4b3dYcm5wanROaDUtZVV1ejdWUm5ESGVyU2VNdU9QTHRqa2RsUmV5bE01bVJSYk1NRzZWRFpEOExmOVlXMk02Q20wX2tlSGFndnpNQ1RqR2FTVFc4RlQydUhPUEVJSjlsRXRWYlNqMHlUQmhpanR6akF2a1FMNXZuOVZ4cG40dk1raEt1UW1J?oc=5",
+    "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNbkZhQjVGMzdZTWFPbHNMYWNoR3hPMEJ5bW1abEhKc3pFS1pSRkhMY09UUnZsUFZ2Q0lBT1FyZGxfMFJXVzhLZHpnbGRoV2ctN3RpcDBHdjJYTGR2NXoyRmVGNnZaN3phOWVuSmpYaW1BRm1yaWRxUldzcnltMDBUYUpXamRaRjU1cDRMY3pQLUJSa0dOcUVUazR6c1dzOHJtQnNXYUZmcVluZVY5SDlHRjVkeE1uVWtIVzZUZG1MTnpfOW9xYkRZT2oxVFpQV3MtOE4xeVNn?oc=5"
+   ],
+   "severity": "medium",
+   "image": "images/526e9201a0.jpg",
+   "credit": "Noclip / Wikimedia Commons / Public domain",
+   "queued_at": "2026-11-05T03:48:47+00:00",
+   "published": true,
+   "approved_at": "2026-11-05T06:00:41+00:00",
+   "fb_id": "1322211944302986_122130355083473720",
+   "published_at": "2026-11-05T06:00:46+00:00"
   }
  ],
  "offset": 569287812,
@@ -2684,19 +2708,6 @@
   "auto": 1
  },
  "queue": [
-  {
-   "id": "526e9201a0",
-   "text": "לפי אל-מוניטור: הדמוקרטים נערכים להתעמת עם טראמפ בסוגיית איראן ובסוגיית הקשרים העסקיים במפרץ\n\nהמפלגה הדמוקרטית בארצות הברית נערכת להתעמת עם הנשיא דונלד טראמפ בשתי סוגיות: המלחמה עם איראן והקשרים העסקיים עם המפרץ. כך מדווח אתר החדשות אל-מוניטור, המתאר את הדמוקרטים כמי שפועלים מתוך ביטחון גובר.\n\nבדיווח לא פורט אילו צעדים נשקלים, מי מוביל אותם ומה חיזק את ביטחונם של הדמוקרטים. גם לוח הזמנים לא פורסם.\n\nלפי החוקה האמריקנית, הסמכות להכריז על מלחמה נתונה לקונגרס. חוק סמכויות המלחמה מ-1973 מאפשר לקונגרס לדרוש להפסיק פעולה צבאית שלא אישר. בפועל, יכולתה של מפלגת האופוזיציה לבלום את הנשיא תלויה בכוחה בשני בתי הקונגרס.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUlhZUjEzb0cxZUxCMTZMN295TFB3WFlJemhFR01wWXpKLV9Jblo4TGdGMGo4b3dYcm5wanROaDUtZVV1ejdWUm5ESGVyU2VNdU9QTHRqa2RsUmV5bE01bVJSYk1NRzZWRFpEOExmOVlXMk02Q20wX2tlSGFndnpNQ1RqR2FTVFc4RlQydUhPUEVJSjlsRXRWYlNqMHlUQmhpanR6akF2a1FMNXZuOVZ4cG40dk1raEt1UW1J?oc=5",
-    "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNbkZhQjVGMzdZTWFPbHNMYWNoR3hPMEJ5bW1abEhKc3pFS1pSRkhMY09UUnZsUFZ2Q0lBT1FyZGxfMFJXVzhLZHpnbGRoV2ctN3RpcDBHdjJYTGR2NXoyRmVGNnZaN3phOWVuSmpYaW1BRm1yaWRxUldzcnltMDBUYUpXamRaRjU1cDRMY3pQLUJSa0dOcUVUazR6c1dzOHJtQnNXYUZmcVluZVY5SDlHRjVkeE1uVWtIVzZUZG1MTnpfOW9xYkRZT2oxVFpQV3MtOE4xeVNn?oc=5"
-   ],
-   "severity": "medium",
-   "image": "images/526e9201a0.jpg",
-   "credit": "Noclip / Wikimedia Commons / Public domain",
-   "queued_at": "2026-11-05T03:48:47+00:00",
-   "published": false
-  },
   {
    "id": "e199d2bf8a",
    "text": "מחקר בטלסקופ האבל: חלק ניכר מהחמצן חסר בגלקסיות ננסיות קרובות 🔭\n\nחוקרים בחנו בעזרת טלסקופ החלל האבל 37 גלקסיות ננסיות קרובות. לפי נאס״א, חסר בהן חלק ניכר מהחמצן שציפו למצוא.\n\nגלקסיה ננסית מכילה בין כמה אלפי כוכבים למאות מיליוני כוכבים. לשם השוואה, בגלקסיית שביל החלב יש מאות מיליארדי כוכבים. אחת הגלקסיות שנבדקו היא NGC 4449, גלקסיה ננסית לא סדירה. נאס״א פרסמה את תמונתה ב-2 בנובמבר 2026.\n\nחמצן נוצר בליבות הכוכבים, ולכן אסטרונומים נעזרים בו כדי לשחזר את ההיסטוריה של גלקסיה.",
@@ -2775,7 +2786,9 @@
   }
  ],
  "slots_done": {
-  "2026-11-05": []
+  "2026-11-05": [
+   "08:00"
+  ]
  },
  "health_ts": 1793857249.9463599,
  "followers": [
@@ -2798,7 +2811,9 @@
  ],
  "removals": [],
  "jobs": {
-  "2026-11-05": []
+  "2026-11-05": [
+   "report"
+  ]
  },
  "sent_log": [
   {
