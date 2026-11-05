@@ -1460,6 +1460,25 @@ def main():
         print(msg)
         tg("sendMessage", chat_id=_chat_id(), text=msg)
         return
+    if mode == "insights":
+        page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
+        token = page_token(page, token)
+        fields = "message,created_time,shares,reactions.summary(true).limit(0),comments.summary(true).limit(0),insights.metric(post_impressions_unique)"
+        r = requests.get(f"https://graph.facebook.com/{FB_VERSION}/{page}/posts", params={"fields": fields, "limit": 40, "access_token": token}, timeout=60).json()
+        if r.get("error"):
+            tg("sendMessage", chat_id=_chat_id(), text="❌ נתוני עמוד: " + str(r["error"].get("message", ""))[:250])
+            return
+        rows = []
+        for p in r.get("data", []):
+            reach = 0
+            for i in (p.get("insights") or {}).get("data", []):
+                reach = (i.get("values") or [{}])[0].get("value", 0)
+            rows.append((reach, p.get("reactions", {}).get("summary", {}).get("total_count", 0), p.get("comments", {}).get("summary", {}).get("total_count", 0), (p.get("shares") or {}).get("count", 0), (p.get("message") or "")[:50].replace("\n", " ")))
+        rows.sort(reverse=True)
+        out = "📊 ביצועי פוסטים אחרונים (חשיפה | לייקים | תגובות | שיתופים)\n" + "\n".join(f"{a} | {b} | {c} | {d} | {t}" for a, b, c, d, t in rows[:15])
+        print(out)
+        tg("sendMessage", chat_id=_chat_id(), text=out[:3900])
+        return
     if mode == "fonts":
         done = imgcard.font_sheet("/tmp/fonts.jpg")
         tg_photo("/tmp/fonts.jpg", "🔤 גופנים לבחירה:\n" + "\n".join(f"{n}. {name}" for n, name in done) + "\n\nכתוב לי את המספר או השם.")
