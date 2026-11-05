@@ -239,6 +239,8 @@ def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="av
     scores = f"⚡ דחיפות {_bar(urgency)} {urgency}/5 · ⭐ חשיבות וייחודיות {_bar(special)} {special}/5"
     rec = "🚀 מומלץ להעלות עכשיו" if urgency >= 4 else ("➕ מומלץ להוסיף לתור" if special >= 3 else "🗑 שקול לדחות")
     head = "🤖 אושר אוטומטית ונכנס לתור (אפשר לבטל)" if auto else "הצעה לפוסט"
+    if urgency >= 5:
+        head = "🚨 מתפרצת · " + head
     msg = f"{tp.get('emoji', '📰')} {head} · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n{when}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{when}\n{check_line(text, n_sources, topic)}\n{scores}\n{rec}"
     res = tg(
         "sendMessage",
