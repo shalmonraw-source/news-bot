@@ -710,7 +710,7 @@ severity: high להסלמה או אירוע גדול, medium להתפתחות מ
 עדיף רשימה ריקה מפוסט בינוני. urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
 החזר JSON בלבד: {"picks":[{"idxs":[0,3],"severity":"low","urgency":3,"special":3,"israel":false}]}   ואם אין: {"picks":[]}"""
 
-SELECT_WORLD = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. מדור "פוליטיקה": תקבל ידיעות פוליטיות מהעולם. בחר רק סיפורים בעלי משקל:
+SELECT_WORLD = """אתה עורך ראשי של MER5, עמוד חדשות ישראלי. מדור "פוליטיקה": עדיפות ראשונה לפוליטיקה הישראלית ולמה שמשפיע ישירות על ישראל והמזרח התיכון (ארה״ב-איראן, ארה״ב-ישראל, סעודיה, תורכיה, מצרים, מדינות המפרץ). פוליטיקה זרה אחרת (בחירות באירופה, אסיה ודרום אמריקה, מקרים מקומיים) רק אם הידיעה גדולה מאוד ובעלת עניין רחב. תקבל ידיעות פוליטיות מהעולם. בחר רק סיפורים בעלי משקל:
 בחירות ותוצאותיהן, משברים בממשלות וקואליציות, החלטות של מנהיגים ומעצמות, פסגות, סנקציות והסכמים, הפוליטיקה בישראל, בארה"ב ובעולם הערבי, ומהלכים שמשפיעים על המזרח התיכון.
 דלג על: רכילות פוליטית, כתבות דעה, סקרים קטנים, פוליטיקה מקומית זעירה, סלבס וספורט. אחד ידיעות על אותו אירוע. severity לפי חשיבות. israel: true אם יש קשר ישיר לישראל.
 שמור על ניטרליות: דווח על עמדות כעמדות של מי שאמר אותן, בלי הטיה לאף צד. עדיף רשימה ריקה. urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
@@ -951,6 +951,9 @@ def fetch_and_propose(st, topic):
     sample = os.environ.get("SAMPLE") == "1"
     sent = 0
     for p in posts:
+        if not sample and topic in ("security", "politics", "abroad") and int(p.get("special") or 3) < 3 and int(p.get("urgency") or 3) < 4:
+            print("skip low-importance:", p["text"][:50].replace("\n", " "))
+            continue
         if sent >= MAX_POSTS_PER_RUN or (not sample and st["daily"]["count"].get(topic, 0) >= tp.get("daily_cap", 4)):
             break
         with STATE_LOCK:
@@ -1322,7 +1325,14 @@ def queue_ttl_hours(it):
     return 6 if u >= 4 else 18 if u == 3 else 36
 
 
+OUTLET = re.compile(r"(לפי|דיווח ב|פורסם ב|ציטט|אמר ל)[-\s״\"]*(אל[- ]?מוניטור|אקסיוס|רויטרס|CNN|וול סטריט|יורוניוז|Popular Science|פוליטיקו|גרדיאן|ניו יורק טיימס|וושינגטון פוסט|ביביסי|BBC|אל ג׳זירה|סקיי|ynet|וואלה|מעריב|הארץ|ג׳רוזלם פוסט|טיימס אוף ישראל|AP|בלומברג|Bloomberg|Politico|Axios|Reuters|Haaretz|JNS|Middle East Eye|The War Zone|Space\.com|New Scientist|Phys\.org|Ars Technica)", re.I)
+
+
 def expire_queue(st):
+    old = [x for x in st["queue"] if OUTLET.search(x.get("text", ""))]
+    if old:
+        st["queue"] = [x for x in st["queue"] if x not in old]
+        print("queue: dropped items crediting outlets:", len(old))
     keep, dropped = [], []
     now = time.time()
     for it in st["queue"]:
