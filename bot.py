@@ -503,6 +503,8 @@ SELECT_SYSTEM = """אתה עורך ראשי של עמוד חדשות תעופה 
 מה לדלג עליו תמיד: הזמנות מטוסים, דוחות כספיים, מינויים, מגעים עסקיים, פתיחת קווים שגרתית, כתבות דעה ורשימות,
 פרסומות, ופעילות צבאית או ביטחונית עם פרטי מיקום או מבצעים. עדיף רשימה ריקה מסיפור בינוני.
 
+עדיפות עליונה לסיפורים מרתקים: סיפור אנושי, תקרית יוצאת דופן שהסתיימה טוב, מקרה נדיר או מוזר, פרט שגורם לקורא לומר "וואו" או לשתף. בנוסף חובה לכלול כל עדכון קריטי: תאונה, נחיתת חירום, סגירת מרחב אווירי, תקלה חמורה, גם אם הסיפור יבש.
+
 אם כמה ידיעות עוסקות באותו אירוע, אחד אותן ל-pick אחד (כל האינדקסים ב-idxs).
 severity: high לאירוע חירום או סכנה, medium לתקלה או שיבוש משמעותי, low לשאר. israel: true אם יש קשר ישראלי ישיר.
 urgency (1-5): כמה דחוף להעלות עכשיו (5 = חדשה מתפרצת שמתיישנת בדקות, 3 = בתוך שעות, 1 = יכולה לחכות ימים). special (1-5): כמה הידיעה ייחודית וחשובה (5 = בלעדית או משנה תמונה, 3 = טובה, 1 = שגרתית).
@@ -773,9 +775,25 @@ def is_duplicate(st, text):
     w = _words(text.split("\n")[0])
     for line in recent_sent(st):
         lw = _words(line)
-        if len(lw) >= 4 and len(w) >= 4 and len(w & lw) / min(len(w), len(lw)) >= 0.5:
+        if len(lw) >= 4 and len(w) >= 4 and len(w & lw) / min(len(w), len(lw)) >= 0.4:
             return True
     return False
+
+
+DEDUP_SYSTEM = """אתה בודק כפילויות בעמוד חדשות. תקבל פוסט חדש ורשימת כותרות של פוסטים שכבר נשלחו. החזר JSON בלבד: {"duplicate":true|false}.
+duplicate=true אם הפוסט החדש עוסק באותו אירוע או באותה ידיעה כמו אחת הכותרות, גם בניסוח שונה או ממקור אחר. false רק אם זה אירוע אחר או התפתחות מהותית חדשה."""
+
+
+def llm_duplicate(st, text):
+    prev = list(dict.fromkeys(recent_sent(st, 36)))[-60:]
+    if not prev:
+        return False
+    try:
+        r = claude_json(DEDUP_SYSTEM, "פוסט חדש:\n" + text[:600] + "\n\nכבר נשלחו:\n" + "\n".join("- " + x for x in prev), MODEL, 300)
+        return bool(r.get("duplicate"))
+    except Exception as e:  # noqa: BLE001
+        print("dedup llm failed:", str(e)[:100])
+        return False
 
 
 def build_posts(cands, topic="aviation", st=None):
@@ -864,6 +882,9 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
     subject = meta.get("subject") or title
     queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
     photo, credit = None, None
+    typo_only = topic == "explain" or bool(re.search(r"הרוג|נהרג|נפצע|פצועים|מת |נרצח|גופות|חלל", text.split("\n\n")[0] + title))
+    if typo_only:  # פוסטי מערכת וידיעות רגישות: כרטיס טיפוגרפי עם הפטרנים, בלי צילום
+        queries, sources = [], ()
     for q in queries:
         try:
             cands = imgcard.commons_candidates(q, aviation=(topic == "aviation"), limit=3)
@@ -891,7 +912,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
                 photo, credit = got, f"תמונה: {host}"
                 break
     blur = False
-    if photo is None:  # עדיין אין תמונה: תמונה כללית של הנושא, מטושטשת, כדי שתמיד יהיה צילום אמיתי
+    if photo is None and not typo_only:  # עדיין אין תמונה: תמונה כללית של הנושא, מטושטשת, כדי שתמיד יהיה צילום אמיתי
         generic = [q for q in (queries + [GENERIC_Q.get(topic, "city skyline")]) if q]
         for q in generic[-2:]:
             try:
@@ -903,7 +924,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
                 photo, credit, blur = c[0][0], c[0][1], True
                 print("generic blurred photo used for:", q)
                 break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay or blur, highlight=meta.get("highlight") or [], blur=blur)
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=(overlay or blur) and not typo_only, highlight=meta.get("highlight") or [], blur=blur)
     return path, credit
 
 
@@ -922,7 +943,12 @@ def fetch_and_propose(st, topic):
     for p in posts:
         if sent >= MAX_POSTS_PER_RUN or (not sample and st["daily"]["count"].get(topic, 0) >= tp.get("daily_cap", 4)):
             break
-        if is_duplicate(st, p["text"]):
+        with STATE_LOCK:
+            dup = is_duplicate(st, p["text"]) or llm_duplicate(st, p["text"])
+            if not dup:  # רושמים מיד, כדי שנושא אחר שרץ במקביל לא ישלח אותו אירוע
+                st.setdefault("sent_log", []).append({"ts": time.time(), "line": p["text"].split("\n")[0][:160]})
+                st["sent_log"] = st["sent_log"][-200:]
+        if dup:
             print("skip duplicate story:", p["text"][:60].replace("\n", " "))
             continue
         links0 = [cands[i]["link"] for i in p["idxs"]]
@@ -937,8 +963,6 @@ def fetch_and_propose(st, topic):
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
         with STATE_LOCK:
-            st.setdefault("sent_log", []).append({"ts": time.time(), "line": p["text"].split("\n")[0][:160]})
-            st["sent_log"] = st["sent_log"][-200:]
             auto = (not sample) and auto_ok(st, topic, p, n_sources)
             if auto:
                 st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
