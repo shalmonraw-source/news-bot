@@ -420,6 +420,7 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     if credit:
         cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 19)
         d.text((m, H - 44), credit[:80], font=cf, fill=(200, 204, 212), anchor="lm")
+    d.rectangle([0, H - 12, W, H], fill=accent)  # פס צבע תחתון, כמו בכרטיסי חדשות
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     canvas.save(out_path, "JPEG", quality=92)
     return out_path
