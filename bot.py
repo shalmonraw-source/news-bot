@@ -801,7 +801,9 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
             got = imgcard.source_image(url, link)
             print("source image:", src_name, "ok" if got else "none")
             if got:
-                photo, credit = got, f"תמונה: {src_name} (מקור הידיעה)"
+                from urllib.parse import urlparse
+                host = urlparse(link).netloc.replace("www.", "") or src_name
+                photo, credit = got, f"תמונה: {host}"
                 break
     path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay, highlight=meta.get("highlight") or [])
     return path, credit
@@ -828,7 +830,7 @@ def fetch_and_propose(st, topic):
         pid = hashlib.sha1("".join(links0).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
+            img_path, credit = make_image(pid, p["text"], topic, overlay=True, sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
