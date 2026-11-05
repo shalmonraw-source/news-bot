@@ -141,10 +141,10 @@ def _strip(s):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", s or ""))).strip()
 
 
-def commons_photo(query, aviation=True):
-    """מחזיר (PIL.Image, credit_text) או None. רק רישיונות פתוחים עם שיוך."""
+def commons_candidates(query, aviation=True, limit=3):
+    """מחזיר עד limit מועמדים [(PIL.Image, credit, תיאור)] רק ברישיון פתוח."""
     if not query:
-        return None
+        return []
     params = {
         "action": "query", "format": "json", "generator": "search",
         "gsrsearch": f"{query} filetype:bitmap", "gsrnamespace": 6, "gsrlimit": 20,
@@ -153,11 +153,10 @@ def commons_photo(query, aviation=True):
     r = requests.get("https://commons.wikimedia.org/w/api.php", params=params, headers={"User-Agent": UA}, timeout=25)
     r.raise_for_status()
     pages = sorted((r.json().get("query", {}).get("pages", {})).values(), key=lambda p: p.get("index", 99))
-    scored = []
-    for p in pages:
-        scored.append((_relevance(p, query, aviation), p.get("index", 99), p))
+    scored = [(_relevance(p, query, aviation), p.get("index", 99), p) for p in pages]
     scored = [x for x in scored if x[0] > 0]
     scored.sort(key=lambda x: (-x[0], x[1]))
+    out = []
     for _, _, p in scored:
         info = (p.get("imageinfo") or [{}])[0]
         meta = info.get("extmetadata", {})
@@ -174,10 +173,17 @@ def commons_photo(query, aviation=True):
         except Exception:  # noqa: BLE001
             continue
         artist = _strip(meta.get("Artist", {}).get("value")) or "Unknown author"
-        credit = f"{artist[:60]} / Wikimedia Commons / {lic}"
-        return img, credit
-    return None
+        desc = _strip(meta.get("ImageDescription", {}).get("value"))[:200]
+        out.append((img, f"{artist[:60]} / Wikimedia Commons / {lic}", f'{p.get("title", "")} {desc}'))
+        if len(out) >= limit:
+            break
+    return out
 
+
+def commons_photo(query, aviation=True):
+    """תאימות לאחור: המועמד הראשון."""
+    c = commons_candidates(query, aviation, 1)
+    return (c[0][0], c[0][1]) if c else None
 
 
 # ------------------------------------------------------------------ logo

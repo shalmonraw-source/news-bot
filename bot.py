@@ -395,6 +395,8 @@ WRITE_SYSTEM = """אתה כתב תעופה בכיר בערוץ חדשות ישר
 - בלי האשטגים, קישורים, או "נעדכן". "דווח כי" מותר פעם אחת לכל היותר, וכשהאירוע לא מאושר בלבד.
 - מונחים: מנחת, המראה, נחיתה, נחיתת חירום, תא הטייס, צוות הדיילים, מגדל הפיקוח, מסלול, מטוס נוסעים, מסוק.
 
+הוק וסיפוריות בטוב טעם: בנושאים לא מפחידים ולא מלחיצים מותר סיפוריות קלה יותר ופתיח שתופס תשומת לב (פרט מפתיע, שאלה חדה או תמונה קונקרטית מהחומר). בדיווחים רציניים או עם נפגעים: הוק קטן ומאופק בלבד. אף פעם לא בגרוזה, בלי המצאות, ובלי לפגוע בדיוק.
+
 דיוק: עובדות על האירוע רק מהחומר. הסברים כלליים על איך התעופה עובדת מותר מהידע הכללי, אם הם מוסכמים ובלי מספרים או טענות ספציפיות על האירוע.
 אין לציין שמות של הרוגים או פצועים (רק גיל, לאום ותפקיד). שמות חברות, מקומות ובעלי תפקידים רשמיים מותרים. אם שם או מספר מופיע בכתיב שונה בין מקורות, השמט אותו.
 אל תנחש סיבות לתקלה או לתאונה. מספרים ושמות בדיוק כפי שבחומר. אירוע שלא אושר מנוסח בזהירות.
@@ -526,11 +528,12 @@ WRITE_NEWS = (
 )
 
 IMAGE_NEWS = """אתה עורך תמונות בעמוד חדשות. תקבל פוסט בעברית. החזר JSON בלבד:
-{"card_title":"...","photo_query":"...","fallback_query":"..."}
+{"card_title":"...","subject":"...","queries":["...","...","..."]}
+- subject: משפט קצר באנגלית: מה בדיוק צריך להיות בתמונה כדי שיהיה קשר ברור לידיעה (המקום, הכלי, המבנה או הארגון המרכזי בפוסט).
+- queries: עד 3 חיפושים באנגלית ב-Wikimedia Commons, מהספציפי לכללי, כולם על הישות המרכזית של הידיעה (שם המקום, המבנה, סוג הספינה/הכלי, המוסד). אם אין צילום ספציפי מתאים, השאר רשימה קצרה: עדיף בלי תמונה מאשר תמונה לא קשורה.
 - card_title: כותרת חדה לכרטיס, עד 75 תווים בעברית, בלי נקודה בסוף, בלי עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
-- photo_query: חיפוש באנגלית ב-Wikimedia Commons לצילום נייטרלי ומאוזן שמסמל את הנושא: קו רקיע של עיר, ציון דרך, בניין ממשלתי, נמל, סוג ספינה או כלי רכב, דגל, נוף. לדוגמה "Beirut skyline", "Strait of Hormuz", "Aircraft carrier USS Theodore Roosevelt".
-  לעולם לא אנשים סובלים, חיילים בפעולה, נשק בשימוש, הרס, פצועים או פוליטיקאים.
-- fallback_query: חיפוש כללי יותר (למשל "Middle East desert landscape")."""
+- הצילום חייב להראות את הישות המרכזית של הידיעה (עיר, ציון דרך, בניין, נמל, סוג ספינה או כלי רכב), לא תמונת "אווירה" כללית.
+  לעולם לא אנשים סובלים, חיילים בפעולה, נשק בשימוש, הרס, פצועים או פוליטיקאים."""
 
 SELECT_FACTS = """אתה עורך ראשי של MER5, מדור "ידיעות מהעולם": עובדות, תגליות וסיפורים מעניינים באמת מהעולם: מדע, היסטוריה, טבע, טכנולוגיה, תרבויות ותופעות חריגות. תקבל רשימת כתבות.
 בחר רק סיפור שגורם לקורא לומר "לא ידעתי את זה": פרט מפתיע, מספר שמעורר תדהמה, גילוי חדש או סיפור היסטורי עם תפנית. הסיפור חייב להיות מבוסס על המקור ולא על שמועה או על טענה בלי הוכחה.
@@ -586,26 +589,63 @@ def build_posts(cands, topic="aviation"):
 
 
 IMAGE_AVIATION = """אתה עורך תמונות בעמוד חדשות תעופה. תקבל פוסט בעברית. החזר JSON בלבד:
-{"card_title":"...","photo_query":"...","fallback_query":"..."}
+{"card_title":"...","subject":"...","queries":["...","...","..."]}
+- subject: משפט קצר באנגלית: מה בדיוק צריך להיות בתמונה (סוג המטוס, החברה או שדה התעופה המרכזיים בפוסט).
+- queries: עד 3 חיפושים באנגלית ב-Wikimedia Commons, מהספציפי לכללי (למשל "LOT Polish Airlines Boeing 737 MAX", "Boeing 737 airliner"), תמיד על סוג המטוס/החברה/שדה התעופה בפוסט. אם אין מידע ספציפי, עדיף רשימה קצרה מתמונה לא קשורה.
 - card_title: כותרת חדה לתמונה, עד 75 תווים בעברית, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
-- photo_query: חיפוש באנגלית ב-Wikimedia Commons לצילום ארכיון של סוג המטוס, החברה או שדה התעופה המעורבים (לא של האירוע עצמו). לדוגמה "Airbus AS350 helicopter", "LOT Polish Airlines Boeing 737 MAX". ספציפי ככל האפשר.
-- fallback_query: חיפוש כללי יותר, לדוגמה "Boeing 737 airliner" או "helicopter landing mountains"."""
+- אם הפוסט אינו מזכיר סוג מטוס או חברה מסוימים, השתמש בשאילתה כללית על סוג הכלי.
+"""
+
+
+def judge_photo(img, info, subject, post):
+    """בדיקה חזותית: האם התמונה מראה את מה שהידיעה עוסקת בו. מחזיר True/False."""
+    import anthropic, base64, io as _io
+
+    small = img.copy()
+    small.thumbnail((800, 800))
+    buf = _io.BytesIO()
+    small.save(buf, "JPEG", quality=80)
+    client = anthropic.Anthropic()
+    resp = client.messages.create(
+        model=MODEL,
+        max_tokens=200,
+        system='אתה עורך תמונות. נתון פוסט חדשותי ותמונה מועמדת. החזר JSON בלבד: {"ok":true|false,"why":"..."}. ok=true רק אם התמונה מראה בבירור את הישות המרכזית של הפוסט (אותו סוג כלי, מקום או מבנה) וראויה לפרסום כרקע לידיעה. תמונה כללית, היסטורית, של דבר אחר, עם טקסט/שלט בולט לא קשור, או באיכות גרועה: false.',
+        messages=[{"role": "user", "content": [
+            {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": base64.b64encode(buf.getvalue()).decode()}},
+            {"type": "text", "text": f"נושא נדרש: {subject}\nכותרת הקובץ: {info}\nהפוסט:\n{post[:700]}"},
+        ]}],
+    )
+    raw = "".join(b.text for b in resp.content if b.type == "text")
+    try:
+        v = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
+    except Exception:  # noqa: BLE001
+        return False
+    print("photo judge:", v.get("ok"), str(v.get("why"))[:100])
+    return bool(v.get("ok"))
 
 
 def make_image(pid, text, topic="aviation"):
-    """מחזיר (נתיב תמונה, קרדיט או None). אם הכול נכשל, כרטיס טיפוגרפי בלי צילום."""
+    """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
-    meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 600)
+    meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
     title = (meta.get("card_title") or text.split("\n", 1)[0]).strip()
+    subject = meta.get("subject") or title
+    queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
     photo, credit = None, None
-    for q in (meta.get("photo_query"), meta.get("fallback_query")):
+    for q in queries:
         try:
-            got = imgcard.commons_photo(q, aviation=(topic == "aviation"))
+            cands = imgcard.commons_candidates(q, aviation=(topic == "aviation"), limit=3)
         except Exception as e:  # noqa: BLE001
             print("commons failed:", type(e).__name__)
-            got = None
-        if got:
-            photo, credit = got
+            continue
+        for img, cr, info in cands:
+            try:
+                if judge_photo(img, info, subject, text):
+                    photo, credit = img, cr
+                    break
+            except Exception as e:  # noqa: BLE001
+                print("judge failed:", type(e).__name__)
+        if photo:
             break
     path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""))
     return path, credit
