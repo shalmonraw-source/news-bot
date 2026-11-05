@@ -1011,9 +1011,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
     badge = "חוסל" if (meta.get("badge") or "").strip() == "חוסל" else ("מתפרצת" if urgent else "")
     # כרטיס הפטרן משולב "פה ושם": פוסטי מערכת תמיד, ומחמש ידיעות רגילות אחת (קבוע לפי מזהה), לא במתפרצות ולא בחותמת
     typo_only = topic == "explain" or (not urgent and not badge and int(hashlib.sha1(pid.encode()).hexdigest(), 16) % 5 == 0)
-    if typo_only:  # פוסטי מערכת וידיעות רגישות: כרטיס טיפוגרפי עם הפטרנים, בלי צילום
-        queries, sources = [], ()
-    if typo_only:
+    if typo_only:  # כרטיס מסגרת עם פטרן: התמונה נכנסת בתוך המסגרת (לא במסך מלא)
         _PATTERN.add(pid)
     for q in queries:
         try:
@@ -1042,7 +1040,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
                 photo, credit = got, f"תמונה: {host}"
                 break
     blur = False
-    if photo is None and not typo_only:  # עדיין אין תמונה: תמונה כללית של הנושא, מטושטשת, כדי שתמיד יהיה צילום אמיתי
+    if photo is None:  # עדיין אין תמונה: תמונה כללית של הנושא, מטושטשת, כדי שתמיד יהיה צילום אמיתי
         generic = [q for q in (queries + [GENERIC_Q.get(topic, "city skyline")]) if q]
         for q in generic[-2:]:
             try:
