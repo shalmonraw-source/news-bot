@@ -660,7 +660,7 @@ def gemini_text(system, user, max_tokens=2000):
         return None
     try:
         r = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/{os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')}:generateContent",
+            f"https://generativelanguage.googleapis.com/v1beta/models/{os.environ.get('GEMINI_MODEL', 'gemini-3.8-flash')}:generateContent",
             headers={"x-goog-api-key": key},
             json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"role": "user", "parts": [{"text": user}]}],
                   "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.2, "responseMimeType": "application/json"}},
@@ -918,7 +918,6 @@ def build_posts(cands, topic="aviation", st=None):
     picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
         picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
-    wmodel = WRITER_MODEL if topic in ("security", "aviation", "politics") else MODEL
     review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -927,6 +926,7 @@ def build_posts(cands, topic="aviation", st=None):
             if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
+            wmodel = WRITER_MODEL if (pk["traffic"] >= 4 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
             w = claude_json(WRITE_BY[topic], material, wmodel, 6000)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
@@ -1426,15 +1426,15 @@ def daily_jobs(st):
             elif name.startswith("reel"):
                 publish_reel(st)
             elif name.startswith("explain"):
-                w = claude_json(EXPLAIN_SYSTEM, "כותרות מהיממה:\n" + "\n".join(recent_headlines(st)), WRITER_MODEL, 4000)
+                w = claude_json(EXPLAIN_SYSTEM, "כותרות מהיממה:\n" + "\n".join(recent_headlines(st)), MODEL, 4000)
                 text = (w.get("text") or "").strip()
                 if text:
-                    pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 4000)
+                    pol = claude_json(HEBREW_SYSTEM, text, MODEL, 4000)
                     propose_custom(st, "explain", clean_hebrew((pol.get("text") or text).strip()), urgency=1, special=3)
             elif name == "digest":
                 heads = [x["text"].split("\n")[0] for x in todays_published(st)]
                 if len(heads) >= 3:
-                    w = claude_json(DIGEST_SYSTEM, "\n".join(heads), WRITER_MODEL, 2000)
+                    w = claude_json(DIGEST_SYSTEM, "\n".join(heads), MODEL, 2000)
                     if (w.get("text") or "").strip():
                         propose_custom(st, "explain", clean_hebrew(w["text"].strip()), urgency=2, special=3)
             elif name == "links":
@@ -1442,7 +1442,7 @@ def daily_jobs(st):
                 if txt:
                     propose_custom(st, "explain", txt, urgency=1, special=2)
             elif name == "follow":
-                w = claude_json(FOLLOW_SYSTEM, "כתוב פוסט הזמנה לעקוב להיום.", WRITER_MODEL, 1500)
+                w = claude_json(FOLLOW_SYSTEM, "כתוב פוסט הזמנה לעקוב להיום.", MODEL, 1500)
                 text = (w.get("text") or "").strip()
                 if text:
                     propose_custom(st, "explain", clean_hebrew(text), urgency=1, special=2)
