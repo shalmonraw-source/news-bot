@@ -1,11 +1,5 @@
 {
  "seen": [
-  "a9ad1fd29a80",
-  "d93a8f71de38",
-  "96c6056e8de5",
-  "a08aebb445b0",
-  "a23eab07bcbf",
-  "dceb830cbed3",
   "08daddf68de0",
   "c483450f0f44",
   "56acd41882a7",
@@ -2999,7 +2993,13 @@
   "e2bdd8353fdb",
   "b626402a8de6",
   "87c3c92773cd",
-  "1132a39d6159"
+  "1132a39d6159",
+  "2cdceb4a480e",
+  "33d2c939db7c",
+  "fa0bd26eec19",
+  "f839e5d9b8bc",
+  "516435ff5459",
+  "054956ecff41"
  ],
  "pending": {
   "f793550a3e": {
@@ -3621,6 +3621,18 @@
    "credit": "Jeff Schmaltz, MODIS Land Rapid Response Team, NASA GSFC / Wikimedia Commons / Public domain",
    "urgency": 4,
    "ts": 1793879548.4810758
+  },
+  "fa0bd26eec": {
+   "text": "חברות דלק: לא זוהתה פעילות חריגה בכרטיסים שהוצגו כראיה לקניית קולות בחברה הערבית\n\nשתי חברות דלק מסרו כי לא זוהו אצלן רכישות חריגות או דפוסי צריכה חריגים לקראת הבחירות. כרטיסי הדלק שלהן הוצגו כראיה לקניית קולות מצד המפלגות הערביות.",
+   "links": [
+    "https://www.haaretz.com/israel-news/elections/2026-11-05/ty-article/.premium/fuel-companies-find-no-unusual-activity-in-cards-said-used-to-sway-arab-voters/000001a1-aaf1-d929-a1a7-eff9f48c0000"
+   ],
+   "severity": "high",
+   "topic": "politics",
+   "image": "images/fa0bd26eec.jpg",
+   "credit": "Cjackh / Wikimedia Commons / CC BY-SA 4.0",
+   "urgency": 4,
+   "ts": 1793879898.4702303
   }
  },
  "approved": [
@@ -4174,7 +4186,7 @@
   "count": {
    "security": 47,
    "aviation": 11,
-   "politics": 25,
+   "politics": 26,
    "facts": 18,
    "abroad": 4
   },
@@ -4769,12 +4781,20 @@
   {
    "ts": 1793879542.0823987,
    "line": "שיא מערכת הגשמים צפוי בשבת, עם חשש להצפות במרכז ובדרום"
+  },
+  {
+   "ts": 1793879876.4442632,
+   "line": "חברות דלק: לא זוהתה פעילות חריגה בכרטיסים שהוצגו כראיה לקניית קולות בחברה הערבית"
+  },
+  {
+   "ts": 1793879894.942145,
+   "line": "טראמפ ונתניהו שוחחו על איראן, וקטר ממשיכה לתווך בין טהרן לוושינגטון"
   }
  ],
  "last_fb_ts": 1793878667.9925747,
  "spend": {
   "date": "2026-11-05",
-  "usd": 1.768,
+  "usd": 2.0224,
   "v": 2
  }
 }
