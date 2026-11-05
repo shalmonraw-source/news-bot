@@ -624,6 +624,7 @@ def story_material(cands, idxs):
         c["link_real"] = resolve_google_news(c["link"])
         art = fetch_article(c["link_real"])
         c["has_body"] = bool(art)
+        print("material:", c["source"], "| resolved" if c["link_real"] != c["link"] else "| NOT resolved", "| body" if art else "| no body")
         parts.append(f'מקור: {c["source"]}\nכותרת: {c["title"]}\nתקציר: {c["summary"]}\n' + (f"גוף הכתבה: {art}" if art else ""))
     return "\n\n---\n\n".join(parts)
 
@@ -797,6 +798,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
     if photo is None:  # אין צילום חופשי מאומת: תמונה מהמקור של הידיעה עצמה (עם קרדיט למקור)
         for url, src_name, link in sources:
             got = imgcard.source_image(url, link)
+            print("source image:", src_name, "ok" if got else "none")
             if got:
                 photo, credit = got, f"תמונה: {src_name} (מקור הידיעה)"
                 break
