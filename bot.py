@@ -842,6 +842,9 @@ def build_posts(cands, topic="aviation", st=None):
                 print("review fixes:", rev["issues"])
             pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 6000)
             text = (pol.get("text") or text).strip()
+            if OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|אבו עלי|אקספרס|פורסם באתר|על פי הדיווח ב", text):
+                fx = claude_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, WRITER_MODEL, 6000)
+                text = (fx.get("text") or text).strip()
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
             print("story failed:", type(e).__name__, str(e)[:200])
