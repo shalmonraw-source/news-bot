@@ -7,7 +7,7 @@
    110,
    30
   ],
-  "daily_cap": 5,
+  "daily_cap": 10,
   "sources": [
    {
     "name": "BBC Middle East",
@@ -68,7 +68,7 @@
    150,
    255
   ],
-  "daily_cap": 4,
+  "daily_cap": 6,
   "sources": [
    {
     "name": "Simple Flying",
@@ -105,7 +105,7 @@
    255,
    61
   ],
-  "daily_cap": 4,
+  "daily_cap": 6,
   "sources": [
    {
     "name": "BBC World",
@@ -138,7 +138,7 @@
    85,
    247
   ],
-  "daily_cap": 2,
+  "daily_cap": 3,
   "en": "DID YOU KNOW",
   "sources": [
    {
@@ -175,7 +175,7 @@
    176,
    32
   ],
-  "daily_cap": 3,
+  "daily_cap": 5,
   "en": "ISRAELIS ABROAD",
   "sources": [
    {

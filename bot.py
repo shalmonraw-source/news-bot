@@ -540,6 +540,11 @@ def claude_json(system, user, model, max_tokens=3000):
     raw = claude_text(system, user, model, max_tokens)
     a, b = raw.find("{"), raw.rfind("}")
     if a < 0 or b < 0:
+        m = re.search(r'"text"\s*:\s*"(.*)', raw, re.S)  # JSON שנחתך באמצע: מחלצים את הטקסט
+        if m and len(m.group(1)) > 150:
+            txt = m.group(1).rstrip("`} \n").rstrip('"').replace("\\n", "\n").replace('\\"', '"')
+            print("truncated JSON recovered, chars:", len(txt))
+            return {"text": txt}
         print("no JSON in reply, start of reply:", raw[:200].replace("\n", " "))
         return {"_raw": raw}
     try:
@@ -718,17 +723,17 @@ def build_posts(cands, topic="aviation"):
             if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
-            w = claude_json(WRITE_BY[topic], material, WRITER_MODEL)
+            w = claude_json(WRITE_BY[topic], material, WRITER_MODEL, 6000)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL)
+            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL, 6000)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
                 print("review fixes:", rev["issues"])
-            pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL)
+            pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 6000)
             text = (pol.get("text") or text).strip()
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
