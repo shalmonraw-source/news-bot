@@ -1561,6 +1561,10 @@ def main():
         print(msg)
         tg("sendMessage", chat_id=_chat_id(), text=msg)
         return
+    if mode == "geminitest":
+        raw = gemini_text("החזר JSON בלבד", 'החזר {"ok":true,"msg":"שלום מג׳מיני"}', 100)
+        tg("sendMessage", chat_id=_chat_id(), text=("✅ Gemini מחובר: " + raw[:80]) if raw else "❌ Gemini לא ענה. בדוק שהסוד GEMINI_API_KEY הוגדר נכון ב-GitHub.")
+        return
     if mode == "chtest":
         ch = load_settings().get("tg_channel")
         r = requests.post(f"https://api.telegram.org/bot{_token()}/sendMessage", data={"chat_id": ch, "text": "✅ בדיקת חיבור: ערוץ MER5 מחובר"}, timeout=30).json()
