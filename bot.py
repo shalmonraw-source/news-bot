@@ -664,7 +664,7 @@ def gemini_text(system, user, max_tokens=2000):
             headers={"x-goog-api-key": key},
             json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"role": "user", "parts": [{"text": user}]}],
                   "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.2, "responseMimeType": "application/json"}},
-            timeout=60,
+            timeout=120,
         )
         j = r.json()
         if "candidates" not in j:
@@ -971,7 +971,7 @@ def judge_photo(img, info, subject, post):
     small.save(buf, "JPEG", quality=80)
     client = anthropic.Anthropic()
     resp = client.messages.create(
-        model=MODEL,
+        model=CHEAP_MODEL,
         max_tokens=200,
         system='אתה עורך תמונות. נתון פוסט חדשותי ותמונה מועמדת. החזר JSON בלבד: {"ok":true|false,"why":"..."}. ok=true רק אם התמונה מראה בבירור את הישות המרכזית של הפוסט (אותו סוג כלי, מקום או מבנה) וראויה לפרסום כרקע לידיעה. תמונה כללית, היסטורית, של דבר אחר, עם טקסט/שלט בולט לא קשור, או באיכות גרועה: false.',
         messages=[{"role": "user", "content": [
@@ -979,7 +979,7 @@ def judge_photo(img, info, subject, post):
             {"type": "text", "text": f"נושא נדרש: {subject}\nכותרת הקובץ: {info}\nהפוסט:\n{post[:700]}"},
         ]}],
     )
-    _charge(MODEL, getattr(resp, "usage", None))
+    _charge(CHEAP_MODEL, getattr(resp, "usage", None))
     raw = "".join(b.text for b in resp.content if b.type == "text")
     try:
         v = json.loads(raw[raw.find("{"): raw.rfind("}") + 1])
@@ -1565,8 +1565,9 @@ def main():
         tg("sendMessage", chat_id=_chat_id(), text=msg)
         return
     if mode == "geminitest":
+        t0 = time.time()
         raw = gemini_text("החזר JSON בלבד", 'החזר {"ok":true,"msg":"שלום מג׳מיני"}', 100)
-        tg("sendMessage", chat_id=_chat_id(), text=("✅ Gemini מחובר: " + raw[:80]) if raw else "❌ Gemini לא ענה. בדוק שהסוד GEMINI_API_KEY הוגדר נכון ב-GitHub.")
+        tg("sendMessage", chat_id=_chat_id(), text=(f"✅ Gemini מחובר ({int(time.time() - t0)} שנ'): " + raw[:80]) if raw else "❌ Gemini לא ענה. פרטים בלוג.")
         return
     if mode == "chtest":
         ch = load_settings().get("tg_channel")
