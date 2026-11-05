@@ -912,8 +912,9 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
     subject = meta.get("subject") or title
     queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
     photo, credit = None, None
-    typo_only = topic == "explain"
     badge = "חוסל" if (meta.get("badge") or "").strip() == "חוסל" else ("מתפרצת" if urgent else "")
+    # כרטיס הפטרן משולב "פה ושם": פוסטי מערכת תמיד, ומחמש ידיעות רגילות אחת (קבוע לפי מזהה), לא במתפרצות ולא בחותמת
+    typo_only = topic == "explain" or (not urgent and not badge and int(hashlib.sha1(pid.encode()).hexdigest(), 16) % 5 == 0)
     if typo_only:  # פוסטי מערכת וידיעות רגישות: כרטיס טיפוגרפי עם הפטרנים, בלי צילום
         queries, sources = [], ()
     for q in queries:
