@@ -396,9 +396,9 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     return out_path
 
 
-def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label=""):
+def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
-    if photo is not None:
+    if photo is not None and overlay:
         return render_card_overlay(title, out_path, photo, credit, color, label)
     accent = tuple(color)
     import re as _re

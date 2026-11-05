@@ -698,7 +698,7 @@ def judge_photo(img, info, subject, post):
     return bool(v.get("ok"))
 
 
-def make_image(pid, text, topic="aviation"):
+def make_image(pid, text, topic="aviation", overlay=False):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
     meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
@@ -721,7 +721,7 @@ def make_image(pid, text, topic="aviation"):
                 print("judge failed:", type(e).__name__)
         if photo:
             break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""))
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay)
     return path, credit
 
 
@@ -745,7 +745,7 @@ def fetch_and_propose(st, topic):
         pid = hashlib.sha1("".join(links).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic)
+            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))))
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
