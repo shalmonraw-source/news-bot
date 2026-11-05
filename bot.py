@@ -1650,6 +1650,9 @@ def main():
         if mode == "sample":
             os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
         _STATE_REF["st"] = st
+        if mode == "run" and load_settings().get("paused"):
+            print("bot paused via settings.json (paused: true)")
+            return
         started = time.time()
         loops = 0
         try:
