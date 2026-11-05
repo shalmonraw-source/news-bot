@@ -755,9 +755,30 @@ def clean_hebrew(t):
     return t.strip()
 
 
-def build_posts(cands, topic="aviation"):
+def _words(s):
+    return set(w for w in re.findall(r"[\u05d0-\u05eaA-Za-z0-9]{3,}", s or ""))
+
+
+def recent_sent(st, hours=48):
+    cut = time.time() - hours * 3600
+    return [x["line"] for x in st.get("sent_log", []) if x["ts"] > cut] + recent_headlines(st)
+
+
+def is_duplicate(st, text):
+    """True אם הפוסט עוסק בדיוק באותו אירוע כמו הצעה שנשלחה ב-48 השעות האחרונות (חפיפת מילים גבוהה)."""
+    w = _words(text.split("\n")[0])
+    for line in recent_sent(st):
+        lw = _words(line)
+        if len(lw) >= 4 and len(w) >= 4 and len(w & lw) / min(len(w), len(lw)) >= 0.5:
+            return True
+    return False
+
+
+def build_posts(cands, topic="aviation", st=None):
     lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"]}' for i, c in enumerate(cands)]
-    picks = parse_picks(claude_json(SELECT_BY[topic], "\n\n".join(lines), MODEL, 2000), len(cands))
+    sent = recent_sent(st) if st else []
+    extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
+    picks = parse_picks(claude_json(SELECT_BY[topic], "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
     review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -888,7 +909,7 @@ def fetch_and_propose(st, topic):
     print(f"[{topic}] candidates: {len(cands)}")
     if not cands:
         return
-    posts = build_posts(cands, topic)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
+    posts = build_posts(cands, topic, st)  # אם נכשל, לא מסמנים כנראה, ננסה שוב בריצה הבאה
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     if st["daily"].get("date") != today or not isinstance(st["daily"].get("count"), dict):
         st["daily"] = {"date": today, "count": {}}
@@ -897,6 +918,9 @@ def fetch_and_propose(st, topic):
     for p in posts:
         if sent >= MAX_POSTS_PER_RUN or (not sample and st["daily"]["count"].get(topic, 0) >= tp.get("daily_cap", 4)):
             break
+        if is_duplicate(st, p["text"]):
+            print("skip duplicate story:", p["text"][:60].replace("\n", " "))
+            continue
         links0 = [cands[i]["link"] for i in p["idxs"]]
         links = [cands[i].get("link_real") or cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
@@ -909,6 +933,8 @@ def fetch_and_propose(st, topic):
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
         with STATE_LOCK:
+            st.setdefault("sent_log", []).append({"ts": time.time(), "line": p["text"].split("\n")[0][:160]})
+            st["sent_log"] = st["sent_log"][-200:]
             auto = (not sample) and auto_ok(st, topic, p, n_sources)
             if auto:
                 st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
@@ -1093,6 +1119,49 @@ def daily_report(st):
     tg("sendMessage", chat_id=_chat_id(), text=msg)
 
 
+
+def publish_reel(st):
+    """בוחר את הפוסט הטרי ביותר שפורסם ולא הפך לרילס, בונה סרטון ומעלה לפייסבוק כרילס."""
+    page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
+    if not page or not token or load_settings().get("pause_publish") or st.get("paused_until", 0) > time.time():
+        return
+    now = time.time()
+    cand = None
+    for it in reversed(st["approved"]):
+        if it.get("published") and it.get("image") and os.path.exists(it["image"]) and not it.get("reeled") and it.get("published_at"):
+            if now - datetime.fromisoformat(it["published_at"]).timestamp() < 24 * 3600:
+                cand = it
+                break
+    if not cand:
+        tg("sendMessage", chat_id=_chat_id(), text="🎬 אין כרגע פוסט טרי להפוך לרילס.")
+        return
+    cand["reeled"] = True  # מסמנים לפני, כדי שכשל לא יגרום להעלאה כפולה
+    import reels
+
+    out = f"/tmp/reel_{cand['id']}.mp4"
+    reels.make_reel(cand["image"], out)
+    tok = page_token(page, token)
+    base = f"https://graph.facebook.com/{FB_VERSION}/{page}/video_reels"
+    s = requests.post(base, data={"upload_phase": "start", "access_token": tok}, timeout=60).json()
+    if not s.get("video_id"):
+        raise RuntimeError("reel start: " + str((s.get("error") or {}).get("message", s))[:200])
+    size = os.path.getsize(out)
+    with open(out, "rb") as f:
+        u = requests.post(s["upload_url"], headers={"Authorization": f"OAuth {tok}", "offset": "0", "file_size": str(size)}, data=f.read(), timeout=180)
+    if u.status_code >= 300:
+        raise RuntimeError("reel upload: " + u.text[:200])
+    head = cand["text"].split("\n")[0]
+    desc = head + "\n\n" + "\n".join(cand["text"].split("\n")[1:3]).strip()
+    fin = requests.post(base, data={"upload_phase": "finish", "video_id": s["video_id"], "video_state": "PUBLISHED", "description": desc[:900], "access_token": tok}, timeout=90).json()
+    try:
+        os.remove(out)
+    except OSError:
+        pass
+    if not fin.get("success", False) and not fin.get("post_id") and not fin.get("id"):
+        raise RuntimeError("reel finish: " + str((fin.get("error") or {}).get("message", fin))[:200])
+    tg("sendMessage", chat_id=_chat_id(), text=f"🎬 רילס עלה לפייסבוק\n{head}")
+
+
 def daily_jobs(st):
     """משימות יומיות לפי שעון ישראל: דוח בוקר, 2 פוסטי הסברה ופוסט הזמנה לעקוב. כל אחת פעם ביום."""
     cfg = load_settings()
@@ -1105,7 +1174,7 @@ def daily_jobs(st):
     st["jobs"] = {today: st.get("jobs", {}).get(today, [])}
     done = st["jobs"][today]
     mins = now.hour * 60 + now.minute
-    plan = [("report", "08:00"), ("explain1", "10:30"), ("follow", "13:00"), ("explain2", "18:30")]
+    plan = [("report", "08:00"), ("reel1", "09:30"), ("explain1", "10:30"), ("follow", "13:00"), ("reel2", "14:00"), ("explain2", "18:30"), ("reel3", "20:00")]
     for name, hhmm in plan:
         start = int(hhmm[:2]) * 60 + int(hhmm[3:])
         force = os.environ.get("FORCE_JOBS") == "1"
@@ -1116,6 +1185,8 @@ def daily_jobs(st):
         try:
             if name == "report":
                 daily_report(st)
+            elif name.startswith("reel"):
+                publish_reel(st)
             elif name.startswith("explain"):
                 w = claude_json(EXPLAIN_SYSTEM, "כותרות מהיממה:\n" + "\n".join(recent_headlines(st)), WRITER_MODEL, 4000)
                 text = (w.get("text") or "").strip()
@@ -1128,7 +1199,9 @@ def daily_jobs(st):
                 if text:
                     propose_custom(st, "explain", clean_hebrew(text), urgency=1, special=2)
         except Exception as e:  # noqa: BLE001
-            print("daily job failed:", name, type(e).__name__, str(e)[:150])
+            print("daily job failed:", name, type(e).__name__, str(e)[:200])
+            if name.startswith("reel"):
+                tg("sendMessage", chat_id=_chat_id(), text="⚠️ רילס נכשל: " + str(e)[:200])
 
 
 def publish_queue(st):
@@ -1240,6 +1313,15 @@ def main():
         os.makedirs(DECISIONS_DIR, exist_ok=True)
         with open(os.path.join(DECISIONS_DIR, f"{int(time.time())}_{pid}.json"), "w", encoding="utf-8") as f:
             json.dump({"pid": pid, "action": action, "item": item}, f, ensure_ascii=False)
+        return
+    elif mode == "reel":  # בדיקה ידנית של רילס אחד
+        try:
+            publish_reel(st)
+        except Exception as e:  # noqa: BLE001
+            print("reel failed:", type(e).__name__, str(e)[:300])
+            tg("sendMessage", chat_id=_chat_id(), text="⚠️ רילס נכשל: " + str(e)[:300])
+        checkpoint(st)
+        save_state(st)
         return
     elif mode == "jobs":  # בדיקה ידנית: מריץ את המשימות היומיות מיד
         os.environ["FORCE_JOBS"] = "1"
