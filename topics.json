@@ -345,5 +345,17 @@
     "url": "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
    }
   ]
+ },
+ "explain": {
+  "label": "הסברה",
+  "emoji": "🎓",
+  "color": [
+   61,
+   220,
+   200
+  ],
+  "daily_cap": 0,
+  "en": "EXPLAINED",
+  "sources": []
  }
 }

@@ -1039,6 +1039,98 @@ def fb_health(st):
         print("health check failed:", type(e).__name__, str(e)[:120])
 
 
+
+# ------------------------------------------------------------ daily jobs
+EXPLAIN_SYSTEM = """אתה כותב מדור ההסברה של MER5, עמוד חדשות ישראלי. תקבל כותרות מהיממה האחרונה בתחומי העמוד (תעופה, ביטחון, פוליטיקה, ידיעות מהעולם, ישראלים בחו"ל).
+בחר נושא אחד שהקהל שומע עליו ומתבלבל או שיש סביבו אי-הבנות, וכתוב פוסט הסברה: "מה זה אומר" / "איך זה עובד" / "מה באמת קורה". אם אין כותרת מתאימה, בחר נושא ידע מוכר ומעניין בתחומים האלה.
+כללים: פתיח שתופס תשומת לב (שאלה או פרט מפתיע), 3-5 פסקאות קצרות, 450-800 תווים, עברית טבעית ורהוטה. רק ידע מבוסס ומוסכם. בלי מספרים וסטטיסטיקות אלא אם אתה בטוח בהם לגמרי. בנושא פוליטי או ביטחוני: הסבר מנגנונים והקשר, לא עמדות, ובלי פרטים מבצעיים. בלי האשטגים, קישורים או שאלה לקורא בסוף. שורה אחרונה: תובנה אחת ברורה.
+החזר JSON בלבד: {"text":"...","topic":"aviation|security|politics|facts|abroad"}"""
+
+FOLLOW_SYSTEM = """אתה כותב ב-MER5 - מהשטח, עמוד חדשות ישראלי (תעופה, ביטחון, פוליטיקה, ידיעות מהעולם, ישראלים בחו"ל). כתוב פוסט קצר ונעים (150-300 תווים) שמזמין לעקוב אחרי העמוד כדי לקבל את הידיעות בזמן. בטון חם ומקצועי, בלי הבטחות שאי אפשר לקיים, בלי מספרים בדויים, בלי האשטגים. גוון את הניסוח.
+החזר JSON בלבד: {"text":"..."}"""
+
+
+def recent_headlines(st):
+    out = []
+    for it in list(st["approved"][-20:]) + list(st["pending"].values()) + list(st["queue"]):
+        line = (it.get("text") or "").split("\n")[0].strip()
+        if line and line != "test":
+            out.append(line)
+    return out[-25:]
+
+
+def propose_custom(st, topic, text, urgency=2, special=3):
+    """שולח הצעה מותאמת (הסברה, עוקבים) לאישור, עם תמונה, כמו כל הצעה אחרת."""
+    pid = hashlib.sha1(text.encode()).hexdigest()[:10]
+    img_path, credit = None, None
+    try:
+        img_path, credit = make_image(pid, text, topic, overlay=True)
+        tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי"))
+    except Exception as e:  # noqa: BLE001
+        print("custom image failed:", type(e).__name__, str(e)[:120])
+    send_proposal(pid, text, [], "low", 1, False, topic, urgency, special, False, "🕒 פוסט מערכת (לא ידיעה)")
+    st["pending"][pid] = {"text": text, "links": [], "severity": "low", "topic": topic, "image": img_path, "credit": credit, "urgency": urgency, "ts": time.time()}
+
+
+def daily_report(st):
+    now = time.time()
+    pub = [x for x in st["approved"] if x.get("published_at") and now - datetime.fromisoformat(x["published_at"]).timestamp() < 86400]
+    fol = st.get("followers") or []
+    delta = ""
+    if len(fol) >= 2:
+        day_ago = [f for f in fol if now - f["ts"] <= 90000]
+        if day_ago:
+            d = fol[-1]["n"] - day_ago[0]["n"]
+            delta = f"\n👥 עוקבים: {fol[-1]['n']} ({'+' if d >= 0 else ''}{d} ב-24 שעות)"
+    elif fol:
+        delta = f"\n👥 עוקבים: {fol[-1]['n']}"
+    by = {}
+    for x in pub:
+        by[x.get("topic") or "?"] = by.get(x.get("topic") or "?", 0) + 1
+    removed = len([x for x in st.get("removals", []) if now - x < 86400])
+    msg = (f"📊 דוח יומי · MER5\n📣 פורסמו ב-24 שעות: {len(pub)}\n🗂 בתור: {len(st['queue'])} · ממתינים לאישור: {len(st['pending'])}" + delta
+           + (f"\n⚠️ הוסרו: {removed}" if removed else "") + "\n\nמסקנה: " + ("פורסמו מעט פוסטים. כדאי לאשר יותר לתור." if len(pub) < 5 else "קצב הפרסום תקין."))
+    tg("sendMessage", chat_id=_chat_id(), text=msg)
+
+
+def daily_jobs(st):
+    """משימות יומיות לפי שעון ישראל: דוח בוקר, 2 פוסטי הסברה ופוסט הזמנה לעקוב. כל אחת פעם ביום."""
+    cfg = load_settings()
+    try:
+        from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo(cfg.get("tz", "Asia/Jerusalem")))
+    except Exception:  # noqa: BLE001
+        return
+    today = now.strftime("%Y-%m-%d")
+    st["jobs"] = {today: st.get("jobs", {}).get(today, [])}
+    done = st["jobs"][today]
+    mins = now.hour * 60 + now.minute
+    plan = [("report", "08:00"), ("explain1", "10:30"), ("follow", "13:00"), ("explain2", "18:30")]
+    for name, hhmm in plan:
+        start = int(hhmm[:2]) * 60 + int(hhmm[3:])
+        force = os.environ.get("FORCE_JOBS") == "1"
+        if not force and (name in done or not (0 <= mins - start < 120)):
+            continue
+        if not force:
+            done.append(name)  # מסמנים לפני, כדי שכשל לא יגרום לשליחה כפולה
+        try:
+            if name == "report":
+                daily_report(st)
+            elif name.startswith("explain"):
+                w = claude_json(EXPLAIN_SYSTEM, "כותרות מהיממה:\n" + "\n".join(recent_headlines(st)), WRITER_MODEL, 4000)
+                text = (w.get("text") or "").strip()
+                if text:
+                    pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 4000)
+                    propose_custom(st, "explain", clean_hebrew((pol.get("text") or text).strip()), urgency=1, special=3)
+            elif name == "follow":
+                w = claude_json(FOLLOW_SYSTEM, "כתוב פוסט הזמנה לעקוב להיום.", WRITER_MODEL, 1500)
+                text = (w.get("text") or "").strip()
+                if text:
+                    propose_custom(st, "explain", clean_hebrew(text), urgency=1, special=2)
+        except Exception as e:  # noqa: BLE001
+            print("daily job failed:", name, type(e).__name__, str(e)[:150])
+
+
 def publish_queue(st):
     """מפרסם פוסט אחד מהתור בכל חלון זמן מוגדר (settings.json: slots, tz). חלון פעיל עד 60 דקות אחרי השעה."""
     cfg = load_settings()
@@ -1148,6 +1240,15 @@ def main():
         with open(os.path.join(DECISIONS_DIR, f"{int(time.time())}_{pid}.json"), "w", encoding="utf-8") as f:
             json.dump({"pid": pid, "action": action, "item": item}, f, ensure_ascii=False)
         return
+    elif mode == "jobs":  # בדיקה ידנית: מריץ את המשימות היומיות מיד
+        os.environ["FORCE_JOBS"] = "1"
+        _STATE_REF["st"] = st
+        try:
+            daily_jobs(st)
+            checkpoint(st)
+        finally:
+            save_state(st)
+        return
     elif mode in ("run", "sample"):
         if mode == "sample":
             os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
@@ -1162,6 +1263,7 @@ def main():
                 publish_approved(st)
                 publish_queue(st)
                 fb_health(st)
+                daily_jobs(st)
                 from concurrent.futures import ThreadPoolExecutor
 
                 topics = [tp for tp in load_topics() if not os.environ.get("ONLY_TOPIC") or tp == os.environ["ONLY_TOPIC"]]
