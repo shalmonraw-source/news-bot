@@ -366,13 +366,17 @@ def _brackets(d, box, color, ln=54, wd=7):
         d.line([(x, y), (x, y + sy * ln)], fill=color, width=wd)
 
 
-def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label="", highlight=()):
+def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label="", highlight=(), blur=False):
     """כרטיס צילום במסך מלא: כותרת גדולה על גרדיאנט כהה בתחתית, סמל ותגית למעלה."""
     import re as _re
     accent = tuple(color)
     title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")
     title = _re.sub(r"(?<=[\u05d0-\u05ea])'(?=\s|$|[,.:])", "\u05f3", title)
     im = _cover(photo, W, H)
+    if blur:  # תמונה כללית: טשטוש חזק כדי שתשמש כרקע ולא תטען לתאר את האירוע
+        from PIL import ImageFilter
+        im = im.filter(ImageFilter.GaussianBlur(14))
+        im = ImageEnhance.Brightness(im).enhance(0.8)
     im = ImageEnhance.Contrast(im).enhance(1.05)
     im = ImageEnhance.Color(im).enhance(0.92)
     canvas = im.convert("RGBA")
@@ -426,10 +430,10 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     return out_path
 
 
-def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False, highlight=()):
+def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False, highlight=(), blur=False):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
     if photo is not None and overlay:
-        return render_card_overlay(title, out_path, photo, credit, color, label, highlight)
+        return render_card_overlay(title, out_path, photo, credit, color, label, highlight, blur)
     accent = tuple(color)
     import re as _re
     title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")  # גרשיים תקינים: נתב״ג, צה״ל

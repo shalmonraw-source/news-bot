@@ -792,6 +792,9 @@ IMAGE_AVIATION = """אתה עורך תמונות בעמוד חדשות תעופ�
 """
 
 
+GENERIC_Q = {"security": "Middle East landscape", "aviation": "airliner at airport", "politics": "parliament building", "facts": "nature landscape", "abroad": "airport departures hall"}
+
+
 def judge_photo(img, info, subject, post):
     """בדיקה חזותית: האם התמונה מראה את מה שהידיעה עוסקת בו. מחזיר True/False."""
     import anthropic, base64, io as _io
@@ -851,7 +854,20 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
                 host = urlparse(link).netloc.replace("www.", "") or src_name
                 photo, credit = got, f"תמונה: {host}"
                 break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay, highlight=meta.get("highlight") or [])
+    blur = False
+    if photo is None:  # עדיין אין תמונה: תמונה כללית של הנושא, מטושטשת, כדי שתמיד יהיה צילום אמיתי
+        generic = [q for q in (queries + [GENERIC_Q.get(topic, "city skyline")]) if q]
+        for q in generic[-2:]:
+            try:
+                c = imgcard.commons_candidates(q, aviation=False, limit=1)
+            except Exception as e:  # noqa: BLE001
+                print("generic commons failed:", type(e).__name__)
+                continue
+            if c:
+                photo, credit, blur = c[0][0], c[0][1], True
+                print("generic blurred photo used for:", q)
+                break
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay or blur, highlight=meta.get("highlight") or [], blur=blur)
     return path, credit
 
 
