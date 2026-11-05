@@ -930,7 +930,7 @@ def build_posts(cands, topic="aviation", st=None):
             if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
-            wmodel = WRITER_MODEL if (pk["traffic"] >= 4 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
+            wmodel = WRITER_MODEL if (pk["traffic"] >= 5 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
             if topic in ("facts", "abroad") and os.environ.get("GEMINI_API_KEY"):  # ניסוי חיסכון: ידיעות קלות נכתבות בגמיני, אותן הוראות. אם נכשל, חוזרים ל-Claude
                 w = cheap_json(WRITE_BY[topic], material, wmodel, 6000)
                 print(f"[{topic}] written via gemini-first path")
@@ -941,14 +941,16 @@ def build_posts(cands, topic="aviation", st=None):
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", MODEL, 6000)
+            rev = cheap_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", MODEL, 6000)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
                 print("review fixes:", rev["issues"])
-            pol = claude_json(HEBREW_SYSTEM, text, MODEL, 6000)
-            text = (pol.get("text") or text).strip()
+            pol = cheap_json(HEBREW_SYSTEM, text, MODEL, 6000)
+            pt = (pol.get("text") or "").strip()
+            if len(pt) >= 0.7 * len(text):  # הגנה: ליטוש שקיצץ הרבה מדי נזרק
+                text = pt
             if OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|אבו עלי|אקספרס|פורסם באתר|על פי הדיווח ב", text):
-                fx = claude_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, MODEL, 6000)
+                fx = cheap_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, MODEL, 6000)
                 text = (fx.get("text") or text).strip()
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
@@ -1007,7 +1009,7 @@ def st_no_source():
 def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=False):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
-    meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
+    meta = cheap_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
     title = (meta.get("card_title") or text.split("\n", 1)[0]).strip()
     subject = meta.get("subject") or title
     queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
