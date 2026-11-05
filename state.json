@@ -376,7 +376,38 @@
   "fd0931cb0148",
   "ba8820f7a7f0",
   "995835e18249",
-  "68b35e6fbddc"
+  "68b35e6fbddc",
+  "a809b917da1d",
+  "444fe8de56a9",
+  "73fe54918526",
+  "23da631363f7",
+  "6401c4a77be6",
+  "b3d5840abf2f",
+  "352be8e78bfd",
+  "a0a74f1d17c2",
+  "a4ea4683476b",
+  "7ddeffbb686b",
+  "b25ac66e8909",
+  "a37d47af5874",
+  "370d545af894",
+  "e0bc95e81d9f",
+  "f3b1d920ce47",
+  "dacf36cc689b",
+  "d9c671872df2",
+  "4ca6b5c9ae22",
+  "076d7d98170e",
+  "1bdfc12f08da",
+  "bd6e165af92c",
+  "2ec712074cef",
+  "888334b98d05",
+  "464114e80af5",
+  "bd8aa6fa1d19",
+  "62774e60277e",
+  "1c20f0184b9c",
+  "52555df7813b",
+  "cbceb6255117",
+  "48a8292044b1",
+  "6f3be6eb0c8f"
  ],
  "pending": {
   "8aec5bd77c": {
@@ -541,6 +572,39 @@
    "image": "images/28cbaa9e0c.jpg",
    "credit": "National Park Service / Wikimedia Commons / Public domain",
    "ts": 1793839718.2611215
+  },
+  "1c20f0184b": {
+   "text": "דיווח: טייס נדקר בטיסה בקו תל אביב, והמטוס איבד אלפי רגל מגובהו\n\nטייס נדקר במהלך טיסה בקו תל אביב, והמטוס איבד אלפי רגל מגובהו. כך עולה מדיווח של רשת ABC News האמריקנית, המתארת את האירוע כמתקפת טרור לכאורה.\n\nהדיווח אינו מפרט את שם חברת התעופה, את סוג המטוס, את מועד הטיסה או את כיוונה. לא ידוע מה מצבו של הטייס, אם נפגעו נוסעים או אנשי צוות, והיכן נחת המטוס.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNZkdKU25NUFppS1h1OVBib2FDRTRrbmRGUk90MU9TM01zVzZUeEFrOTZ2RGFleGxJd2JQakhYTExYRGZYSUpTUXlVWkJlTExBVUJVSjlycVpGWThMaWNBYWFGajg5QlgyRVFRWjRKMmQ3RVJvTTJ1Y3lVeVByMjlTZzMtR0RSN1RiclpVTDR0d2hzajFPOVlEOEd6SjI2U3BSa3EwcWJlMnHSAa4BQVVfeXFMUF9sbEVqZ2c0MW9lMkRJaTBOa0UtdVFMR3pyNWJoNVE1SDJVWDlYM0xDbTFNMWFHdlNldXJVVHV5OUxWU1lRcXd1RFdpVmVkUjl4dFJ6WHQ2Ynl2SjRDSVhfNG5WSks0am5XMUZFNlJWUGJnbUFDNlRlYWQteG5xLWpEdWt5MWpNS0VTX3JHc3hlOFAtQkZaS2VtX2NnRjVnZlJjNDRWOXlOamR6a2RB?oc=5"
+   ],
+   "severity": "high",
+   "topic": "aviation",
+   "image": "images/1c20f0184b.jpg",
+   "credit": null,
+   "ts": 1793839860.724747
+  },
+  "48a8292044": {
+   "text": "חשד ביטחוני בטיסת אל על: מאבטחים הורידו גבר ואישה מהטיסה\n\nמאבטחים הורידו גבר ואישה מטיסה של אל על בעקבות חשד ביטחוני, כך דיווחה רשת 13.\n\nבדיווח לא פורטו מספר הטיסה, יעדה, מועד האירוע ומהות החשד. גם זהותם ואזרחותם של השניים לא פורסמו, ולא ידוע אם נעצרו או נחקרו.\n\nעל האבטחה בטיסות של חברות התעופה הישראליות מופקדים מאבטחים ייעודיים, גם בנמלי התעופה בחו״ל. הם מוסמכים למנוע מנוסע לעלות למטוס, או להוריד אותו ממנו לפני ההמראה, אם מתעורר חשד.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMicEFVX3lxTFBCT1U0akxBSktwcVlyR3YyU21sNDFFZWtTN3lZQlRkcXFCVXBqVjVKOURkclBpcW5MeHQtZWNacTBZLS1kQlFDaFR2YjZ3dEdNbm5xQnVrUDZXWTh5WDFGSkk1dVJKRjdsYzV4Z3VPY1Q?oc=5"
+   ],
+   "severity": "medium",
+   "topic": "aviation",
+   "image": "images/48a8292044.jpg",
+   "credit": "Acroterion / Wikimedia Commons / CC BY-SA 4.0",
+   "ts": 1793839864.2521706
+  },
+  "2ec712074c": {
+   "text": "מטוס של פרונטיר פגע באדם על מסלול בנמל התעופה של דנוור\n\nמטוס של חברת התעופה פרונטיר איירליינס פגע באדם על מסלול בנמל התעופה הבינלאומי של דנוור, כך אישרו גורמים רשמיים.\n\nבשלב זה לא פורסמו פרטים על זהותו של האדם או על מצבו. עדיין לא ידוע כיצד הגיע אל המסלול, ואם המטוס היה בהמראה, בנחיתה או בהסעה על הקרקע. גם מספר הנוסעים שהיו על סיפונו לא פורסם.\n\nהמסלולים בנמלי תעופה נמצאים בתוך מתחם סגור ומאובטח. הגישה אליהם מותרת רק לעובדים מורשים, וכל תנועה עליהם מתואמת עם מגדל הפיקוח. לכן נוכחות של אדם לא מורשה על מסלול נחשבת לאירוע חריג, ובדרך כלל מובילה גם לבדיקה של אבטחת השדה.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOdVRrclhhcGFxcnpTdkZuWHhIaHpNRnBkakNvT2NuUEhwMW9FdWZDVDB4SlBTUjVCOGk3NGo1WUFWYV9GQVZOX1FfbjgxRlFJNTV0S1ZacU1xWnNEX3JkNzdjeC0wWUxvb2JxVzhWZWNibWN5YzdSOXRXNnBNUzlNN016WGI4bnNwN08wR05Zc1Joc1AxR3NsdzJqXzRRMDNGT2tzS0lWVjMxQdIBrwFBVV95cUxNdUNOTUZsblVDM2F1SHViVnE4aDNsMEZNSDVseF84ZlRQclE2RlZoc3l3Z0N5Zkh0TTJIR0thUGEtM25BMlRvUU5Ia3RoN2JEcEdRUWpLUnFHSzZaTTRucTQ2aS01WGM2RFQ1N3ExRGFCaVRzUDJiQWFjVmtfdU81b2ROYW94anNQaklUSHNfWGp0ZUMyeDVyQ1g0eWlaOHA2cUk5dEUyQ0FZekxYY0xj?oc=5"
+   ],
+   "severity": "high",
+   "topic": "aviation",
+   "image": "images/2ec712074c.jpg",
+   "credit": "Andrew Heneen / Wikimedia Commons / CC BY 4.0",
+   "ts": 1793839867.888754
   }
  },
  "approved": [
@@ -585,7 +649,8 @@
  "daily": {
   "date": "2026-11-05",
   "count": {
-   "security": 3
+   "security": 3,
+   "aviation": 3
   }
  },
  "queue": [],
