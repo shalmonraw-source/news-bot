@@ -575,11 +575,55 @@ def parse_picks(data, n):
     return picks
 
 
+
+_GN_CACHE = {}
+
+
+def resolve_google_news(link):
+    """מפענח קישור news.google.com לכתובת הכתבה האמיתית. אם נכשל, מחזיר את הקישור המקורי."""
+    if "news.google.com" not in link:
+        return link
+    if link in _GN_CACHE:
+        return _GN_CACHE[link]
+    out = link
+    try:
+        import base64
+        from urllib.parse import quote, urlparse
+
+        gid = urlparse(link).path.rstrip("/").split("/")[-1]
+        try:  # פורמט ישן: הכתובת מקודדת בתוך המזהה
+            raw = base64.urlsafe_b64decode(gid + "=" * (-len(gid) % 4))
+            m = re.search(rb"https?://[\x21-\x7e]+", raw)
+            if m and raw.startswith(b"\x08\x13\x22"):
+                out = m.group(0).decode()
+        except Exception:  # noqa: BLE001
+            pass
+        if out == link:
+            page = requests.get(f"https://news.google.com/articles/{gid}?hl=en-US&gl=US&ceid=US:en", headers={"User-Agent": UA}, timeout=20).text
+            sg = re.search(r'data-n-a-sg="([^"]+)"', page)
+            ts = re.search(r'data-n-a-ts="([^"]+)"', page)
+            if sg and ts:
+                inner = json.dumps(["garturlreq", [["X", "X", ["X", "X"], None, None, 1, 1, "US:en", None, 1, None, None, None, None, None, 0, 1], "X", "X", 1, [1, 1, 1], 1, 1, None, 0, 0, None, 0], gid, ts.group(1), sg.group(1)])
+                body = "f.req=" + quote(json.dumps([[["Fbv4je", inner, None, "generic"]]]))
+                r = requests.post("https://news.google.com/_/DotsSplashUi/data/batchexecute", data=body, timeout=20,
+                                  headers={"User-Agent": UA, "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"})
+                arr = json.loads(r.text.split("\n\n", 1)[1])
+                url = json.loads(arr[0][2])[1]
+                if url.startswith("http"):
+                    out = url
+    except Exception as e:  # noqa: BLE001
+        print("gnews resolve failed:", type(e).__name__, str(e)[:80])
+    _GN_CACHE[link] = out
+    return out
+
+
 def story_material(cands, idxs):
     parts = []
     for i in idxs:
         c = cands[i]
-        art = fetch_article(c["link"])
+        c["link_real"] = resolve_google_news(c["link"])
+        art = fetch_article(c["link_real"])
+        c["has_body"] = bool(art)
         parts.append(f'מקור: {c["source"]}\nכותרת: {c["title"]}\nתקציר: {c["summary"]}\n' + (f"גוף הכתבה: {art}" if art else ""))
     return "\n\n---\n\n".join(parts)
 
@@ -669,6 +713,9 @@ def build_posts(cands, topic="aviation"):
     for pk in picks[:MAX_POSTS_PER_RUN]:
         try:
             material = story_material(cands, pk["idxs"])
+            if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
+                print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
+                continue
             w = claude_json(WRITE_BY[topic], material, WRITER_MODEL)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
@@ -772,12 +819,13 @@ def fetch_and_propose(st, topic):
     for p in posts:
         if sent >= MAX_POSTS_PER_RUN or (not sample and st["daily"]["count"].get(topic, 0) >= tp.get("daily_cap", 4)):
             break
-        links = [cands[i]["link"] for i in p["idxs"]]
+        links0 = [cands[i]["link"] for i in p["idxs"]]
+        links = [cands[i].get("link_real") or cands[i]["link"] for i in p["idxs"]]
         n_sources = len({cands[i]["source"] for i in p["idxs"]})
-        pid = hashlib.sha1("".join(links).encode()).hexdigest()[:10]
+        pid = hashlib.sha1("".join(links0).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i]["link"]) for i in p["idxs"]])
+            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
