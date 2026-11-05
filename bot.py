@@ -237,7 +237,12 @@ FAST_DAILY_CAP = 15
 
 def FAST_OK(st, topic, p):
     """מתפרצת (דחיפות 4+) עולה מיד לפייסבוק כדיווח ראשוני. תקרה יומית נגד ספאם/חסימה."""
-    return topic in FAST_TOPICS and int(p.get("urgency") or 3) >= 4 and st["daily"].get("fast", 0) < FAST_DAILY_CAP and not load_settings().get("no_fast")
+    if topic not in FAST_TOPICS or int(p.get("urgency") or 3) < 4 or int(p.get("traffic") or 3) < 4:
+        return False
+    if st["daily"].get("fast", 0) >= FAST_DAILY_CAP or load_settings().get("no_fast"):
+        return False
+    gap = 10 if int(p.get("urgency") or 3) >= 5 else 25  # מרווח מינימלי בדקות מפוסט קודם, כדי שלא יקניבלו זה את זה
+    return time.time() - st.get("last_fb_ts", 0) > gap * 60
 
 
 def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3, auto=False, when=""):
@@ -726,7 +731,8 @@ WRITE_NEWS = (
 )
 
 IMAGE_NEWS = """אתה עורך תמונות בעמוד חדשות. תקבל פוסט בעברית. החזר JSON בלבד:
-{"card_title":"...","highlight":["..."],"subject":"...","queries":["...","...","..."]}
+{"card_title":"...","highlight":["..."],"subject":"...","queries":["...","...","..."],"badge":""}
+- badge: חותמת אדומה על הכרטיס. "חוסל" רק אם הידיעה היא שאדם מסוים חוסל או נהרג בפעולה של צה״ל או כוחות הביטחון. אחרת מחרוזת ריקה.
 - highlight: עד 3 מילים מתוך card_title בדיוק כפי שהן כתובות שהן עיקר הידיעה (מקום, מספר או הפועל המרכזי), לצביעה בצבע הנושא.
 - subject: משפט קצר באנגלית: מה בדיוק צריך להיות בתמונה כדי שיהיה קשר ברור לידיעה (המקום, הכלי, המבנה או הארגון המרכזי בפוסט).
 - queries: עד 3 חיפושים באנגלית ב-Wikimedia Commons, מהספציפי לכללי, כולם על הישות המרכזית של הידיעה (שם המקום, המבנה, סוג הספינה/הכלי, המוסד). אם אין צילום ספציפי מתאים, השאר רשימה קצרה: עדיף בלי תמונה מאשר תמונה לא קשורה.
@@ -898,7 +904,7 @@ def st_no_source():
     return _STATE_REF.get("st", {}).get("no_source_images_until", 0) > time.time()
 
 
-def make_image(pid, text, topic="aviation", overlay=False, sources=()):
+def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=False):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
     meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
@@ -906,7 +912,8 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
     subject = meta.get("subject") or title
     queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
     photo, credit = None, None
-    typo_only = topic == "explain" or bool(re.search(r"הרוג|נהרג|נפצע|פצועים|מת |נרצח|גופות|חלל", text.split("\n\n")[0] + title))
+    typo_only = topic == "explain"
+    badge = "חוסל" if (meta.get("badge") or "").strip() == "חוסל" else ("מתפרצת" if urgent else "")
     if typo_only:  # פוסטי מערכת וידיעות רגישות: כרטיס טיפוגרפי עם הפטרנים, בלי צילום
         queries, sources = [], ()
     for q in queries:
@@ -948,7 +955,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
                 photo, credit, blur = c[0][0], c[0][1], True
                 print("generic blurred photo used for:", q)
                 break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=(overlay or blur) and not typo_only, highlight=meta.get("highlight") or [], blur=blur)
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=(overlay or blur) and not typo_only, highlight=meta.get("highlight") or [], blur=blur, badge=badge)
     return path, credit
 
 
@@ -989,7 +996,7 @@ def fetch_and_propose(st, topic):
         pid = hashlib.sha1("".join(links0).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic, overlay=True, sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
+            img_path, credit = make_image(pid, p["text"], topic, overlay=True, urgent=int(p.get("urgency") or 3) >= 5 and int(p.get("traffic") or 3) >= 4, sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i].get("link_real") or cands[i]["link"]) for i in p["idxs"]])
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
@@ -1117,6 +1124,7 @@ def publish_approved(st):
             except Exception:  # noqa: BLE001
                 pass
             item["published"] = True
+            st["last_fb_ts"] = time.time()
             mirror_to_channel(item)
             item["fb_id"] = fb_id
             item["published_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")

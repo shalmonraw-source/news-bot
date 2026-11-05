@@ -366,7 +366,18 @@ def _brackets(d, box, color, ln=54, wd=7):
         d.line([(x, y), (x, y + sy * ln)], fill=color, width=wd)
 
 
-def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label="", highlight=(), blur=False):
+def _badge(d, text, y=130, m=56):
+    """חותמת אדומה (חוסל / מתפרצת) מתחת לתגית הנושא."""
+    if not text:
+        return
+    bf = _font(40)
+    tw = _width(d, text, bf)
+    x1, x0 = W - m, W - m - tw - 56
+    d.rounded_rectangle([x0, y, x1, y + 68], radius=34, fill=(214, 28, 38))
+    d.text(((x0 + x1) // 2, y + 34), _shape(text), font=bf, fill=(255, 255, 255), anchor="mm", **_kw())
+
+
+def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label="", highlight=(), blur=False, badge=""):
     """כרטיס צילום במסך מלא: כותרת גדולה על גרדיאנט כהה בתחתית, סמל ותגית למעלה."""
     import re as _re
     accent = tuple(color)
@@ -397,6 +408,7 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     tw = _width(d, tag, tf)
     d.rounded_rectangle([W - m - tw - 44, 54, W - m, 106], radius=8, fill=accent)
     d.text((W - m - 22, 80), _shape(tag), font=tf, fill=(12, 12, 13), anchor="rm", **_kw())
+    _badge(d, badge)
     margin, max_w = m + 8, W - 2 * (m + 8)
     scratch = ImageDraw.Draw(Image.new("RGB", (W, 10)))
     for size in range(92, 51, -4):
@@ -430,10 +442,10 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     return out_path
 
 
-def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False, highlight=(), blur=False):
+def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False, highlight=(), blur=False, badge=""):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
     if photo is not None and overlay:
-        return render_card_overlay(title, out_path, photo, credit, color, label, highlight, blur)
+        return render_card_overlay(title, out_path, photo, credit, color, label, highlight, blur, badge)
     accent = tuple(color)
     import re as _re
     title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")  # גרשיים תקינים: נתב״ג, צה״ל
@@ -453,6 +465,7 @@ def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), 
     d.rectangle([0, 0, W, 10], fill=accent)
     d.rounded_rectangle([W - m - tw - 44, 62, W - m, 62 + 52], radius=8, fill=accent)
     d.text((W - m - 22, 88), _shape(tag), font=tf, fill=(12, 12, 13), anchor="rm", **_kw())
+    _badge(d, badge, y=130)
 
     # --- אזור התמונה
     pw, phh = ph_box[2] - ph_box[0], ph_box[3] - ph_box[1]
