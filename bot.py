@@ -595,7 +595,7 @@ _CREDIT_ALERT = 0
 _PATTERN = set()
 _BUDGET_ALERT = 0
 # מחירים בדולר למיליון טוקנים, מוערכים בגבוה כדי להיות בצד הבטוח (קלט, פלט)
-_PRICE = {"opus": (15, 75), "sonnet": (3, 15), "haiku": (1, 5)}
+_PRICE = {"opus": (4, 20), "sonnet": (2, 10), "haiku": (0.10, 0.50)}  # מחירי רשימה אוק׳ 2026; haiku 5.5 עד 100K טוקנים
 
 
 def _spend_state():
@@ -617,12 +617,14 @@ def _charge(model, usage):
     sp = _spend_state()
     if sp is None or usage is None:
         return
-    pin, pout = next((v for k, v in _PRICE.items() if k in model), (15, 75))
+    pin, pout = next((v for k, v in _PRICE.items() if k in model), (4, 20))
     inp = getattr(usage, "input_tokens", 0) or 0
     out = getattr(usage, "output_tokens", 0) or 0
     cw = getattr(usage, "cache_creation_input_tokens", 0) or 0
     cr = getattr(usage, "cache_read_input_tokens", 0) or 0
-    sp["usd"] = round(sp["usd"] + (inp * pin + cw * pin * 1.25 + cr * pin * 0.1 + out * pout) / 1e6, 4)
+    cost = (inp * pin + cw * pin * 1.25 + cr * pin * 0.1 + out * pout) / 1e6
+    sp["usd"] = round(sp["usd"] + cost, 4)
+    print(f"LLM {model} in={inp} cw={cw} cr={cr} out={out} ${cost:.4f} | day=${sp['usd']:.3f}")
 
 
 def claude_text(system, user, model, max_tokens=3000):
@@ -654,10 +656,13 @@ def claude_text(system, user, model, max_tokens=3000):
     return "".join(b.text for b in resp.content if b.type == "text")
 
 
+_GEM_DOWN = [0.0, 0]
+
+
 def gemini_text(system, user, max_tokens=2000):
     """מודל זול (Gemini Flash) לעבודה מכנית: בחירה וכפילויות. מחזיר None אם אין מפתח או שנכשל, ואז חוזרים ל-Claude."""
     key = os.environ.get("GEMINI_API_KEY")
-    if not key:
+    if not key or time.time() < _GEM_DOWN[0]:
         return None
     models = [os.environ.get("GEMINI_MODEL", "gemini-3.8-flash"), "gemini-flash-latest", "gemini-3.8-flash-lite"]
     for m in models:
@@ -673,9 +678,16 @@ def gemini_text(system, user, max_tokens=2000):
             if "candidates" not in j:
                 print("gemini error:", m, r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:200])
                 continue
+            um = j.get("usageMetadata", {})
+            print(f"GEM {m} in={um.get('promptTokenCount')} out={um.get('candidatesTokenCount')} think={um.get('thoughtsTokenCount')}")
+            _GEM_DOWN[1] = 0
             return "".join(p.get("text", "") for p in j["candidates"][0]["content"]["parts"])
         except Exception as e:  # noqa: BLE001
             print("gemini failed:", m, type(e).__name__, str(e)[:100])
+    _GEM_DOWN[1] += 1
+    if _GEM_DOWN[1] >= 2:  # שתי קריאות כושלות ברצף: מפסיקים לנסות 15 דקות כדי לא לבזבז זמן
+        _GEM_DOWN[0] = time.time() + 900
+        print("gemini circuit open for 15 min")
     return None
 
 
@@ -688,6 +700,15 @@ def cheap_json(system, user, model, max_tokens=2000):
         except Exception:  # noqa: BLE001
             print("gemini bad JSON, falling back to claude")
     return claude_json(system, user, model, max_tokens)
+
+
+def soft_json(system, user, model, max_tokens=3000):
+    """שלבים מכניים (ליטוש, תיקון, מטא): אם נכשל או נחסם, מחזירים {} והפוסט ממשיך כפי שהוא."""
+    try:
+        return claude_json(system, user, model, max_tokens)
+    except Exception as e:  # noqa: BLE001
+        print("soft step failed:", type(e).__name__, str(e)[:120])
+        return {}
 
 
 def claude_json(system, user, model, max_tokens=3000):
@@ -941,16 +962,17 @@ def build_posts(cands, topic="aviation", st=None):
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rev = cheap_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", MODEL, 6000)
+            rmodel = MODEL if topic in ("security", "aviation", "politics") else CHEAP_MODEL  # ביקורת עובדות: סונט לנושאים רגישים, הייקו לקלים
+            rev = soft_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", rmodel, 6000)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
                 print("review fixes:", rev["issues"])
-            pol = cheap_json(HEBREW_SYSTEM, text, MODEL, 6000)
+            pol = soft_json(HEBREW_SYSTEM, text, CHEAP_MODEL, 6000)
             pt = (pol.get("text") or "").strip()
             if len(pt) >= 0.7 * len(text):  # הגנה: ליטוש שקיצץ הרבה מדי נזרק
                 text = pt
             if OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|אבו עלי|אקספרס|פורסם באתר|על פי הדיווח ב", text):
-                fx = cheap_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, MODEL, 6000)
+                fx = soft_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, CHEAP_MODEL, 6000)
                 text = (fx.get("text") or text).strip()
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
@@ -1009,7 +1031,7 @@ def st_no_source():
 def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=False):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
-    meta = cheap_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
+    meta = soft_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, CHEAP_MODEL, 700)
     title = (meta.get("card_title") or text.split("\n", 1)[0]).strip()
     subject = meta.get("subject") or title
     queries = [q for q in (meta.get("queries") or []) if isinstance(q, str)][:3]
