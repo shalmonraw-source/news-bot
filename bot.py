@@ -1067,8 +1067,7 @@ def scan_due():
         n = datetime.now(ZoneInfo("Asia/Jerusalem"))
     except Exception:  # noqa: BLE001
         return True
-    night = n.hour >= 23 or n.hour < 6
-    return (n.minute % 30 < 5) if night else (n.minute % 10 < 5)
+    return True  # קצב מלא: כל 5 דקות, גם בלילה (הבחירה רצה על Gemini ולא עולה כסף)
 
 
 def fetch_and_propose(st, topic):
