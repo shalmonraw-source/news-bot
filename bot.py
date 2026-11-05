@@ -843,6 +843,9 @@ def build_posts(cands, topic="aviation", st=None):
     sent = recent_sent(st) if st else []
     extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
     picks = parse_picks(claude_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
+    if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
+        picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
+    wmodel = WRITER_MODEL if topic in ("security", "aviation", "politics") else MODEL
     review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -851,7 +854,7 @@ def build_posts(cands, topic="aviation", st=None):
             if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
-            w = claude_json(WRITE_BY[topic], material, WRITER_MODEL, 6000)
+            w = claude_json(WRITE_BY[topic], material, wmodel, 6000)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
@@ -973,6 +976,19 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
                 break
     path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=(overlay or blur) and not typo_only, highlight=meta.get("highlight") or [], blur=blur, badge=badge)
     return path, credit
+
+
+def scan_due():
+    """חיסכון: בשעות העומס סורקים כל 10 דקות, בלילה (23:00-06:00 בישראל) כל 30. הפעלה ידנית (workflow_dispatch) תמיד סורקת."""
+    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+        return True
+    try:
+        from zoneinfo import ZoneInfo
+        n = datetime.now(ZoneInfo("Asia/Jerusalem"))
+    except Exception:  # noqa: BLE001
+        return True
+    night = n.hour >= 23 or n.hour < 6
+    return (n.minute % 30 < 5) if night else (n.minute % 10 < 5)
 
 
 def fetch_and_propose(st, topic):
@@ -1571,6 +1587,9 @@ def main():
                 from concurrent.futures import ThreadPoolExecutor
 
                 topics = [tp for tp in load_topics() if not os.environ.get("ONLY_TOPIC") or tp == os.environ["ONLY_TOPIC"]]
+                if mode == "run" and not os.environ.get("ONLY_TOPIC") and not scan_due():
+                    print("scan skipped (throttle)")
+                    topics = []
 
                 def one(topic):
                     t0 = time.time()
