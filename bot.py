@@ -28,6 +28,17 @@ MAX_AGE_HOURS = int(os.environ.get("MAX_AGE_HOURS", "12"))
 MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "40"))
 MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "3"))
 PENDING_TTL_DAYS = 3
+
+
+import threading
+
+STATE_LOCK = threading.RLock()
+
+
+def ttl_hours(urgency):
+    """תוקף הצעה לפי דחיפות: חדשה דחופה מתיישנת מהר, ידע יכול לחכות."""
+    u = int(urgency or 3)
+    return 3 if u >= 4 else 12 if u == 3 else PENDING_TTL_DAYS * 24
 UA = "Mozilla/5.0 (compatible; news-bot/1.0)"
 
 
@@ -87,8 +98,8 @@ def load_state(apply_decisions=True):
 def save_state(st):
     st["seen"] = st["seen"][-3000:]
     st["approved"] = st["approved"][-300:]
-    cutoff = time.time() - PENDING_TTL_DAYS * 86400
-    st["pending"] = {k: v for k, v in st["pending"].items() if v.get("ts", 0) > cutoff}
+    now = time.time()
+    st["pending"] = {k: v for k, v in st["pending"].items() if v.get("ts", 0) > now - ttl_hours(v.get("urgency")) * 3600}
     keep = {os.path.basename(x["image"]) for x in list(st["pending"].values()) + st["approved"] + st["queue"] if x.get("image")}
     if os.path.isdir("images"):
         for fn in os.listdir("images"):
@@ -677,19 +688,23 @@ def fetch_and_propose(st, topic):
             print("image failed:", type(e).__name__, str(e)[:150])
             img_path = None
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3))
-        st["pending"][pid] = {
-            "text": p["text"],
-            "links": links,
-            "severity": p["severity"],
-            "topic": topic,
-            "image": img_path,
-            "credit": credit,
-            "ts": time.time(),
-        }
+        with STATE_LOCK:
+            st["pending"][pid] = {
+                "text": p["text"],
+                "links": links,
+                "severity": p["severity"],
+                "topic": topic,
+                "image": img_path,
+                "credit": credit,
+                "urgency": p.get("urgency", 3),
+                "ts": time.time(),
+            }
+            if not sample:
+                st["daily"]["count"][topic] = st["daily"]["count"].get(topic, 0) + 1
+            checkpoint(st)  # נשמר מיד אחרי כל הצעה, כך שלחיצה בטלגרם תמיד תמצא אותה
         sent += 1
-        if not sample:
-            st["daily"]["count"][topic] = st["daily"]["count"].get(topic, 0) + 1
-    st["seen"].extend(c["h"] for c in cands)
+    with STATE_LOCK:
+        st["seen"].extend(c["h"] for c in cands)
     print(f"[{topic}] proposals sent: {sent}")
 
 
@@ -858,15 +873,21 @@ def main():
         try:
             publish_approved(st)
             publish_queue(st)
-            for topic in load_topics():
-                if os.environ.get("ONLY_TOPIC") and topic != os.environ["ONLY_TOPIC"]:
-                    continue
+            from concurrent.futures import ThreadPoolExecutor
+
+            topics = [tp for tp in load_topics() if not os.environ.get("ONLY_TOPIC") or tp == os.environ["ONLY_TOPIC"]]
+
+            def one(topic):
                 t0 = time.time()
                 try:
                     fetch_and_propose(st, topic)
                 except Exception as e:  # noqa: BLE001
                     print(f"[{topic}] failed:", type(e).__name__, str(e)[:200])
                 print(f"[{topic}] took {int(time.time() - t0)}s")
+
+            with ThreadPoolExecutor(max_workers=len(topics) or 1) as ex:
+                list(ex.map(one, topics))  # הנושאים רצים במקביל
+            with STATE_LOCK:
                 checkpoint(st)
         finally:
             save_state(st)
