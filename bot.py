@@ -605,7 +605,10 @@ def _spend_state():
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     sp = st.get("spend")
     if not sp or sp.get("date") != today:
-        sp = st["spend"] = {"date": today, "usd": 0.0}
+        sp = st["spend"] = {"date": today, "usd": 0.0, "v": 2}
+    if sp.get("v") != 2:  # מעבר למחירי אמת: המונה הישן נספר במחירים מנופחים בערך פי 2.5
+        sp["usd"] = round(sp["usd"] * 0.4, 4)
+        sp["v"] = 2
     return sp
 
 
@@ -946,7 +949,7 @@ def build_posts(cands, topic="aviation", st=None):
     picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, CHEAP_MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
         picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
-    review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
+    review = (REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS) + '\n\nחיסכון: אם הטיוטה תקינה ואין מה לתקן, החזר {"issues":[],"text":""} בלי להעתיק אותה. החזר טקסט מלא רק אם תיקנת בו משהו.'
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
         try:
