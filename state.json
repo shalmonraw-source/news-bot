@@ -1,24 +1,5 @@
 {
  "seen": [
-  "c920f0f2e65c",
-  "7c14c861a1d6",
-  "b09166db3e14",
-  "e81dd0efb655",
-  "a9ac7f0a377b",
-  "1f5bdbd49c13",
-  "d2bba0ba252e",
-  "4d045b59e1ec",
-  "079e5a4abb0b",
-  "f4e230cf9a32",
-  "32d5371a144b",
-  "7535c499e783",
-  "a9ac7f0a377b",
-  "0c4c29232281",
-  "af1bb96b8336",
-  "98ffdb69df60",
-  "5a61b16ccb6c",
-  "19a9780d51ed",
-  "cd78def3c866",
   "94f711c048eb",
   "510d54aaae28",
   "f0a50f2ab727",
@@ -2999,7 +2980,26 @@
   "bda36dd1e4b8",
   "ef386012c6d0",
   "1071883fdb96",
-  "4f6e85874292"
+  "4f6e85874292",
+  "57f5c64858e3",
+  "c0e218d783ce",
+  "b13427597c29",
+  "b42362010773",
+  "73d1cef8a704",
+  "704da7b84f07",
+  "5186a17c4ffd",
+  "f7fa42a52ff0",
+  "83defe891eff",
+  "a63142058c87",
+  "5147a623a961",
+  "7db2b4916d0c",
+  "b468df3df018",
+  "712b3f4abbf6",
+  "f4dfff0e4f10",
+  "5ebbda8ea798",
+  "13224e5cb0d0",
+  "b542c6526a6c",
+  "a75636bc819d"
  ],
  "pending": {
   "f793550a3e": {
@@ -3832,6 +3832,18 @@
    "credit": "תמונה: i24news.tv",
    "urgency": 3,
    "ts": 1793882199.1380792
+  },
+  "712b3f4abb": {
+   "text": "מונטריאול במקום הראשון: הערים הבטוחות ביותר לתיירים ב-2027\n\nעל פי דו״ח חדש שמדרג עשר ערים לפי בטיחות למטיילים, מונטריאול עולה למקום הראשון, על חשבון יעדים קלאסיים. טוקיו במקום הרביעי, ואמסטרדם נכנסת לשלישייה המובילה למרות הסטיגמות שדבקו בה.",
+   "links": [
+    "https://www.israelhayom.co.il/travel/travel-abroad/article/21787986"
+   ],
+   "severity": "low",
+   "topic": "abroad",
+   "image": "images/712b3f4abb.jpg",
+   "credit": "Wilfredor / Wikimedia Commons / CC BY-SA 4.0",
+   "urgency": 2,
+   "ts": 1793882201.383238
   }
  },
  "approved": [
@@ -4422,7 +4434,7 @@
    "aviation": 12,
    "politics": 32,
    "facts": 19,
-   "abroad": 4
+   "abroad": 5
   },
   "auto": 4,
   "fast": 12
