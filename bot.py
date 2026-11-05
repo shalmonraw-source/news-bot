@@ -173,6 +173,46 @@ def _bar(v):
     return "●" * v + "○" * (5 - v)
 
 
+
+def when_line(cands, idxs):
+    """שורת זמני פרסום ראשון: שעה בישראל ובת כמה הידיעה, לפי המקור הוותיק ביותר."""
+    from zoneinfo import ZoneInfo
+
+    rows = []
+    for i in idxs:
+        c = cands[i]
+        if not c.get("ts"):
+            continue
+        try:
+            d = datetime.fromisoformat(c["ts"])
+            if d.tzinfo is None:
+                d = d.replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+        rows.append((d, c["source"]))
+    if not rows:
+        return "🕒 זמן פרסום לא ידוע"
+    rows.sort()
+    d, src = rows[0]
+    mins = max(0, int((datetime.now(timezone.utc) - d).total_seconds() // 60))
+    age = f"לפני {mins} דק'" if mins < 90 else f"לפני {mins // 60} שע'"
+    stamp = d.astimezone(ZoneInfo("Asia/Jerusalem")).strftime("%H:%M %d/%m")
+    fresh = "🟢" if mins < 60 else ("🟠" if mins < 180 else "🔴")
+    return f"🕒 פורסם לראשונה: {stamp} ({age}) · {src} {fresh}"
+
+
+def check_line(text, n_sources, topic):
+    """בדיקה אוטומטית לידיעות רגישות: מקורות, ייחוס, נפגעים ופרטים מבצעיים."""
+    if topic not in ("security", "politics"):
+        return ""
+    ok = lambda b, y, n: ("✅ " + y) if b else ("⚠️ " + n)  # noqa: E731
+    return "🔍 בדיקה: " + " · ".join([
+        ok(n_sources >= 2, "2+ מקורות", "מקור יחיד"),
+        ok("לפי" in text or "אמר" in text or "מסר" in text, "יש ייחוס", "אין ייחוס"),
+        ok(not re.search(r"\d+ הרוגים|נהרגו \d+|שם ההרוג|קואורדינט", text), "בלי פרטים מסוכנים", "בדוק נפגעים/פרטים"),
+    ])
+
+
 AUTO_TOPICS = {"facts", "aviation"}
 AUTO_DAILY_CAP = 4
 SENSITIVE = re.compile(r"הרוג|נהרג|נהרגו|פצוע|נפצע|נפצעו|התרסק|התרסקות|קורבנ|מת\b|מתו|אסון|תאונה|חטיפ|פיגוע|מלחמ|ירי|טיל")
@@ -189,7 +229,7 @@ def auto_ok(st, topic, p, n_sources):
     return st["daily"].get("auto", 0) < AUTO_DAILY_CAP
 
 
-def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3, auto=False):
+def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="aviation", urgency=3, special=3, auto=False, when=""):
     sev = {"high": "🔴 חומרה גבוהה", "medium": "🟠 חומרה בינונית"}.get(severity, "🟢 חומרה נמוכה")
     verified = f"{n_sources} מקורות" if n_sources > 1 else "⚠️ מקור יחיד"
     flag = " · 🇮🇱 קשר ישראלי" if israel else ""
@@ -197,7 +237,7 @@ def send_proposal(pid, text, links, severity, n_sources, israel=False, topic="av
     scores = f"⚡ דחיפות {_bar(urgency)} {urgency}/5 · ⭐ חשיבות וייחודיות {_bar(special)} {special}/5"
     rec = "🚀 מומלץ להעלות עכשיו" if urgency >= 4 else ("➕ מומלץ להוסיף לתור" if special >= 3 else "🗑 שקול לדחות")
     head = "🤖 אושר אוטומטית ונכנס לתור (אפשר לבטל)" if auto else "הצעה לפוסט"
-    msg = f"{tp.get('emoji', '📰')} {head} · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{scores}\n{rec}"
+    msg = f"{tp.get('emoji', '📰')} {head} · {tp.get('label', '')}\n{scores}\n{sev} · {verified}{flag}\n{when}\n\n{text}\n\n" + "\n".join(f"🔗 {u}" for u in links) + f"\n\n{when}\n{check_line(text, n_sources, topic)}\n{scores}\n{rec}"
     res = tg(
         "sendMessage",
         chat_id=_chat_id(),
@@ -714,7 +754,7 @@ def fetch_and_propose(st, topic):
             auto = (not sample) and auto_ok(st, topic, p, n_sources)
             if auto:
                 st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
-        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto)
+        send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto, when_line(cands, p["idxs"]))
         with STATE_LOCK:
             if auto:
                 st["queue"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit,
