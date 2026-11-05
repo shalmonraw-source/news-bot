@@ -667,6 +667,9 @@ def gemini_text(system, user, max_tokens=2000):
             timeout=60,
         )
         j = r.json()
+        if "candidates" not in j:
+            print("gemini error:", r.status_code, json.dumps(j.get("error", j), ensure_ascii=False)[:300])
+            return None
         return "".join(p.get("text", "") for p in j["candidates"][0]["content"]["parts"])
     except Exception as e:  # noqa: BLE001
         print("gemini failed:", type(e).__name__, str(e)[:120])
