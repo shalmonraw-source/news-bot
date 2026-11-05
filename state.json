@@ -2934,7 +2934,58 @@
   "a1936c086e4c",
   "f67143a69264",
   "3057ab9e316d",
-  "7aeb77aa3f35"
+  "7aeb77aa3f35",
+  "407ee5800011",
+  "c2bbecf51d55",
+  "568fdbfe1d1a",
+  "e459105e4a41",
+  "a145ad8bfe99",
+  "c1dc324d49ff",
+  "ec2997ca37a8",
+  "b181aee99a95",
+  "0e7b927de6c7",
+  "34c08d817ed1",
+  "6abec9d507cc",
+  "a60fcf26dc8d",
+  "c769311987b0",
+  "a14fa37efb40",
+  "d6a65fb9dd7a",
+  "e26fe69412f9",
+  "59eed2f1d092",
+  "879fc8a778e7",
+  "96cf71fb81a0",
+  "7f7090330804",
+  "757d5934f189",
+  "a87595134692",
+  "955a5d097cf9",
+  "783e9dab1898",
+  "72c6dc9df3ff",
+  "ea432df1fe08",
+  "05f4ee27cba1",
+  "c3524d2dd730",
+  "e37cda8cc5be",
+  "ecdf998ce0f1",
+  "94c1a26bddad",
+  "73147937f054",
+  "6e47cc903be5",
+  "f27ddcef9c4a",
+  "95247487b7a8",
+  "bb239dd98b3e",
+  "1ed4a534fa89",
+  "f36daa1e9d24",
+  "d4df4b88fa49",
+  "fb26f3745991",
+  "17323c9c21d0",
+  "2d61c8a35913",
+  "0601809d62ed",
+  "864cc27f7dd7",
+  "4f4f27e86c66",
+  "b24c0989facb",
+  "e0612aef62dc",
+  "435db5387eb4",
+  "58ab277e2514",
+  "262227ce1f6e",
+  "03a02b32acee"
  ],
  "pending": {
   "f793550a3e": {
@@ -3465,10 +3516,10 @@
    "security": 23,
    "aviation": 7,
    "politics": 13,
-   "facts": 3,
+   "facts": 4,
    "abroad": 2
   },
-  "auto": 1
+  "auto": 2
  },
  "queue": [
   {
@@ -3618,6 +3669,23 @@
    "credit": "Rebecca J. Moat / Wikimedia Commons / Public domain",
    "queued_at": "2026-11-05T07:53:53+00:00",
    "published": false
+  },
+  {
+   "id": "5eafe875f8",
+   "text": "המלך שהביא את רומא לבריטניה היה כנראה מלכה 👑\n\nלפי מחקר של אוניברסיטת בורנמות׳, ורִיקה, שליטת שבט האטרבטים בדרום בריטניה, הייתה כנראה אישה, ולא גבר כפי שסברו היסטוריונים במשך 200 שנה לפחות. לפי ההיסטוריון הרומי קסיוס דיו, ורִיקה נמלטה מהאי אחרי מרד ופנתה לקיסר קלאודיוס בבקשה לעזרה. בשנת 43 לספירה פלשה רומא לבריטניה.\n\nהארכיאולוג מיילס ראסל, שפרסם את טיעוניו בכתב העת Current Archaeology, מציין שבבריטניה של תקופת הברזל, שמות שהסתיימו ב-a היו לרוב שמות נשים. לדבריו, המטבעות של ורִיקה מציגים לוחמות רכובות על סוסים, בעוד ששליטים אחרים הטביעו דמויות של גברים. גם התואר הלטיני rex, שמופיע על המטבעות, לא היה שמור לגברים. ארכיאולוגית מאוניברסיטת וינה כינתה את הטיעון ״משכנע מאוד״, אך הסתייגה מזיהוי מינן של הדמויות המסוגננות שעל המטבעות.\n\nראסל מוסיף שסופרים רומיים הציגו את קלאודיוס כשליט חלש, שנשים ועבדים משוחררים הכתיבו לו את החלטותיו. לדבריו, אם ורִיקה הייתה אישה, תיאורו של קסיוס דיו, שקשר את ההחלטה לפלוש לבקשתה, משתלב בדימוי הזה.",
+   "links": [
+    "https://phys.org/news/2026-11-ancient-coins-influential-iron-age.html",
+    "https://www.popsci.com/science/iron-age-king-was-woman-verica-britain/",
+    "https://www.newscientist.com/article/2597465-british-iron-age-king-who-prompted-roman-invasion-was-probably-a-woman/?utm_campaign=RSS|NSNS&utm_content=home&utm_medium=RSS&utm_source=NSNS"
+   ],
+   "severity": "low",
+   "image": "images/5eafe875f8.jpg",
+   "credit": "Sussex Archaeological Society, Alex Bliss, 2016-08-30 13:36: / Wikimedia Commons / CC BY 2.0",
+   "topic": "facts",
+   "urgency": 2,
+   "queued_at": "2026-11-05T08:02:25+00:00",
+   "published": false,
+   "auto": true
   }
  ],
  "slots_done": {
@@ -3759,6 +3827,10 @@
   {
    "ts": 1793865730.3538013,
    "line": "התרסקות לירג׳ט בפלורידה: תשעה הרוגים, חלקים מהכנף ומהזנב נמצאו במרחק של כ-6.4 ק״מ מאתר ההתרסקות"
+  },
+  {
+   "ts": 1793865745.1819682,
+   "line": "המלך שהביא את רומא לבריטניה היה כנראה מלכה 👑"
   }
  ]
 }
