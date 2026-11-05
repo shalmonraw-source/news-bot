@@ -931,7 +931,11 @@ def build_posts(cands, topic="aviation", st=None):
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
             wmodel = WRITER_MODEL if (pk["traffic"] >= 4 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
-            w = claude_json(WRITE_BY[topic], material, wmodel, 6000)
+            if topic in ("facts", "abroad") and os.environ.get("GEMINI_API_KEY"):  # ניסוי חיסכון: ידיעות קלות נכתבות בגמיני, אותן הוראות. אם נכשל, חוזרים ל-Claude
+                w = cheap_json(WRITE_BY[topic], material, wmodel, 6000)
+                print(f"[{topic}] written via gemini-first path")
+            else:
+                w = claude_json(WRITE_BY[topic], material, wmodel, 6000)
             draft = (w.get("text") or "").strip()
             if not draft and len(w.get("_raw", "")) > 150 and "{" not in w["_raw"][:5]:
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
