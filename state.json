@@ -1266,6 +1266,18 @@
    "credit": "Basile Morin / Wikimedia Commons / CC BY-SA 4.0",
    "urgency": 4,
    "ts": 1793843776.6579611
+  },
+  "f98de9476a": {
+   "text": "🌍 דיווח: ישראלים עשו צרכים על כנסייה בחו״ל – ״חוסר כבוד בוטה״\n\nלפי דיווח באתר mako, ישראלים עשו את צרכיהם על כנסייה מחוץ לישראל. בכותרת הדיווח תואר המעשה כ״חוסר כבוד בוטה״.\n\nבדיווח לא צוין באיזו מדינה אירע המקרה, כמה אנשים היו מעורבים בו ומתי התרחש. כמו כן לא פורט מי תיאר כך את המעשה.\n\nלא ידוע אם הרשויות המקומיות פתחו בהליך נגד המעורבים, וגם לא אם התקבלה תגובה רשמית מישראל.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMihgFBVV95cUxQRUFzTXRFSUh2OGswcThoX19ZQXo3WGRkVjNuN01VME9wZDJlSkNvcFM1OGsyQVJZc1JKTVFJdGZOODZ6ZTAtZWJqcS1KaUpFbkZkNVE4bWgwYTZMa3Y4Q2pCUmpDS00zbDBJbTl3Ym81OVZlZkFFaUNGaFliU3RibGJHUXRWZw?oc=5"
+   ],
+   "severity": "low",
+   "topic": "abroad",
+   "image": "images/f98de9476a.jpg",
+   "credit": null,
+   "urgency": 2,
+   "ts": 1793843835.3656454
   }
  },
  "approved": [
