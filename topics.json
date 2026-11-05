@@ -120,6 +120,76 @@
     "type": "telegram",
     "handle": "MiddleEastSpectator",
     "url": "https://t.me/s/MiddleEastSpectator"
+   },
+   {
+    "name": "Haaretz",
+    "url": "https://www.haaretz.com/srv/haaretz-latest-headlines"
+   },
+   {
+    "name": "i24NEWS",
+    "url": "https://www.i24news.tv/en/rss"
+   },
+   {
+    "name": "Arutz Sheva",
+    "url": "https://www.israelnationalnews.com/Rss.aspx"
+   },
+   {
+    "name": "JNS",
+    "url": "https://www.jns.org/feed/"
+   },
+   {
+    "name": "Al-Monitor",
+    "url": "https://www.al-monitor.com/rss"
+   },
+   {
+    "name": "Middle East Eye",
+    "url": "https://www.middleeasteye.net/rss"
+   },
+   {
+    "name": "The War Zone",
+    "url": "https://www.twz.com/feed"
+   },
+   {
+    "name": "Breaking Defense",
+    "url": "https://breakingdefense.com/feed/"
+   },
+   {
+    "name": "Defense News",
+    "url": "https://www.defensenews.com/arc/outboundfeeds/rss/?outputType=xml"
+   },
+   {
+    "name": "Sky News World",
+    "url": "https://feeds.skynews.com/feeds/rss/world.xml"
+   },
+   {
+    "name": "NPR World",
+    "url": "https://feeds.npr.org/1004/rss.xml"
+   },
+   {
+    "name": "DW World",
+    "url": "https://rss.dw.com/rdf/rss-en-all"
+   },
+   {
+    "name": "GN Iran",
+    "url": "https://news.google.com/rss/search?q=Iran%20Israel%20OR%20Hezbollah%20OR%20Houthis%20OR%20Syria%20OR%20Lebanon%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN IDF",
+    "url": "https://news.google.com/rss/search?q=IDF%20OR%20%22Israel%20Defense%20Forces%22%20OR%20Shin%20Bet%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN צבא וביטחון",
+    "url": "https://news.google.com/rss/search?q=%D7%A6%D7%94%22%D7%9C%20OR%20%D7%A9%D7%91%22%D7%9B%20OR%20%D7%97%D7%99%D7%96%D7%91%D7%90%D7%9C%D7%9C%D7%94%20OR%20%D7%97%D7%9E%D7%90%D7%A1%20OR%20%D7%90%D7%99%D7%A8%D7%90%D7%9F%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN חדשות מתפרצות",
+    "url": "https://news.google.com/rss/search?q=%D7%9E%D7%91%D7%96%D7%A7%20OR%20%22%D7%93%D7%99%D7%95%D7%95%D7%97%20%D7%A8%D7%90%D7%A9%D7%95%D7%A0%D7%99%22%20OR%20%22%D7%A2%D7%9B%D7%A9%D7%99%D7%95%22%20%D7%91%D7%99%D7%98%D7%97%D7%95%D7%A0%D7%99%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "Telegram OSINTLive",
+    "type": "telegram",
+    "handle": "OSINTLive",
+    "url": "https://t.me/s/OSINTLive"
    }
   ],
   "en": "SECURITY"
@@ -173,6 +243,96 @@
    {
     "name": "Flight Global",
     "url": "https://www.flightglobal.com/rss"
+   },
+   {
+    "name": "Aviation A2Z",
+    "url": "https://www.aviationa2z.com/index.php/feed/"
+   },
+   {
+    "name": "Airways Magazine",
+    "url": "https://www.airwaysmag.com/feed/"
+   },
+   {
+    "name": "Paddle Your Own Kanoo",
+    "url": "https://paddleyourownkanoo.com/feed/"
+   },
+   {
+    "name": "Executive Traveller",
+    "url": "https://www.executivetraveller.com/feed"
+   },
+   {
+    "name": "One Mile at a Time",
+    "url": "https://onemileatatime.com/feed/"
+   },
+   {
+    "name": "View from the Wing",
+    "url": "https://viewfromthewing.com/feed/"
+   },
+   {
+    "name": "Aerotime Hub",
+    "url": "https://www.aerotime.aero/rss"
+   },
+   {
+    "name": "Aviation Source News",
+    "url": "https://aviationsourcenews.com/feed/"
+   },
+   {
+    "name": "NTSB Press Releases",
+    "url": "https://www.ntsb.gov/news/press-releases/Pages/RSS.aspx"
+   },
+   {
+    "name": "FAA News",
+    "url": "https://www.faa.gov/newsroom/rss"
+   },
+   {
+    "name": "EASA News",
+    "url": "https://www.easa.europa.eu/en/newsroom-and-events/news/rss"
+   },
+   {
+    "name": "GN Emergency landings",
+    "url": "https://news.google.com/rss/search?q=emergency%20landing%20OR%20mayday%20OR%20%22diverted%22%20OR%20%22runway%20excursion%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Aviation incidents",
+    "url": "https://news.google.com/rss/search?q=aircraft%20incident%20OR%20%22near%20miss%22%20OR%20%22engine%20failure%22%20OR%20%22bird%20strike%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Israeli airlines",
+    "url": "https://news.google.com/rss/search?q=%22El%20Al%22%20OR%20Israir%20OR%20Arkia%20OR%20%22Ben%20Gurion%20Airport%22%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Airlines news",
+    "url": "https://news.google.com/rss/search?q=airline%20announces%20OR%20%22new%20route%22%20OR%20%22cancels%20flights%22%20Israel%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Aviation records & oddities",
+    "url": "https://news.google.com/rss/search?q=%22longest%20flight%22%20OR%20%22world%27s%20largest%22%20OR%20%22first%20flight%22%20aircraft%20OR%20%22unusual%20aircraft%22%20when%3A7d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Aircraft safety",
+    "url": "https://news.google.com/rss/search?q=Boeing%20OR%20Airbus%20safety%20OR%20grounding%20OR%20%22airworthiness%20directive%22%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Aviation security",
+    "url": "https://news.google.com/rss/search?q=airport%20security%20OR%20airspace%20closure%20OR%20%22no-fly%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN תעופה חירום",
+    "url": "https://news.google.com/rss/search?q=%D7%A0%D7%97%D7%99%D7%AA%D7%AA%20%D7%97%D7%99%D7%A8%D7%95%D7%9D%20OR%20%D7%AA%D7%A7%D7%9C%D7%94%20%D7%91%D7%9E%D7%98%D7%95%D7%A1%20OR%20%22%D7%A9%D7%93%D7%94%20%D7%94%D7%AA%D7%A2%D7%95%D7%A4%D7%94%22%20OR%20%D7%A0%D7%AA%D7%91%22%D7%92%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN חברות תעופה",
+    "url": "https://news.google.com/rss/search?q=%D7%90%D7%9C%20%D7%A2%D7%9C%20OR%20%D7%99%D7%A9%D7%A8%D7%90%D7%99%D7%99%D7%A8%20OR%20%D7%90%D7%A8%D7%A7%D7%99%D7%A2%20OR%20%22%D7%98%D7%99%D7%A1%D7%95%D7%AA%20%D7%9C%D7%99%D7%A9%D7%A8%D7%90%D7%9C%22%20OR%20%22%D7%97%D7%91%D7%A8%D7%AA%20%D7%AA%D7%A2%D7%95%D7%A4%D7%94%22%20when%3A2d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN מטוסים",
+    "url": "https://news.google.com/rss/search?q=%D7%9E%D7%98%D7%95%D7%A1%20OR%20%D7%9E%D7%A1%D7%95%D7%A7%20OR%20%22%D7%9B%D7%9C%D7%99%20%D7%98%D7%99%D7%A1%22%20%D7%94%D7%AA%D7%A8%D7%A1%D7%A7%20OR%20%D7%A0%D7%97%D7%AA%20OR%20%D7%94%D7%9E%D7%A8%D7%99%D7%90%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "Telegram Airlive",
+    "type": "telegram",
+    "handle": "airlivenet",
+    "url": "https://t.me/s/airlivenet"
    }
   ],
   "en": "AVIATION"
@@ -244,6 +404,50 @@
     "type": "telegram",
     "handle": "Israel_Realtime_Updates",
     "url": "https://t.me/s/Israel_Realtime_Updates"
+   },
+   {
+    "name": "Politico",
+    "url": "https://www.politico.com/rss/politicopicks.xml"
+   },
+   {
+    "name": "The Hill",
+    "url": "https://thehill.com/feed/"
+   },
+   {
+    "name": "Sky News World",
+    "url": "https://feeds.skynews.com/feeds/rss/world.xml"
+   },
+   {
+    "name": "DW World",
+    "url": "https://rss.dw.com/rdf/rss-en-all"
+   },
+   {
+    "name": "NPR Politics",
+    "url": "https://feeds.npr.org/1014/rss.xml"
+   },
+   {
+    "name": "Euronews",
+    "url": "https://www.euronews.com/rss?format=mrss"
+   },
+   {
+    "name": "Haaretz",
+    "url": "https://www.haaretz.com/srv/haaretz-latest-headlines"
+   },
+   {
+    "name": "i24NEWS",
+    "url": "https://www.i24news.tv/en/rss"
+   },
+   {
+    "name": "GN Elections",
+    "url": "https://news.google.com/rss/search?q=election%20results%20OR%20%22vote%20count%22%20OR%20referendum%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Diplomacy",
+    "url": "https://news.google.com/rss/search?q=summit%20OR%20%22peace%20talks%22%20OR%20sanctions%20OR%20%22trade%20deal%22%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN פוליטיקה ישראל",
+    "url": "https://news.google.com/rss/search?q=%D7%9B%D7%A0%D7%A1%D7%AA%20OR%20%D7%9E%D7%9E%D7%A9%D7%9C%D7%94%20OR%20%D7%A7%D7%95%D7%90%D7%9C%D7%99%D7%A6%D7%99%D7%94%20OR%20%22%D7%95%D7%A2%D7%93%D7%AA%20%D7%97%D7%A7%D7%99%D7%A8%D7%94%22%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
    }
   ],
   "en": "POLITICS"
@@ -294,6 +498,54 @@
    {
     "name": "National Geographic",
     "url": "https://www.nationalgeographic.com/pages/feed/"
+   },
+   {
+    "name": "Phys.org",
+    "url": "https://phys.org/rss-feed/"
+   },
+   {
+    "name": "Ars Technica Science",
+    "url": "https://feeds.arstechnica.com/arstechnica/science"
+   },
+   {
+    "name": "New Scientist",
+    "url": "https://www.newscientist.com/feed/home/"
+   },
+   {
+    "name": "IFLScience",
+    "url": "https://www.iflscience.com/rss"
+   },
+   {
+    "name": "Quanta Magazine",
+    "url": "https://www.quantamagazine.org/feed/"
+   },
+   {
+    "name": "Big Think",
+    "url": "https://bigthink.com/feed/"
+   },
+   {
+    "name": "Mental Floss",
+    "url": "https://www.mentalfloss.com/feeds/all"
+   },
+   {
+    "name": "History.com",
+    "url": "https://www.history.com/.rss/full"
+   },
+   {
+    "name": "Space.com",
+    "url": "https://www.space.com/feeds/all"
+   },
+   {
+    "name": "Popular Science",
+    "url": "https://www.popsci.com/arcio/rss/"
+   },
+   {
+    "name": "GN Discoveries",
+    "url": "https://news.google.com/rss/search?q=scientists%20discover%20OR%20%22archaeologists%22%20OR%20%22new%20species%22%20OR%20%22first%20time%20ever%22%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN גילוי מדעי",
+    "url": "https://news.google.com/rss/search?q=%D7%97%D7%95%D7%A7%D7%A8%D7%99%D7%9D%20%D7%92%D7%99%D7%9C%D7%95%20OR%20%D7%90%D7%A8%D7%9B%D7%99%D7%90%D7%95%D7%9C%D7%95%D7%92%D7%99%D7%9D%20OR%20%22%D7%9C%D7%A8%D7%90%D7%A9%D7%95%D7%A0%D7%94%20%D7%91%D7%A2%D7%95%D7%9C%D7%9D%22%20when%3A2d&hl=he&gl=IL&ceid=IL:he"
    }
   ]
  },
@@ -343,6 +595,34 @@
    {
     "name": "Reuters (via Google News)",
     "url": "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "State Dept Travel Advisories",
+    "url": "https://travel.state.gov/_res/rss/TAsTWs.xml"
+   },
+   {
+    "name": "Haaretz",
+    "url": "https://www.haaretz.com/srv/haaretz-latest-headlines"
+   },
+   {
+    "name": "GN Israelis Turkey Greece Cyprus",
+    "url": "https://news.google.com/rss/search?q=Israeli%20tourists%20OR%20Israelis%20Turkey%20OR%20Cyprus%20OR%20Georgia%20OR%20Vietnam%20OR%20Japan%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Israelis Latin America",
+    "url": "https://news.google.com/rss/search?q=Israelis%20Bolivia%20OR%20Peru%20OR%20Colombia%20OR%20Brazil%20OR%20Mexico%20when%3A3d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN Jewish communities",
+    "url": "https://news.google.com/rss/search?q=Chabad%20OR%20%22Jewish%20community%22%20OR%20synagogue%20abroad%20Israelis%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "GN ישראלים תיירות",
+    "url": "https://news.google.com/rss/search?q=%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%91%D7%97%D7%95%22%D7%9C%20OR%20%22%D7%AA%D7%99%D7%99%D7%A8%D7%99%D7%9D%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%22%20OR%20%22%D7%90%D7%96%D7%94%D7%A8%D7%AA%20%D7%9E%D7%A1%D7%A2%22%20OR%20%22%D7%94%D7%9E%D7%9C%22%D7%9C%22%20when%3A2d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "GN טיסות ישראלים",
+    "url": "https://news.google.com/rss/search?q=%D7%98%D7%99%D7%A1%D7%95%D7%AA%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%A0%D7%AA%D7%A7%D7%A2%D7%95%20OR%20%22%D7%9E%D7%97%D7%99%D7%A8%20%D7%98%D7%99%D7%A1%D7%95%D7%AA%22%20OR%20%22%D7%95%D7%99%D7%96%D7%94%20%D7%9C%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%22%20when%3A2d&hl=he&gl=IL&ceid=IL:he"
    }
   ]
  },
