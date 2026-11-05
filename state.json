@@ -3355,6 +3355,21 @@
    "credit": "MODIS Land Rapid Response Team, NASA GSFC / Wikimedia Commons / Public domain",
    "urgency": 4,
    "ts": 1793866070.45514
+  },
+  "bf4ba8d1e5": {
+   "text": "החות׳ים מאיימים על מצרים: סיוע צבאי לסעודיה ייחשב הכרזת מלחמה\n\nלפי אל-מג׳לה, נשיא מצרים עבד אל-פתאח א-סיסי ביקש מהפרלמנט לאשר סיוע צבאי הגנתי לסעודיה, והפרלמנט נענה לבקשה. החות׳ים הודיעו שכל סיוע צבאי מצרי לסעודיה ייחשב ״הכרזת מלחמה״. בתוך שעות, ב-27 באוקטובר, אמר הבכיר החות׳י מוחמד עלי אל-חות׳י שהמהלך יגרור את מצרים למלחמת החות׳ים בריאד.\n\nא-סיסי הציג את הסיוע כהכרת תודה על התמיכה הכספית והמדינית של סעודיה. לפי אל-מג׳לה, מצרים נמנעה עד כה מעימות עם החות׳ים, גם כשהתקיפות שלהם בים האדום הסיטו ספינות מתעלת סואץ ופגעו קשות בכלכלה המצרית.\n\nבתימן הלחימה נמשכת. לפי כלי תקשורת המזוהים עם החות׳ים, תקיפות הקואליציה בהובלת סעודיה הרגו כ-20 בני אדם בתוך 24 שעות. לפי מידל איסט איי, טיל בליסטי פגע ביום רביעי בחיפאן שבמחוז תעז והרג ארבעה בני משפחה אחת, ובהם שלושה ילדים. לפי התקשורת הממלכתית של ממשלת תימן, החות׳ים כיוונו את הטיל לבית המשפחה, ועוד ארבעה מבני המשפחה נפצעו.\n\nלפי אל-מג׳לה, מצרים נהנתה מגידול בתיירות ובהשקעות הזרות בזכות ההימנעות ממעורבות בעימותים. עכשיו, ההחלטה אם להמשיך לסייע לסעודיה הפכה להכרעה כבדה בהרבה.",
+   "links": [
+    "https://en.majalla.com/node/333983/politics/egypt%E2%80%99s-options-shrink-amid-growing-houthi-threats",
+    "https://news.google.com/rss/articles/CBMivAFBVV95cUxQVVhxQjdGQlQ0S0NwQjVReFpaVlpSOUM3c1I4YTVMS0FhWC1zYmQ0YTEwclNHRl9uaFdseHJtenlvM2tJakhPeENNWW1hSWtfQXlBOGs5NFFQUlZHVHgzeTF2SnV2SUxUalVuT0JLRWVOeDQxdGJGTUVOTGwtc1ROcmF2VFhUaVNJUnp3TDdWU2U4bzB4M1dsR0o5VVd1OHNaOHJrYkxGLXcxV2hmeG5XOG96UGtnTlVVMDN3Wg?oc=5",
+    "https://www.middleeasteye.net/live-blog/live-blog-update/saudi-led-coalition-hits-yemen-reportedly-kill-20-people-over-past-day",
+    "https://www.middleeasteye.net/live-blog/live-blog-update/houthi-attack-kills-four-people-yemeni-government-forces-make-gains-al"
+   ],
+   "severity": "medium",
+   "topic": "security",
+   "image": "images/bf4ba8d1e5.jpg",
+   "credit": "תמונה: en.majalla.com",
+   "urgency": 3,
+   "ts": 1793866111.3209982
   }
  },
  "approved": [
@@ -3565,7 +3580,7 @@
  "daily": {
   "date": "2026-11-05",
   "count": {
-   "security": 23,
+   "security": 24,
    "aviation": 8,
    "politics": 13,
    "facts": 6,
@@ -3898,6 +3913,10 @@
   {
    "ts": 1793866070.0283363,
    "line": "אקסיוס: ארה״ב נערכת לחידוש אפשרי של הלחימה באיראן"
+  },
+  {
+   "ts": 1793866110.8969598,
+   "line": "החות׳ים מאיימים על מצרים: סיוע צבאי לסעודיה ייחשב הכרזת מלחמה"
   }
  ]
 }
