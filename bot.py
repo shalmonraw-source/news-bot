@@ -979,9 +979,7 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=(), urgent=Fa
 
 
 def scan_due():
-    """חיסכון: בשעות העומס סורקים כל 10 דקות, בלילה (23:00-06:00 בישראל) כל 30. הפעלה ידנית (workflow_dispatch) תמיד סורקת."""
-    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
-        return True
+    """חיסכון: בשעות העומס סורקים כל 10 דקות, בלילה (23:00-06:00 בישראל) כל 30. הפעלה עם נושא מוגדר או sample תמיד סורקת."""
     try:
         from zoneinfo import ZoneInfo
         n = datetime.now(ZoneInfo("Asia/Jerusalem"))
