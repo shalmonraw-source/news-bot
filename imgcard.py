@@ -347,8 +347,59 @@ def _brackets(d, box, color, ln=54, wd=7):
         d.line([(x, y), (x, y + sy * ln)], fill=color, width=wd)
 
 
+def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label=""):
+    """כרטיס צילום במסך מלא: כותרת גדולה על גרדיאנט כהה בתחתית, סמל ותגית למעלה."""
+    import re as _re
+    accent = tuple(color)
+    title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")
+    title = _re.sub(r"(?<=[\u05d0-\u05ea])'(?=\s|$|[,.:])", "\u05f3", title)
+    im = _cover(photo, W, H)
+    im = ImageEnhance.Contrast(im).enhance(1.05)
+    im = ImageEnhance.Color(im).enhance(0.92)
+    canvas = im.convert("RGBA")
+    fade = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    fd = ImageDraw.Draw(fade)
+    top = int(H * 0.40)
+    for y in range(top, H):
+        fd.line([(0, y), (W, y)], fill=(6, 7, 9, int(235 * ((y - top) / (H - top)) ** 1.3)))
+    for y in range(0, 190):
+        fd.line([(0, y), (W, y)], fill=(6, 7, 9, int(150 * (1 - y / 190) ** 1.5)))
+    canvas = Image.alpha_composite(canvas, fade).convert("RGB")
+    d = ImageDraw.Draw(canvas)
+    m = 56
+    canvas.paste(logo_mark(64, accent), (m, 48), logo_mark(64, accent))
+    _wordmark(d, m + 80, 80, 40, WHITE, accent, _font(46))
+    tf = _font(30)
+    tag = label or PAGE_TAG
+    tw = _width(d, tag, tf)
+    d.rounded_rectangle([W - m - tw - 44, 54, W - m, 106], radius=8, fill=accent)
+    d.text((W - m - 22, 80), _shape(tag), font=tf, fill=(12, 12, 13), anchor="rm", **_kw())
+    margin, max_w = m + 8, W - 2 * (m + 8)
+    scratch = ImageDraw.Draw(Image.new("RGB", (W, 10)))
+    for size in range(92, 51, -4):
+        f = _font(size)
+        lines = _wrap(scratch, title, f, max_w)
+        if len(lines) <= 4:
+            break
+    lh = int(size * 1.24)
+    block = len(lines) * lh
+    y = H - 110 - block
+    d.rectangle([W - margin - 120, y - 40, W - margin, y - 32], fill=accent)
+    for ln in lines:
+        d.text((W - margin, y), _shape(ln), font=f, fill=WHITE, anchor="ra", **_kw())
+        y += lh
+    if credit:
+        cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 19)
+        d.text((m, H - 44), credit[:80], font=cf, fill=(200, 204, 212), anchor="lm")
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    canvas.save(out_path, "JPEG", quality=92)
+    return out_path
+
+
 def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label=""):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
+    if photo is not None:
+        return render_card_overlay(title, out_path, photo, credit, color, label)
     accent = tuple(color)
     import re as _re
     title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")  # גרשיים תקינים: נתב״ג, צה״ל
