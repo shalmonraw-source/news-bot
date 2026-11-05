@@ -270,6 +270,8 @@ def apply_decision(st, decision):
                 "text": item["text"],
                 "links": item["links"],
                 "severity": item.get("severity"),
+                "topic": item.get("topic"),
+                "urgency": item.get("urgency"),
                 "image": item.get("image"),
                 "credit": item.get("credit"),
                 "queued_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -943,7 +945,7 @@ def fetch_and_propose(st, topic):
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto, when_line(cands, p["idxs"]))
         with STATE_LOCK:
             if auto:
-                st["queue"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit,
+                st["queue"].append({"id": pid, "text": p["text"], "links": links, "severity": p["severity"], "image": img_path, "credit": credit, "topic": topic, "urgency": p.get("urgency", 3),
                                     "queued_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "published": False, "auto": True})
             else:
                 st["pending"][pid] = {
@@ -1206,6 +1208,30 @@ def daily_jobs(st):
                 tg("sendMessage", chat_id=_chat_id(), text="⚠️ רילס נכשל: " + str(e)[:200])
 
 
+
+def queue_ttl_hours(it):
+    """כמה זמן ידיעה בתור נשארת רלוונטית: מתפרצת 6 שעות, רגילה 18 שעות, ידע והסברה 72 שעות."""
+    if it.get("topic") in ("facts", "explain"):
+        return 72
+    u = int(it.get("urgency") or 3)
+    return 6 if u >= 4 else 18 if u == 3 else 36
+
+
+def expire_queue(st):
+    keep, dropped = [], []
+    now = time.time()
+    for it in st["queue"]:
+        try:
+            age = now - datetime.fromisoformat(it.get("queued_at", "")).timestamp()
+        except ValueError:
+            age = 0
+        (dropped if age > queue_ttl_hours(it) * 3600 else keep).append(it)
+    if dropped:
+        st["queue"] = keep
+        names = "\n".join("• " + x["text"].split("\n")[0][:70] for x in dropped[:8])
+        tg("sendMessage", chat_id=_chat_id(), text=f"🗑 הוסרו מהתור ({len(dropped)}) כי כבר לא רלוונטיות:\n{names}")
+
+
 def publish_queue(st):
     """מפרסם פוסט אחד מהתור בכל חלון זמן מוגדר (settings.json: slots, tz). חלון פעיל עד 60 דקות אחרי השעה."""
     cfg = load_settings()
@@ -1217,6 +1243,7 @@ def publish_queue(st):
         now = datetime.now(timezone.utc)
     today = now.strftime("%Y-%m-%d")
     st["slots_done"] = {today: st["slots_done"].get(today, [])}
+    expire_queue(st)
     if not st["queue"]:
         return
     mins = now.hour * 60 + now.minute
