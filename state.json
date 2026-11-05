@@ -3539,6 +3539,20 @@
    "credit": "Robbie Klinkenberg / Wikimedia Commons / CC BY-SA 4.0",
    "urgency": 4,
    "ts": 1793872489.4799051
+  },
+  "09d7cb821a": {
+   "text": "איראן מציגה את הפסד הרפובליקנים כניצחון, אך חוששת מתקיפות חדשות\n\nהנשיא טראמפ וסגנו, ג׳יי די ואנס, הכירו בכך שהמלחמה באיראן תרמה להפסד המפלגה הרפובליקנית בבחירות. באיראן מסכימים עם הניתוח הזה ומכריזים על ניצחון פוליטי על טראמפ. במקביל הזהירה טהרן את וושינגטון שלא לשנות את עמדתה.\n\nקאליבאף תקף בחריפות את ההנהגה האמריקנית ואמר שהיא משדרת ״אנרגיה של מהמר מפסיד״. הוא מיקד את ביקורתו במה שכינה ״צוות ישראל תחילה״.\n\nלצד הכרזות הניצחון, באיראן חוששים מסבב תקיפות אמריקני נוסף.",
+   "links": [
+    "https://www.npr.org/2026/11/05/nx-s1-6029100/iran-wary-of-new-u-s-attacks-despite-trump-noting-wars-role-in-election-losses",
+    "https://news.google.com/rss/articles/CBMi4gFBVV95cUxPODFPbzljQ0RJTm9taUE3R3I4YXhaWS13QUxJcVA4LVdkVl91UnVPcmlzUkpxZFRCQ1c0bXZHclFHYUZTaTllYVQ1YXNiTm5vRUpyUDUyVkwyLXFnc3YzRFVGSF93LXVqcU5OLS0yVG5xdGluSjdIVGxkN2pxci1QS2RyRExZdE5UU3JybUJRdUE0b0t1Y1dBMWc2VXNwZFB2TklLX04tT001VUVQZjV2VjBWQ2V5Z01MXzdmdkVydjZlOVlnakVmeEZmS2F0eXJpeld1TExQQy1jQ2lWZXllaWpB?oc=5",
+    "https://news.google.com/rss/articles/CBMirwFBVV95cUxOMy1zYk5BenNjTlFnUm54WGxJMXRyelZOSksyck1hSlpkeEFPSVJ1Y0R6dVFGUEJkcVRWcXdqZTFnOElxaTZ5SUFkbUd5Z19UZmtTQkZ3dnpwT2xnV29VcHlQZDRGbTh3LXJXLUVVUjRmc3lZLWxVUVpjTjZpZnREemZfYnk1UFg5RGVGYmFraVNxZ3ZidnhiaXhtdFVPZVNvLVByT0xQRFc4c3hZVUUw?oc=5"
+   ],
+   "severity": "medium",
+   "topic": "security",
+   "image": "images/09d7cb821a.jpg",
+   "credit": "بهادر های زاده / Wikimedia Commons / CC BY-SA 4.0",
+   "urgency": 3,
+   "ts": 1793872524.5329769
   }
  },
  "approved": [
@@ -3996,7 +4010,7 @@
  "daily": {
   "date": "2026-11-05",
   "count": {
-   "security": 42,
+   "security": 43,
    "aviation": 9,
    "politics": 24,
    "facts": 10,
@@ -4498,6 +4512,10 @@
   {
    "ts": 1793872493.8807297,
    "line": "הרצוג פתח בהתייעצויות להרכבת הממשלה: לאף גוש אין 61 מנדטים"
+  },
+  {
+   "ts": 1793872518.1935601,
+   "line": "איראן מציגה את הפסד הרפובליקנים כניצחון, אך חוששת מתקיפות חדשות"
   }
  ],
  "last_fb_ts": 1793872512.6129148
