@@ -166,5 +166,34 @@
     "url": "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=he&gl=IL&ceid=IL:he"
    }
   ]
+ },
+ "abroad": {
+  "label": "ישראלים בעולם",
+  "emoji": "🌍",
+  "color": [
+   255,
+   176,
+   32
+  ],
+  "daily_cap": 3,
+  "en": "ISRAELIS ABROAD",
+  "sources": [
+   {
+    "name": "Times of Israel",
+    "url": "https://www.timesofisrael.com/feed/"
+   },
+   {
+    "name": "Google News Israelis Abroad (EN)",
+    "url": "https://news.google.com/rss/search?q=Israeli%20tourists%20OR%20Israelis%20Thailand%20OR%20Israelis%20India%20OR%20Israelis%20Greece%20OR%20%22Israeli%20citizens%22%20abroad%20when%3A1d&hl=en-US&gl=US&ceid=US:en"
+   },
+   {
+    "name": "Google News Israelis Abroad (HE)",
+    "url": "https://news.google.com/rss/search?q=%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%91%D7%AA%D7%90%D7%99%D7%9C%D7%A0%D7%93%20OR%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%91%D7%94%D7%95%D7%93%D7%95%20OR%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%20%D7%91%D7%97%D7%95%22%D7%9C%20OR%20%22%D7%AA%D7%99%D7%99%D7%A8%D7%99%D7%9D%20%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%D7%9D%22%20OR%20%22%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99%20%D7%A0%D7%A2%D7%A6%D7%A8%22%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
+   },
+   {
+    "name": "Google News Travel Warnings",
+    "url": "https://news.google.com/rss/search?q=Israeli%20travelers%20warning%20OR%20%22travel%20warning%22%20Israelis%20OR%20%22Israelis%20banned%22%20OR%20%22Israelis%20visa%22%20when%3A2d&hl=en-US&gl=US&ceid=US:en"
+   }
+  ]
  }
 }

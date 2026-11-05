@@ -180,6 +180,25 @@ def commons_candidates(query, aviation=True, limit=3):
     return out
 
 
+def source_image(url, link=""):
+    """תמונה של פריט החדשות עצמו: מה-RSS, ואם אין, og:image של הכתבה. מחזיר PIL או None (לא לוגו/אייקון קטן)."""
+    try:
+        if not url and link and "news.google.com" not in link:
+            r = requests.get(link, headers={"User-Agent": UA}, timeout=15)
+            m = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)', r.text) or re.search(
+                r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image', r.text)
+            url = html.unescape(m.group(1)) if m else ""
+        if not url:
+            return None
+        resp = requests.get(url, headers={"User-Agent": UA}, timeout=25)
+        im = Image.open(io.BytesIO(resp.content)).convert("RGB")
+        if im.width < 700 or im.height < 400 or max(im.size) / min(im.size) > 3:
+            return None
+        return im
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def commons_photo(query, aviation=True):
     """תאימות לאחור: המועמד הראשון."""
     c = commons_candidates(query, aviation, 1)
@@ -347,7 +366,7 @@ def _brackets(d, box, color, ln=54, wd=7):
         d.line([(x, y), (x, y + sy * ln)], fill=color, width=wd)
 
 
-def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label=""):
+def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255), label="", highlight=()):
     """כרטיס צילום במסך מלא: כותרת גדולה על גרדיאנט כהה בתחתית, סמל ותגית למעלה."""
     import re as _re
     accent = tuple(color)
@@ -385,8 +404,18 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     block = len(lines) * lh
     y = H - 110 - block
     d.rectangle([W - margin - 120, y - 40, W - margin, y - 32], fill=accent)
+    hl = {_re.sub(r"[^\w\u05d0-\u05ea]", "", w) for w in (highlight or []) for w in w.split()}
     for ln in lines:
-        d.text((W - margin, y), _shape(ln), font=f, fill=WHITE, anchor="ra", **_kw())
+        if not hl:
+            d.text((W - margin, y), _shape(ln), font=f, fill=WHITE, anchor="ra", **_kw())
+        else:  # מילה אחר מילה מימין לשמאל, מילות הדגש בצבע הנושא
+            x = W - margin
+            sp = _width(d, "א א", f) - _width(d, "אא", f)
+            for w in ln.split():
+                cw = _re.sub(r"[^\w\u05d0-\u05ea]", "", w)
+                col = accent if any(h and h in cw for h in hl) else WHITE
+                d.text((x, y), _shape(w), font=f, fill=col, anchor="ra", **_kw())
+                x -= _width(d, w, f) + sp
         y += lh
     if credit:
         cf = ImageFont.truetype(FONT_FALLBACK if os.path.exists(FONT_FALLBACK) else FONT_BOLD, 19)
@@ -396,10 +425,10 @@ def render_card_overlay(title, out_path, photo, credit=None, color=(61, 139, 255
     return out_path
 
 
-def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False):
+def render_card(title, out_path, photo=None, credit=None, color=(61, 139, 255), label="", en_label="", overlay=False, highlight=()):
     """כרטיס MER5: רקע אפור כהה עם פטרן, מסגרת צילום עם סימני פינה בצבע הנושא, כותרת גדולה למטה."""
     if photo is not None and overlay:
-        return render_card_overlay(title, out_path, photo, credit, color, label)
+        return render_card_overlay(title, out_path, photo, credit, color, label, highlight)
     accent = tuple(color)
     import re as _re
     title = _re.sub(r'(?<=[\u05d0-\u05ea])"(?=[\u05d0-\u05ea])', "\u05f4", title or "")  # גרשיים תקינים: נתב״ג, צה״ל

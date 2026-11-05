@@ -375,6 +375,19 @@ def strip_html(s):
     return re.sub(r"\s+", " ", html.unescape(s)).strip()
 
 
+def feed_image(e):
+    """כתובת תמונה מתוך פריט ה-RSS, אם קיימת."""
+    for key in ("media_content", "media_thumbnail"):
+        for m in e.get(key, []) or []:
+            if m.get("url"):
+                return m["url"]
+    for l in e.get("links", []) or []:
+        if str(l.get("type", "")).startswith("image") and l.get("href"):
+            return l["href"]
+    m = re.search(r'<img[^>]+src="([^"]+)"', e.get("summary", "") or "")
+    return m.group(1) if m else ""
+
+
 def entry_time(e):
     t = e.get("published_parsed") or e.get("updated_parsed")
     if not t:
@@ -420,6 +433,7 @@ def fetch_candidates(st, topic):
                     "title": strip_html(e.get("title")),
                     "summary": strip_html(e.get("summary"))[:500],
                     "link": link,
+                    "image": feed_image(e),
                     "ts": ts.isoformat(timespec="minutes") if ts else "",
                 }
             )
@@ -602,10 +616,11 @@ WRITE_NEWS = (
 )
 
 IMAGE_NEWS = """אתה עורך תמונות בעמוד חדשות. תקבל פוסט בעברית. החזר JSON בלבד:
-{"card_title":"...","subject":"...","queries":["...","...","..."]}
+{"card_title":"...","highlight":["..."],"subject":"...","queries":["...","...","..."]}
+- highlight: עד 3 מילים מתוך card_title בדיוק כפי שהן כתובות שהן עיקר הידיעה (מקום, מספר או הפועל המרכזי), לצביעה בצבע הנושא.
 - subject: משפט קצר באנגלית: מה בדיוק צריך להיות בתמונה כדי שיהיה קשר ברור לידיעה (המקום, הכלי, המבנה או הארגון המרכזי בפוסט).
 - queries: עד 3 חיפושים באנגלית ב-Wikimedia Commons, מהספציפי לכללי, כולם על הישות המרכזית של הידיעה (שם המקום, המבנה, סוג הספינה/הכלי, המוסד). אם אין צילום ספציפי מתאים, השאר רשימה קצרה: עדיף בלי תמונה מאשר תמונה לא קשורה.
-- card_title: כותרת חדה לכרטיס, עד 75 תווים בעברית, בלי נקודה בסוף, בלי עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
+- card_title: כותרת חדה לכרטיס, עד 75 תווים בעברית, בלי אימוג'י, בלי נקודה בסוף, בלי עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
 - הצילום חייב להראות את הישות המרכזית של הידיעה (עיר, ציון דרך, בניין, נמל, סוג ספינה או כלי רכב), לא תמונת "אווירה" כללית.
   לעולם לא אנשים סובלים, חיילים בפעולה, נשק בשימוש, הרס, פצועים או פוליטיקאים."""
 
@@ -619,8 +634,18 @@ WRITE_FACTS = WRITE_NEWS.replace("אתה כתב בכיר בערוץ חדשות �
 
 מדור עובדות: הפתיח הוא הקרס. פתח בשאלה או בפרט מפתיע אחד מהחומר. הסיפור מסופר בקצב טוב, עם "לשם השוואה" מדויקת כשיש נתון בטוח. דיוק עובדתי מעל הכול: כל מספר, שנה ושם מהמקור בלבד."""
 
-SELECT_BY = {"facts": SELECT_FACTS, "aviation": SELECT_SYSTEM, "security": SELECT_MIDEAST, "politics": SELECT_WORLD}
-WRITE_BY = {"facts": WRITE_FACTS, "aviation": WRITE_SYSTEM, "security": WRITE_NEWS, "politics": WRITE_NEWS}
+SELECT_ABROAD = """אתה עורך ראשי של MER5, מדור "ישראלים בעולם": ידיעות שמעניינות ישראלים שמטיילים, גרים או עושים עסקים בחו"ל. תקבל רשימת ידיעות.
+בחר: שינויי ויזה וכניסה, אזהרות מסע, יחס מקומי לתיירים ישראלים, אירועים שמערבים ישראלים, בטיחות במוקדי תיירות (תאילנד, הודו, יוון, טורקיה, דרום אמריקה ועוד), טיסות וקווים לישראל, פעילות קהילות ישראליות ויהודיות בחו"ל.
+דלג על: פוליטיקה פנימית, ספורט, סלבס, עבירות פליליות של פרט בלי נפגעים, וידיעה בלי פרט שמשנה משהו לישראלי שמתכנן נסיעה.
+severity: high רק אם יש סכנה ממשית לישראלים. israel תמיד true.
+urgency (1-5): כמה דחוף להעלות עכשיו (5 = אזהרה או שינוי שנוגעים למטיילים עכשיו). special (1-5): כמה הידיעה ייחודית וחשובה.
+עדיף רשימה ריקה. החזר JSON בלבד: {"picks":[{"idxs":[0],"severity":"low","urgency":3,"special":3,"israel":true}]}   ואם אין: {"picks":[]}"""
+
+SELECT_BY = {"abroad": SELECT_ABROAD, "facts": SELECT_FACTS, "aviation": SELECT_SYSTEM, "security": SELECT_MIDEAST, "politics": SELECT_WORLD}
+WRITE_ABROAD = WRITE_NEWS + """
+
+מדור ישראלים בעולם: השורה הראשונה של הפוסט פותחת באימוג'י הדגל של המדינה שבה מדובר (למשל 🇹🇭), ואחריו הכותרת. הפסקאות קצרות מאוד (1-3 משפטים). כל טענה על יחס או החלטה מיוחסת למי שאמר אותה. ציין בסוף מה המשמעות המעשית למי שמתכנן נסיעה, רק אם היא נובעת מהחומר."""
+WRITE_BY = {"abroad": WRITE_ABROAD, "facts": WRITE_FACTS, "aviation": WRITE_SYSTEM, "security": WRITE_NEWS, "politics": WRITE_NEWS}
 REVIEW_NEWS = REVIEW_SYSTEM + """
 4. בדוק במיוחד ייחוס: כל טענה על אירוע, מספר נפגעים או כוונה של צד חייבת להיות מיוחסת. טענה בלי ייחוס מקור בחומר: הוסף ייחוס או הסר אותה.
 5. הסר כל פרט מבצעי (מיקום או תנועת כוחות ישראליים, מועדי תקיפה), שמות של הרוגים ופצועים, ותיאור גרפי. החומר שהוסר מופיע ברשימת issues."""
@@ -663,10 +688,11 @@ def build_posts(cands, topic="aviation"):
 
 
 IMAGE_AVIATION = """אתה עורך תמונות בעמוד חדשות תעופה. תקבל פוסט בעברית. החזר JSON בלבד:
-{"card_title":"...","subject":"...","queries":["...","...","..."]}
+{"card_title":"...","highlight":["..."],"subject":"...","queries":["...","...","..."]}
+- highlight: עד 3 מילים מתוך card_title בדיוק כפי שהן כתובות שהן עיקר הידיעה (מקום, מספר או הפועל המרכזי), לצביעה בצבע הנושא.
 - subject: משפט קצר באנגלית: מה בדיוק צריך להיות בתמונה (סוג המטוס, החברה או שדה התעופה המרכזיים בפוסט).
 - queries: עד 3 חיפושים באנגלית ב-Wikimedia Commons, מהספציפי לכללי (למשל "LOT Polish Airlines Boeing 737 MAX", "Boeing 737 airliner"), תמיד על סוג המטוס/החברה/שדה התעופה בפוסט. אם אין מידע ספציפי, עדיף רשימה קצרה מתמונה לא קשורה.
-- card_title: כותרת חדה לתמונה, עד 75 תווים בעברית, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
+- card_title: כותרת חדה לתמונה, עד 75 תווים בעברית, בלי אימוג'י, בלי נקודה בסוף, שונה מעט מכותרת הפוסט ולא מוסיפה עובדות שלא נאמרו בפוסט. מספרים חייבים להיות זהים לפוסט. כתיב מדויק לגמרי, גרשיים תקינים (צה״ל, נתב״ג).
 - אם הפוסט אינו מזכיר סוג מטוס או חברה מסוימים, השתמש בשאילתה כללית על סוג הכלי.
 """
 
@@ -698,7 +724,7 @@ def judge_photo(img, info, subject, post):
     return bool(v.get("ok"))
 
 
-def make_image(pid, text, topic="aviation", overlay=False):
+def make_image(pid, text, topic="aviation", overlay=False, sources=()):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
     meta = claude_json(IMAGE_AVIATION if topic == "aviation" else IMAGE_NEWS, text, MODEL, 700)
@@ -721,7 +747,13 @@ def make_image(pid, text, topic="aviation", overlay=False):
                 print("judge failed:", type(e).__name__)
         if photo:
             break
-    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay)
+    if photo is None:  # אין צילום חופשי מאומת: תמונה מהמקור של הידיעה עצמה (עם קרדיט למקור)
+        for url, src_name, link in sources:
+            got = imgcard.source_image(url, link)
+            if got:
+                photo, credit = got, f"תמונה: {src_name} (מקור הידיעה)"
+                break
+    path = imgcard.render_card(title, os.path.join("images", f"{pid}.jpg"), photo, credit, tp["color"], tp["label"], tp.get("en", ""), overlay=overlay, highlight=meta.get("highlight") or [])
     return path, credit
 
 
@@ -745,7 +777,7 @@ def fetch_and_propose(st, topic):
         pid = hashlib.sha1("".join(links).encode()).hexdigest()[:10]
         img_path, credit = None, None
         try:
-            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))))
+            img_path, credit = make_image(pid, p["text"], topic, overlay=(p.get("special", 3) >= 4 or bool(p.get("israel"))), sources=[(cands[i].get("image", ""), cands[i]["source"], cands[i]["link"]) for i in p["idxs"]])
             tg_photo(img_path, "🖼 תמונה לפוסט" + (f"\n📷 {credit}" if credit else "\nכרטיס טיפוגרפי, בלי צילום"))
         except Exception as e:  # noqa: BLE001
             print("image failed:", type(e).__name__, str(e)[:150])
