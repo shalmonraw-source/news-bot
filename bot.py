@@ -919,7 +919,7 @@ def build_posts(cands, topic="aviation", st=None):
     lines = [f'[{i}] ({c["source"]}) {c["title"]}\n{c["summary"][:220]}' for i, c in enumerate(cands)]
     sent = recent_sent(st) if st else []
     extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
-    picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, MODEL, 2000), len(cands))
+    picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, CHEAP_MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
         picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
     review = REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS
