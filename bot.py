@@ -213,7 +213,7 @@ def check_line(text, n_sources, topic):
     ])
 
 
-AUTO_TOPICS = {"facts", "aviation"}
+AUTO_TOPICS = {"facts", "aviation", "politics"}
 AUTO_DAILY_CAP = 4
 SENSITIVE = re.compile(r"הרוג|נהרג|נהרגו|פצוע|נפצע|נפצעו|התרסק|התרסקות|קורבנ|מת\b|מתו|אסון|תאונה|חטיפ|פיגוע|מלחמ|ירי|טיל")
 
@@ -226,6 +226,8 @@ def auto_ok(st, topic, p, n_sources):
         return False
     if topic == "aviation" and n_sources < 2:
         return False
+    if topic == "politics" and (n_sources < 3 or st["daily"].get("auto_politics", 0) >= 2):
+        return False  # פוליטיקה: רק עם 3 מקורות ומעלה, עד 2 ביום
     return st["daily"].get("auto", 0) < AUTO_DAILY_CAP
 
 
@@ -901,6 +903,8 @@ def fetch_and_propose(st, topic):
             auto = (not sample) and auto_ok(st, topic, p, n_sources)
             if auto:
                 st["daily"]["auto"] = st["daily"].get("auto", 0) + 1
+                if topic == "politics":
+                    st["daily"]["auto_politics"] = st["daily"].get("auto_politics", 0) + 1
         send_proposal(pid, p["text"], links, p["severity"], n_sources, p.get("israel", False), topic, p.get("urgency", 3), p.get("special", 3), auto, when_line(cands, p["idxs"]))
         with STATE_LOCK:
             if auto:
