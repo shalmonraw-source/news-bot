@@ -196,14 +196,6 @@
     "url": "https://rss.walla.co.il/feed/1?type=main"
    },
    {
-    "name": "Times of Israel",
-    "url": "https://www.timesofisrael.com/feed/"
-   },
-   {
-    "name": "Kan News",
-    "url": "https://www.kan.org.il/Rss/news.xml"
-   },
-   {
     "name": "GN משטרה ופלילים",
     "url": "https://news.google.com/rss/search?q=%D7%9E%D7%A9%D7%98%D7%A8%D7%94%20OR%20%D7%A4%D7%99%D7%92%D7%95%D7%A2%20OR%20%D7%99%D7%A8%D7%99%20OR%20%D7%93%D7%A7%D7%99%D7%A8%D7%94%20OR%20%D7%AA%D7%90%D7%95%D7%A0%D7%94%20%D7%A7%D7%98%D7%9C%D7%A0%D7%99%D7%AA%20OR%20%D7%A9%D7%A8%D7%99%D7%A4%D7%94%20when%3A1d&hl=he&gl=IL&ceid=IL:he"
    },
@@ -291,24 +283,12 @@
     "url": "https://aviationweek.com/rss.xml"
    },
    {
-    "name": "Flight Global",
-    "url": "https://www.flightglobal.com/rss"
-   },
-   {
     "name": "Aviation A2Z",
     "url": "https://www.aviationa2z.com/index.php/feed/"
    },
    {
-    "name": "Airways Magazine",
-    "url": "https://www.airwaysmag.com/feed/"
-   },
-   {
     "name": "Paddle Your Own Kanoo",
     "url": "https://paddleyourownkanoo.com/feed/"
-   },
-   {
-    "name": "Executive Traveller",
-    "url": "https://www.executivetraveller.com/feed"
    },
    {
     "name": "One Mile at a Time",
@@ -323,20 +303,8 @@
     "url": "https://www.aerotime.aero/rss"
    },
    {
-    "name": "Aviation Source News",
-    "url": "https://aviationsourcenews.com/feed/"
-   },
-   {
     "name": "NTSB Press Releases",
     "url": "https://www.ntsb.gov/news/press-releases/Pages/RSS.aspx"
-   },
-   {
-    "name": "FAA News",
-    "url": "https://www.faa.gov/newsroom/rss"
-   },
-   {
-    "name": "EASA News",
-    "url": "https://www.easa.europa.eu/en/newsroom-and-events/news/rss"
    },
    {
     "name": "GN Emergency landings",
@@ -456,10 +424,6 @@
     "url": "https://t.me/s/Israel_Realtime_Updates"
    },
    {
-    "name": "Politico",
-    "url": "https://www.politico.com/rss/politicopicks.xml"
-   },
-   {
     "name": "The Hill",
     "url": "https://thehill.com/feed/"
    },
@@ -546,10 +510,6 @@
     "url": "https://www.nasa.gov/rss/dyn/breaking_news.rss"
    },
    {
-    "name": "National Geographic",
-    "url": "https://www.nationalgeographic.com/pages/feed/"
-   },
-   {
     "name": "Phys.org",
     "url": "https://phys.org/rss-feed/"
    },
@@ -562,24 +522,12 @@
     "url": "https://www.newscientist.com/feed/home/"
    },
    {
-    "name": "IFLScience",
-    "url": "https://www.iflscience.com/rss"
-   },
-   {
     "name": "Quanta Magazine",
     "url": "https://www.quantamagazine.org/feed/"
    },
    {
     "name": "Big Think",
     "url": "https://bigthink.com/feed/"
-   },
-   {
-    "name": "Mental Floss",
-    "url": "https://www.mentalfloss.com/feeds/all"
-   },
-   {
-    "name": "History.com",
-    "url": "https://www.history.com/.rss/full"
    },
    {
     "name": "Space.com",
