@@ -1095,7 +1095,9 @@ def propose_custom(st, topic, text, urgency=2, special=3):
     except Exception as e:  # noqa: BLE001
         print("custom image failed:", type(e).__name__, str(e)[:120])
     send_proposal(pid, text, [], "low", 1, False, topic, urgency, special, False, "🕒 פוסט מערכת (לא ידיעה)")
-    st["pending"][pid] = {"text": text, "links": [], "severity": "low", "topic": topic, "image": img_path, "credit": credit, "urgency": urgency, "ts": time.time()}
+    with STATE_LOCK:
+        st["pending"][pid] = {"text": text, "links": [], "severity": "low", "topic": topic, "image": img_path, "credit": credit, "urgency": urgency, "ts": time.time()}
+        checkpoint(st)  # נשמר מיד, כדי שלחיצה בטלגרם תמצא את ההצעה
 
 
 def daily_report(st):
@@ -1243,9 +1245,14 @@ def checkpoint(st):
         run("git", "add", "-A", "state.json", "images", "decisions")
         if run("git", "diff", "--staged", "--quiet").returncode != 0:
             run("git", "commit", "-m", "checkpoint state")
-            if run("git", "pull", "--rebase", "-X", "theirs").returncode != 0:  # בהתנגשות, גרסת המצב שלנו גוברת
-                run("git", "rebase", "--abort")
-            run("git", "push")
+            for _ in range(3):  # בהתנגשות או דחייה, גרסת המצב שלנו גוברת וננסה שוב
+                if run("git", "pull", "--rebase", "-X", "theirs").returncode != 0:
+                    run("git", "rebase", "--abort")
+                if run("git", "push").returncode == 0:
+                    break
+                time.sleep(2)
+            else:
+                print("warn: checkpoint push failed after retries")
     except Exception as e:  # noqa: BLE001
         print("warn: checkpoint", type(e).__name__)
 
