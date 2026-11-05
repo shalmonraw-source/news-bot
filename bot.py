@@ -25,6 +25,7 @@ STATE_FILE = os.environ.get("STATE_FILE", "state.json")
 TOPICS_FILE = os.environ.get("TOPICS_FILE", "topics.json")
 MODEL = os.environ.get("CLAUDE_MODEL", "claude-sonnet-5-5")
 MAX_AGE_HOURS = int(os.environ.get("MAX_AGE_HOURS", "12"))
+MAX_AGE_HOURS_BREAKING = int(os.environ.get("MAX_AGE_HOURS_BREAKING", "5"))  # חדשות מתפרצות: לא מסתמכים על מקור שפרסם באיחור של יותר מכמה שעות
 MAX_CANDIDATES = int(os.environ.get("MAX_CANDIDATES", "70"))
 MAX_POSTS_PER_RUN = int(os.environ.get("MAX_POSTS_PER_RUN", "3"))
 PENDING_TTL_DAYS = 3
@@ -444,7 +445,9 @@ def fetch_candidates(st, topic):
     sources = load_topics()[topic]["sources"]
     sample = os.environ.get("SAMPLE") == "1"
     seen = set() if sample else set(st["seen"])
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=72 if sample else MAX_AGE_HOURS)
+    breaking = topic in ("security", "aviation", "politics", "abroad")
+    age_h = 72 if sample else (MAX_AGE_HOURS_BREAKING if breaking else 48)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=age_h)
     out, failed = [], []
     in_run = set()
     for src in sources:
@@ -460,7 +463,7 @@ def fetch_candidates(st, topic):
                         ts = datetime.fromisoformat(iso) if iso else None
                     except ValueError:
                         ts = None
-                    if ts and ts < cutoff:
+                    if (ts and ts < cutoff) or (breaking and not ts and not sample):
                         continue
                     out.append({"h": h, "source": src["name"], "title": text.split("\n")[0][:140], "summary": text[:500], "link": link,
                                 "image": img, "ts": ts.astimezone(timezone.utc).isoformat(timespec="minutes") if ts else ""})
@@ -485,7 +488,7 @@ def fetch_candidates(st, topic):
                 continue
             in_run.add(h)
             ts = entry_time(e)
-            if ts and ts < cutoff:
+            if (ts and ts < cutoff) or (breaking and not ts and not sample):
                 continue
             out.append(
                 {
@@ -587,16 +590,27 @@ HEBREW_SYSTEM = """אתה עורך לשון בכיר בעיתון ישראלי �
 החזר JSON בלבד: {"text":"הנוסח הסופי"}"""
 
 
+_CREDIT_ALERT = 0
+
+
 def claude_text(system, user, model, max_tokens=3000):
     import anthropic
 
     client = anthropic.Anthropic()
-    resp = client.messages.create(
-        model=model,
-        max_tokens=max_tokens,
-        system=system,
-        messages=[{"role": "user", "content": user}],
-    )
+    try:
+        resp = client.messages.create(
+            model=model,
+            max_tokens=max_tokens,
+            system=system,
+            messages=[{"role": "user", "content": user}],
+        )
+    except Exception as e:  # noqa: BLE001
+        if "credit balance" in str(e).lower() or "billing" in str(e).lower():
+            global _CREDIT_ALERT
+            if time.time() - _CREDIT_ALERT > 6 * 3600:
+                _CREDIT_ALERT = time.time()
+                tg("sendMessage", chat_id=_chat_id(), text="🚨 נגמרו קרדיטים ב-Claude API. הבוט לא יכול לכתוב פוסטים עד שתטען ב-console.anthropic.com ← Billing.")
+        raise
     return "".join(b.text for b in resp.content if b.type == "text")
 
 
@@ -842,14 +856,14 @@ def build_posts(cands, topic="aviation", st=None):
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", WRITER_MODEL, 6000)
+            rev = claude_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", MODEL, 6000)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
                 print("review fixes:", rev["issues"])
-            pol = claude_json(HEBREW_SYSTEM, text, WRITER_MODEL, 6000)
+            pol = claude_json(HEBREW_SYSTEM, text, MODEL, 6000)
             text = (pol.get("text") or text).strip()
             if OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|אבו עלי|אקספרס|פורסם באתר|על פי הדיווח ב", text):
-                fx = claude_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, WRITER_MODEL, 6000)
+                fx = claude_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, MODEL, 6000)
                 text = (fx.get("text") or text).strip()
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
