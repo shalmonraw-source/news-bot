@@ -1309,7 +1309,15 @@
   "33e9656043bd",
   "20f0ca68c46b",
   "b6ad1171a109",
-  "dda137d1ff45"
+  "dda137d1ff45",
+  "086cd3856c33",
+  "7b1a4323a270",
+  "96671efc6429",
+  "9c081b968262",
+  "88f878a8c656",
+  "51019c461703",
+  "fb75b85b7bae",
+  "5a109ca7001b"
  ],
  "pending": {
   "test814657": {
@@ -1437,17 +1445,6 @@
    "credit": "Diliff / Wikimedia Commons / CC BY 2.5",
    "ts": 1793840066.264543
   },
-  "e7aaf16a16": {
-   "text": "גם ציפורים סובלות מג׳ט לג: יסעורים סוטים מהמסלול בדרך הביתה\n\nיסעורי מנקס, עופות ים בצבע שחור-לבן, עפים מהר כל כך שהשעון הביולוגי שלהם לא עומד בקצב. כך עולה ממחקר שפורסם ב-29 באוקטובר בכתב העת Science, לפי סמיתסוניאן.\n\nכ-80 אחוז מאוכלוסיית המין בעולם מקננת באיים שמול החוף המערבי של בריטניה. משם הציפורים עפות יותר מ-600 מייל מערבה כדי לחפש מזון, ואחר כך חוזרות מזרחה אל המושבה. החוקרים ניתחו נתוני GPS שנאספו במשך 20 שנה מ-1,045 ציפורים, ובודדו מתוכם 1,837 מסעות חזרה.\n\nהיסעורים מנווטים לפי השמש, וכדי לעשות זאת הם צריכים לדעת מה השעה. במעוף מהיר מזרחה השעון הפנימי לא מתעדכן לפי השעה המקומית, ולפי הנתונים הציפורים סטו בעד 15 מעלות עם כיוון השעון. החוקרים בדקו גם גורמים אחרים, כמו עוצמת רוחות הצד והמרחק מהמושבה. אבל לדברי המחבר הראשי של המחקר, פטריק לוין מאוניברסיטת אוקספורד, הגורם שניבא את הסטייה בצורה הטובה ביותר היה תמיד אפקט מצפן השמש.\n\nהסטייה נמשכה גם כשהציפורים עפו לאורך קו החוף. לפי סמיתסוניאן, הממצא המפתיע מרמז שהיסעורים נעזרים בכמה סימני ניווט במקביל, וממשיכים להשתמש בכולם גם כשהסימנים מצביעים על כיוונים סותרים.",
-   "links": [
-    "https://www.smithsonianmag.com/smart-news/its-not-just-you-some-fast-flying-birds-also-get-jet-lag-180989811/"
-   ],
-   "severity": "low",
-   "topic": "facts",
-   "image": "images/e7aaf16a16.jpg",
-   "credit": "Louis Bouscary (IFREMER, Direction Communication, Centre Bre / Wikimedia Commons / CC BY 4.0",
-   "ts": 1793840215.2709782
-  },
   "d6197c0648": {
    "text": "שיער וציפורניים של מומיות ילדים מהאנדים חשפו קוקה, בירת תירס ואיוואסקה\n\nילד בן שבע, שנמצא קפוא ב-1999 בפסגת הר געש באנדים הארגנטינאיים, הוא אחד משמונה ילדים שהמומיות שלהם עברו בדיקה טוקסיקולוגית חדשה. לפי מחקר שפורסם בכתב העת Antiquity, הילדים קיבלו קוקה, בירת תירס טקסית ואלקלואיד הקשור לחליטות איוואסקה בחודשים שקדמו להקרבתם בטקס הקפאקוצ׳ה של האינקה, לפני כחמש מאות שנה.\n\nהחוקרים בדקו שיער וציפורניים של ילד אחד ושבע ילדות בני 6 עד 14, שנמצאו בהרים בפרו ובארגנטינה. קוקאין נמצא אצל כל השמונה, וסימני אלכוהול אצל ארבעה. לדברי החוקרת הראשית, דגמרה סוחה מאוניברסיטת ורשה, הקוקה הייתה משותפת לכולם, אבל שאר החומרים השתנו מילד לילד ומאתר לאתר. כלומר, ההכנה להקרבה לא הייתה אחידה ברחבי האימפריה.\n\nחומרים כימיים נלכדים בחלבון הקרטין של השיער והציפורניים בזמן שהם צומחים, ולכן נשמר בהם תיעוד של החודשים האחרונים בחייו של אדם. לפי המחקר, הקוקה דיכאה כנראה את הרעב והעייפות והקלה על מחלת הגבהים בזמן הטיפוס לפסגות. בירת התירס, הצ׳יצ׳ה, ניתנה כדי להרגיע את הילדים לקראת ההקרבה.\n\nלפסלונים שנקברו לצד המומיות יש לחיים נפוחות, סימן לגוש עלי קוקה בפה.",
    "links": [
@@ -1459,85 +1456,17 @@
    "credit": "ESO/M. Tarenghi / Wikimedia Commons / CC BY 4.0",
    "ts": 1793840219.2650173
   },
-  "983b2170eb": {
-   "text": "טראמפ איבד את הקונגרס, וסגנו ונס מאשים את המלחמה באיראן\n\nבעוד האבק שוקע אחרי בחירות האמצע, החשבון הרשמי של הבית הלבן פרסם ב-X תמונה של טראמפ עומד, חמור סבר, מאחורי שולחנו בחדר הסגלגל. לפי ה-BBC, הדמוקרטים זכו ברוב בבית הנבחרים ובסנאט בבחירות שנערכו ביום שלישי.\n\nהביקורת הבולטת הגיעה מבפנים. סגן הנשיא ג׳יי די ונס כתב בפוסט ארוך ברשתות החברתיות שהמלחמה באיראן, שטראמפ פתח בה יחד עם ישראל, היא שהובילה להפסד. \"כולם יודעים למה הפסדנו\", כתב. לפי CBS News, טראמפ שואל יועצים קרובים אם להחליף את שר ההגנה פיט הגסת׳, מאדריכלי המלחמה. טראמפ הכחיש.\n\nלפי ניתוח של ה-BBC, בשנתיים האחרונות של כהונתו נותרו בידי טראמפ סמכויות רחבות, ובהן צווים נשיאותיים וזכות וטו. הרוב שיהיה לדמוקרטים לא יספיק כדי לעקוף וטו, והמכשולים הגדולים ביותר עשויים לצוץ דווקא מתוך מפלגתו.\n\nלפי ה-BBC, הפעם האחרונה שבה זכו הדמוקרטים ברוב בהיקף כזה בבחירות אמצע הייתה ב-2006. אז החליף ג׳ורג׳ וו. בוש את שר ההגנה דונלד רמספלד, מהכוחות המניעים של מלחמת עיראק.",
+  "deb92d2a4f": {
+   "text": "🇨🇦 מאפייה כשרה במונטריאול הוצתה, יומיים אחרי ניסיון קודם שכשל\n\nכ-60 כבאים עמלו במשך שעתיים על כיבוי שריפה שפרצה במאפייה כשרה ברובע סן-לורן במונטריאול, כך דווח ב״ישראל היום״.\n\nלפי הדיווח, המשטרה המקומית מעריכה כי מדובר בהצתה מכוונת, ומחלקת פשעי השנאה של המשטרה הצטרפה לחקירה.\n\nעוד נמסר כי מוקדם יותר השבוע נעשה ניסיון לתקוף את המקום, אך הוא לא צלח. המשטרה מחפשת קצה חוט שיוביל אל החשודים.",
    "links": [
-    "https://news.google.com/rss/articles/CBMiggFBVV95cUxQS1dhbGdEUklRVFQteWlpakFoa2FBT21ybFFSdnZJYThaTGVTc3BuWWxJTHNBYWxqSzEwRVdnMlRBVHVMRlFnZS1OcW15RXRmUW1RUWZUczdUV0hjY3VmU09NNHdibXVRUGNYZWdMbDMzU3dXMDN1ejRCZnJpZElLbExR?oc=5",
-    "https://news.google.com/rss/articles/CBMifkFVX3lxTFBQMmdXRDY4SkxCc0NSNXBTQTZiQktjSlk4ekJabWJlQVJNYk9jdEdsS21tN1Ffa0U5UGt2TFlIR1M3djFSSjIwdHZCb04wRVRld0pVVFNuWXkzcjVSZmpJRW0yNkc2Ti01cnQ3ZUNQMlZxVnNrd3U0eG5haHlFUdIBgwFBVV95cUxNdGtMbm10WmRZNDkwMXBSWno0VmhpaXh0NGVYbXhXSHlWbzdBWmwyTEd4SlZCN2tCQTBxOXpxWm1IM09uWnZWdm5OWWcyUlJGQ0dJd2FodWVscjNuUHNIaXItdVJHRW5JekJKeXV4UmQ0WXpVRVJSSlE4Zjd2Zk9BMGI3dw?oc=5",
-    "https://news.google.com/rss/articles/CBMiggFBVV95cUxOTlRHckk4bFA0QmdHUnQ5WTYxVDZLMzBnMUhrV294cDVHZlZ3X1VHMlJSVF8ycnJ4REZabGdPRFpwU3BENkJhdnBQRmZTYnZLVU8xaU1EQ0lrVmpHTENocjY3SVV1T1hUNG9ZVGE2OE9YWEJ1ZW5xVVN4eUxXWElKQlBB?oc=5",
-    "https://www.bbc.co.uk/news/articles/cmpdg093e589o?at_medium=RSS&at_campaign=rss"
+    "https://www.israelhayom.co.il/news/world-news/other/article/21784551"
    ],
-   "severity": "high",
-   "topic": "politics",
-   "image": "images/983b2170eb.jpg",
-   "credit": "Diliff / Wikimedia Commons / CC BY 2.5",
-   "urgency": 4,
-   "ts": 1793840963.8109083
-  },
-  "d18a6496c6": {
-   "text": "אחרי התבוסה בבחירות האמצע: ואנס נראה כמי שמטיל ספק במלחמה באיראן\n\nלפי אתר אקסיוס, אחרי התבוסה בבחירות האמצע ניצב הנשיא טראמפ בעיקר בפני אפשרויות גרועות בסוגיית איראן. אל ג׳זירה מדווחת כי ואנס, המבקש להתמודד על הנשיאות, נראה כמי שמטיל ספק במלחמה באיראן אחרי המפלה בקלפי.\n\nאתר אל ג׳זירה נט מביא דיווח של CNN, ולפיו טראמפ מרגיש שהוטעה בנוגע למלחמה באיראן וחושש לאבד את השפעתו. הדיווחים אינם מפרטים מה בדיוק אמר ואנס ואילו צעדים שוקל הבית הלבן.\n\nאתר ארם ניוז תוהה אם דברי ואנס יבלמו את מה שהוא מכנה ״מלחמת טראמפ באיראן״ אחרי ״התבוסה הכואבת״.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMif0FVX3lxTE4xLW5GUVNsM0M5N3czNGNCaUxWQVNfamtLbFFBdEVzZlEydFJEY3E2TkhJQTN6c3g0LWtaZmJ4bXlOY2FtV0d1c0ROd1JFc045OENVWnpLSGxrbm9sTHJVTzlwQnNUeEJKdE9RT21ValNvUkZRRldSVGVDNHVwTDg?oc=5",
-    "https://news.google.com/rss/articles/CBMitwFBVV95cUxPNFdoTi1INVRLRUdkTG9SY3pPQ1dQcTgwTzVjMWQySGdBWUJLczFfMWV1anNEbElxY29VSy1ieGh5dzlCTUhFdEtIMUViLWNURVFEWUw2X3lsbXJVM2dCWW9jQnV2Slg3bm5NMW1iU3JzeHlja2xOSFN6U0ZUR3hwVVRuaU1zV1FmR2p3bTQtczVmMU5VS3NWR2d5d0pzdEpVcFAzNzB6VXc1MUdfVExXX0RwOXRyVEXSAbwBQVVfeXFMTUlnRGFpN3h6WmRvdWJNS1pDdkV3WGJKSC1xNFZtSjNLMWIxRjBweTZYcDZRRzVmdDYxXzNaenQxMzQwUVRqNlpuRW9MaGxHakxsV011NkVTUXZ6LXVjWGItOFZUVzRkTklkOTFYa25oRnNvZTItTWdFLTZpUkwzR3E5ZGpQMzlZdXJNdXRwc2NNRXlYQnQ4LTI0YnExc2RscHhKWEw2ZzdHOHVyWEZaZDFNelVkOGlLOGI4eDM?oc=5",
-    "https://news.google.com/rss/articles/CBMiwwJBVV95cUxOc0gyTklzQjludGlIdGNmQWtmX25qN1lpT29UbmwwMmZVOFZwb0dCTFBHampYanN5czFiMjV4VzNpeXVpWk9tRlFzTmF1LXdOanpWeFVnVzZaWWl0SS1uSFM1Z0s3RUZoVDNsN0sxTy1sQlV5UEZfNHM1cHNrbWk4TS0tQkZtd0dwQ0xJUUdmd2QzdEJDc3JkNU84YkoyZ3FncnR6ZV9NdVhoYV9iU29vZ3U1MUZuaTNKa1lwYmdBenRvVENEUU1EZHlXbWdSaHFVenllLUJ6aWtCQ1lKcFpuQi13SXBNLTRXX0xmdUh0U1JRSDZNbm1oeGFwcEhPdF82WmtNTUVrcElMQ3p0M19GMDNBLVM2WkZfZU5UY3pWVFVHMFgxWkhhREVnY1g2YlBCOWFxa2U2M0NCc0U1U3NIaHg2Yw?oc=5",
-    "https://news.google.com/rss/articles/CBMiVkFVX3lxTE40TjU4SnllWkhYRlFfQ1phYkFHWW41VzRQR25neEZpdGtrZFg4ekR6aHB2dEg3YUtXRWEyVVhQd0dUQ3NNNGZfLWRnSjBfWVBUSVBxRkVn?oc=5"
-   ],
-   "severity": "medium",
-   "topic": "security",
-   "image": "images/d18a6496c6.jpg",
+   "severity": "low",
+   "topic": "abroad",
+   "image": "images/deb92d2a4f.jpg",
    "credit": null,
-   "urgency": 4,
-   "ts": 1793841005.9092185
-  },
-  "526e9201a0": {
-   "text": "לפי אל-מוניטור: הדמוקרטים נערכים להתעמת עם טראמפ בסוגיית איראן ובסוגיית הקשרים העסקיים במפרץ\n\nהמפלגה הדמוקרטית בארצות הברית נערכת להתעמת עם הנשיא דונלד טראמפ בשתי סוגיות: המלחמה עם איראן והקשרים העסקיים עם המפרץ. כך מדווח אתר החדשות אל-מוניטור, המתאר את הדמוקרטים כמי שפועלים מתוך ביטחון גובר.\n\nבדיווח לא פורט אילו צעדים נשקלים, מי מוביל אותם ומה חיזק את ביטחונם של הדמוקרטים. גם לוח הזמנים לא פורסם.\n\nלפי החוקה האמריקנית, הסמכות להכריז על מלחמה נתונה לקונגרס. חוק סמכויות המלחמה מ-1973 מאפשר לקונגרס לדרוש להפסיק פעולה צבאית שלא אישר. בפועל, יכולתה של מפלגת האופוזיציה לבלום את הנשיא תלויה בכוחה בשני בתי הקונגרס.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUlhZUjEzb0cxZUxCMTZMN295TFB3WFlJemhFR01wWXpKLV9Jblo4TGdGMGo4b3dYcm5wanROaDUtZVV1ejdWUm5ESGVyU2VNdU9QTHRqa2RsUmV5bE01bVJSYk1NRzZWRFpEOExmOVlXMk02Q20wX2tlSGFndnpNQ1RqR2FTVFc4RlQydUhPUEVJSjlsRXRWYlNqMHlUQmhpanR6akF2a1FMNXZuOVZ4cG40dk1raEt1UW1J?oc=5",
-    "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNbkZhQjVGMzdZTWFPbHNMYWNoR3hPMEJ5bW1abEhKc3pFS1pSRkhMY09UUnZsUFZ2Q0lBT1FyZGxfMFJXVzhLZHpnbGRoV2ctN3RpcDBHdjJYTGR2NXoyRmVGNnZaN3phOWVuSmpYaW1BRm1yaWRxUldzcnltMDBUYUpXamRaRjU1cDRMY3pQLUJSa0dOcUVUazR6c1dzOHJtQnNXYUZmcVluZVY5SDlHRjVkeE1uVWtIVzZUZG1MTnpfOW9xYkRZT2oxVFpQV3MtOE4xeVNn?oc=5"
-   ],
-   "severity": "medium",
-   "topic": "security",
-   "image": "images/526e9201a0.jpg",
-   "credit": "Noclip / Wikimedia Commons / Public domain",
    "urgency": 3,
-   "ts": 1793841014.0147164
-  },
-  "cb3d4d866f": {
-   "text": "מנועי מטוסים שהוצאו משירות מקבלים חיים שניים כמחוללי חשמל למרכזי נתונים\n\nמנוע ישן שהוסר מבואינג 737 או מאיירבוס A320 עשוי להיות שווה יותר כמחולל חשמל למרכז נתונים של בינה מלאכותית מאשר אם יפורק וחלקיו יימכרו. מפתחי מרכזי נתונים ממתינים לעיתים שנים לחיבור לרשת החשמל. מנוע סילון שהוסב למחולל מאפשר להם לייצר חשמל באתר ולהפעיל את השרתים מוקדם בהרבה.\n\nחברת FTAI Aviation מניו יורק, שמתקנת ומחכירה מנועי סילון, חתמה על חוזים לאספקת יותר מ-100 מחוללים מבוססי CFM56 ללקוחות בארה״ב ובקנדה ב-2027 וב-2028. המחולל שלה, Mod-1, מבוסס על ליבת המנוע. בניסויים שנערכו במתקן החברה במיאמי עמד המחולל ביעדים של 23 מגה-ואט בהספק רציף ו-25 מגה-ואט בשיא. ביולי 2026 הזמינה חברת ענן שזהותה לא נחשפה מחוללים בהיקף של 1.465 מיליארד דולר.\n\nלענף התעופה פירוש הדבר תחרות חדשה על מנועים שהגיעו לסוף דרכם. מנועים כאלה נשלחים בדרך כלל לפירוק, ולעיתים מודולים תקינים שלהם מורכבים במנוע אחר שחוזר לשירות.\n\nבמקביל, חברת Boom Supersonic מפתחת ליבת טורבינה חדשה שתשמש גם את מנוע המטוס העל-קולי Overture וגם טורבינת גז טבעי של 42 מגה-ואט למרכזי נתונים. כל זאת עוד לפני שהמטוס נשא ולו נוסע אחד.",
-   "links": [
-    "https://www.aerotime.aero/articles/retired-jet-engines-powering-ai-data-centers"
-   ],
-   "severity": "low",
-   "topic": "aviation",
-   "image": "images/cb3d4d866f.jpg",
-   "credit": null,
-   "urgency": 1,
-   "ts": 1793842637.6439047
-  },
-  "f98de9476a": {
-   "text": "🌍 דיווח: ישראלים עשו צרכים על כנסייה בחו״ל – ״חוסר כבוד בוטה״\n\nלפי דיווח באתר mako, ישראלים עשו את צרכיהם על כנסייה מחוץ לישראל. בכותרת הדיווח תואר המעשה כ״חוסר כבוד בוטה״.\n\nבדיווח לא צוין באיזו מדינה אירע המקרה, כמה אנשים היו מעורבים בו ומתי התרחש. כמו כן לא פורט מי תיאר כך את המעשה.\n\nלא ידוע אם הרשויות המקומיות פתחו בהליך נגד המעורבים, וגם לא אם התקבלה תגובה רשמית מישראל.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMihgFBVV95cUxQRUFzTXRFSUh2OGswcThoX19ZQXo3WGRkVjNuN01VME9wZDJlSkNvcFM1OGsyQVJZc1JKTVFJdGZOODZ6ZTAtZWJqcS1KaUpFbkZkNVE4bWgwYTZMa3Y4Q2pCUmpDS00zbDBJbTl3Ym81OVZlZkFFaUNGaFliU3RibGJHUXRWZw?oc=5"
-   ],
-   "severity": "low",
-   "topic": "abroad",
-   "image": "images/f98de9476a.jpg",
-   "credit": null,
-   "urgency": 2,
-   "ts": 1793843835.3656454
-  },
-  "12a65d799e": {
-   "text": "🇮🇱 פחות יציאות לחו״ל באוקטובר, אבל מתחילת השנה המספרים גבוהים מאשתקד\n\nעל פניו, באוקטובר יצאו מהארץ פחות ישראלים. לפי נתוני הלשכה המרכזית לסטטיסטיקה שפורסמו ביום רביעי, נרשמו באוקטובר 793.5 אלף יציאות לחו״ל, לעומת 811.9 אלף באוקטובר 2025.\n\nלפי ״מעריב״, הירידה נובעת כנראה מלוח השנה: אשתקד חלו סוכות ושמחת תורה באמצע אוקטובר, ואילו השנה נפלו רוב חגי תשרי כבר בספטמבר.\n\nבתמונה הרחבה, המגמה הפוכה. לפי הלמ״ס, בין ינואר לאוקטובר נרשמו 8.10 מיליון יציאות, לעומת 7.93 מיליון בתקופה המקבילה אשתקד.\n\nלפי ״מעריב״, במרץ, עם פתיחת מבצע ״שאגת הארי״ וסגירת השמיים, היציאות כמעט נעצרו. מאז הן שבו לעלות במהירות, ובחודשי הקיץ נשברו שיאים.\n\nנתון נוסף נוגע לישראלים שגרים בחו״ל ומגיעים לביקור. לפי הלמ״ס, באוקטובר נרשמו 76.3 אלף יציאות שלהם, 9.6% מכלל היציאות, לעומת 6.4% באוקטובר 2025.",
-   "links": [
-    "https://www.c14.co.il/article/1772802",
-    "https://www.maariv.co.il/lifestyle/travel/article-1384764"
-   ],
-   "severity": "low",
-   "topic": "abroad",
-   "image": "images/12a65d799e.jpg",
-   "credit": "Michaelg2588 / Wikimedia Commons / CC BY-SA 3.0",
-   "urgency": 2,
-   "ts": 1793846652.6506283
+   "ts": 1793850706.7790837
   }
  },
  "approved": [
@@ -1604,6 +1533,23 @@
    "published": true,
    "fb_id": "1322211944302986_122130325137473720",
    "published_at": "2026-11-05T03:38:19+00:00"
+  },
+  {
+   "id": "983b2170eb",
+   "text": "טראמפ איבד את הקונגרס, וסגנו ונס מאשים את המלחמה באיראן\n\nבעוד האבק שוקע אחרי בחירות האמצע, החשבון הרשמי של הבית הלבן פרסם ב-X תמונה של טראמפ עומד, חמור סבר, מאחורי שולחנו בחדר הסגלגל. לפי ה-BBC, הדמוקרטים זכו ברוב בבית הנבחרים ובסנאט בבחירות שנערכו ביום שלישי.\n\nהביקורת הבולטת הגיעה מבפנים. סגן הנשיא ג׳יי די ונס כתב בפוסט ארוך ברשתות החברתיות שהמלחמה באיראן, שטראמפ פתח בה יחד עם ישראל, היא שהובילה להפסד. \"כולם יודעים למה הפסדנו\", כתב. לפי CBS News, טראמפ שואל יועצים קרובים אם להחליף את שר ההגנה פיט הגסת׳, מאדריכלי המלחמה. טראמפ הכחיש.\n\nלפי ניתוח של ה-BBC, בשנתיים האחרונות של כהונתו נותרו בידי טראמפ סמכויות רחבות, ובהן צווים נשיאותיים וזכות וטו. הרוב שיהיה לדמוקרטים לא יספיק כדי לעקוף וטו, והמכשולים הגדולים ביותר עשויים לצוץ דווקא מתוך מפלגתו.\n\nלפי ה-BBC, הפעם האחרונה שבה זכו הדמוקרטים ברוב בהיקף כזה בבחירות אמצע הייתה ב-2006. אז החליף ג׳ורג׳ וו. בוש את שר ההגנה דונלד רמספלד, מהכוחות המניעים של מלחמת עיראק.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiggFBVV95cUxQS1dhbGdEUklRVFQteWlpakFoa2FBT21ybFFSdnZJYThaTGVTc3BuWWxJTHNBYWxqSzEwRVdnMlRBVHVMRlFnZS1OcW15RXRmUW1RUWZUczdUV0hjY3VmU09NNHdibXVRUGNYZWdMbDMzU3dXMDN1ejRCZnJpZElLbExR?oc=5",
+    "https://news.google.com/rss/articles/CBMifkFVX3lxTFBQMmdXRDY4SkxCc0NSNXBTQTZiQktjSlk4ekJabWJlQVJNYk9jdEdsS21tN1Ffa0U5UGt2TFlIR1M3djFSSjIwdHZCb04wRVRld0pVVFNuWXkzcjVSZmpJRW0yNkc2Ti01cnQ3ZUNQMlZxVnNrd3U0eG5haHlFUdIBgwFBVV95cUxNdGtMbm10WmRZNDkwMXBSWno0VmhpaXh0NGVYbXhXSHlWbzdBWmwyTEd4SlZCN2tCQTBxOXpxWm1IM09uWnZWdm5OWWcyUlJGQ0dJd2FodWVscjNuUHNIaXItdVJHRW5JekJKeXV4UmQ0WXpVRVJSSlE4Zjd2Zk9BMGI3dw?oc=5",
+    "https://news.google.com/rss/articles/CBMiggFBVV95cUxOTlRHckk4bFA0QmdHUnQ5WTYxVDZLMzBnMUhrV294cDVHZlZ3X1VHMlJSVF8ycnJ4REZabGdPRFpwU3BENkJhdnBQRmZTYnZLVU8xaU1EQ0lrVmpHTENocjY3SVV1T1hUNG9ZVGE2OE9YWEJ1ZW5xVVN4eUxXWElKQlBB?oc=5",
+    "https://www.bbc.co.uk/news/articles/cmpdg093e589o?at_medium=RSS&at_campaign=rss"
+   ],
+   "severity": "high",
+   "image": "images/983b2170eb.jpg",
+   "credit": "Diliff / Wikimedia Commons / CC BY 2.5",
+   "approved_at": "2026-11-05T03:49:15+00:00",
+   "published": true,
+   "fb_id": "1322211944302986_122130327015473720",
+   "published_at": "2026-11-05T03:49:21+00:00"
   }
  ],
  "offset": 569287812,
@@ -1613,10 +1559,25 @@
    "security": 5,
    "aviation": 4,
    "politics": 4,
-   "facts": 2
+   "facts": 2,
+   "abroad": 1
   }
  },
- "queue": [],
+ "queue": [
+  {
+   "id": "526e9201a0",
+   "text": "לפי אל-מוניטור: הדמוקרטים נערכים להתעמת עם טראמפ בסוגיית איראן ובסוגיית הקשרים העסקיים במפרץ\n\nהמפלגה הדמוקרטית בארצות הברית נערכת להתעמת עם הנשיא דונלד טראמפ בשתי סוגיות: המלחמה עם איראן והקשרים העסקיים עם המפרץ. כך מדווח אתר החדשות אל-מוניטור, המתאר את הדמוקרטים כמי שפועלים מתוך ביטחון גובר.\n\nבדיווח לא פורט אילו צעדים נשקלים, מי מוביל אותם ומה חיזק את ביטחונם של הדמוקרטים. גם לוח הזמנים לא פורסם.\n\nלפי החוקה האמריקנית, הסמכות להכריז על מלחמה נתונה לקונגרס. חוק סמכויות המלחמה מ-1973 מאפשר לקונגרס לדרוש להפסיק פעולה צבאית שלא אישר. בפועל, יכולתה של מפלגת האופוזיציה לבלום את הנשיא תלויה בכוחה בשני בתי הקונגרס.",
+   "links": [
+    "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQUlhZUjEzb0cxZUxCMTZMN295TFB3WFlJemhFR01wWXpKLV9Jblo4TGdGMGo4b3dYcm5wanROaDUtZVV1ejdWUm5ESGVyU2VNdU9QTHRqa2RsUmV5bE01bVJSYk1NRzZWRFpEOExmOVlXMk02Q20wX2tlSGFndnpNQ1RqR2FTVFc4RlQydUhPUEVJSjlsRXRWYlNqMHlUQmhpanR6akF2a1FMNXZuOVZ4cG40dk1raEt1UW1J?oc=5",
+    "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNbkZhQjVGMzdZTWFPbHNMYWNoR3hPMEJ5bW1abEhKc3pFS1pSRkhMY09UUnZsUFZ2Q0lBT1FyZGxfMFJXVzhLZHpnbGRoV2ctN3RpcDBHdjJYTGR2NXoyRmVGNnZaN3phOWVuSmpYaW1BRm1yaWRxUldzcnltMDBUYUpXamRaRjU1cDRMY3pQLUJSa0dOcUVUazR6c1dzOHJtQnNXYUZmcVluZVY5SDlHRjVkeE1uVWtIVzZUZG1MTnpfOW9xYkRZT2oxVFpQV3MtOE4xeVNn?oc=5"
+   ],
+   "severity": "medium",
+   "image": "images/526e9201a0.jpg",
+   "credit": "Noclip / Wikimedia Commons / Public domain",
+   "queued_at": "2026-11-05T03:48:47+00:00",
+   "published": false
+  }
+ ],
  "slots_done": {
   "2026-11-05": []
  }
