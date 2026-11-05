@@ -824,6 +824,13 @@ def judge_photo(img, info, subject, post):
     return bool(v.get("ok"))
 
 
+_STATE_REF = {}
+
+
+def st_no_source():
+    return _STATE_REF.get("st", {}).get("no_source_images_until", 0) > time.time()
+
+
 def make_image(pid, text, topic="aviation", overlay=False, sources=()):
     """מחזיר (נתיב תמונה, קרדיט או None). צילום רק אם נבדק שהוא קשור לידיעה, אחרת כרטיס טיפוגרפי נקי."""
     tp = load_topics()[topic]
@@ -847,6 +854,8 @@ def make_image(pid, text, topic="aviation", overlay=False, sources=()):
                 print("judge failed:", type(e).__name__)
         if photo:
             break
+    if photo is None and (load_settings().get("use_source_images", True) is False or st_no_source()):
+        sources = ()
     if photo is None:  # אין צילום חופשי מאומת: תמונה מהמקור של הידיעה עצמה (עם קרדיט למקור)
         for url, src_name, link in sources:
             got = imgcard.source_image(url, link)
@@ -948,11 +957,14 @@ def publish_approved(st):
     page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
     if not page or not token:
         return
+    if load_settings().get("pause_publish") or st.get("paused_until", 0) > time.time():
+        return  # הפרסום מושהה (ידנית או אוטומטית אחרי חסימה)
     token = page_token(page, token)
     for item in st["approved"]:
         if item.get("published") or item.get("fails", 0) >= 2:
             continue
-        caption = item["text"] + ("\n\n📷 צילום ארכיון: " + item["credit"] if item.get("credit") else "")
+        cr = item.get("credit") or ""
+        caption = item["text"] + (("\n\n📷 " + (cr if cr.startswith("תמונה:") else "צילום ארכיון: " + cr)) if cr else "")
         try:
             base = f"https://graph.facebook.com/{FB_VERSION}/{page}"
             if item.get("image") and os.path.exists(item["image"]):
@@ -963,7 +975,11 @@ def publish_approved(st):
             data = r.json()
             fb_id = data.get("post_id") or data.get("id")
             if not fb_id:
-                raise RuntimeError(str((data.get("error") or {}).get("message", "unknown"))[:150])
+                err = data.get("error") or {}
+                if err.get("code") in (368, 4, 17, 32, 613, 190, 200, 10) and err.get("code") != 200:
+                    st["paused_until"] = time.time() + 6 * 3600
+                    tg("sendMessage", chat_id=_chat_id(), text=f"🚨 פייסבוק חסם או הגביל פרסום (קוד {err.get('code')}): {str(err.get('message', ''))[:200]}\nהפרסום הושהה ל-6 שעות. בדוק ב-Meta Business Suite > Account Quality.")
+                raise RuntimeError(str(err.get("message", "unknown"))[:150])
             # מקורות בתגובה הראשונה, כדי לא לפגוע בחשיפה
             try:
                 requests.post(f"https://graph.facebook.com/{FB_VERSION}/{fb_id}/comments", data={"message": "מקורות:\n" + "\n".join(item["links"]), "access_token": token}, timeout=40)
@@ -977,6 +993,50 @@ def publish_approved(st):
             print("publish failed:", type(e).__name__, str(e)[:150])
             item["fails"] = item.get("fails", 0) + 1
             tg("sendMessage", chat_id=_chat_id(), text="⚠️ הפרסום לפייסבוק נכשל: " + (str(e)[:150] if isinstance(e, RuntimeError) else type(e).__name__))
+
+
+
+def fb_health(st):
+    """בדיקת בריאות העמוד כל 30 דקות: תקינות הטוקן, פוסטים שהוסרו, ומעקב עוקבים. התראה בטלגרם כשיש בעיה."""
+    page, token = os.environ.get("FB_PAGE_ID"), os.environ.get("FB_PAGE_TOKEN")
+    if not page or not token or time.time() - st.get("health_ts", 0) < 1800:
+        return
+    st["health_ts"] = time.time()
+    try:
+        token = page_token(page, token)
+        base = f"https://graph.facebook.com/{FB_VERSION}"
+        r = requests.get(f"{base}/{page}", params={"fields": "name,followers_count,fan_count,is_published", "access_token": token}, timeout=30).json()
+        if r.get("error"):
+            tg("sendMessage", chat_id=_chat_id(), text=f"🚨 בעיית גישה לעמוד בפייסבוק (קוד {r['error'].get('code')}): {str(r['error'].get('message', ''))[:200]}")
+            return
+        if r.get("is_published") is False:
+            tg("sendMessage", chat_id=_chat_id(), text="🚨 העמוד מסומן כלא מפורסם בפייסבוק!")
+        st.setdefault("followers", []).append({"ts": int(time.time()), "n": r.get("followers_count") or r.get("fan_count") or 0})
+        st["followers"] = st["followers"][-600:]
+        removed = []
+        for item in st["approved"][-15:]:
+            fid = item.get("fb_id")
+            if not fid or not item.get("published") or item.get("removed"):
+                continue
+            age = time.time() - datetime.fromisoformat(item.get("published_at", "2000-01-01T00:00:00+00:00")).timestamp()
+            if age > 3 * 86400:
+                continue
+            q = requests.get(f"{base}/{fid}", params={"fields": "id,is_hidden,is_published", "access_token": token}, timeout=30).json()
+            e = q.get("error") or {}
+            if e.get("code") == 100 and e.get("error_subcode") in (33, None) or q.get("is_published") is False or q.get("is_hidden"):
+                item["removed"] = True
+                removed.append(item)
+        if removed:
+            st.setdefault("removals", []).extend(int(time.time()) for _ in removed)
+            names = "\n".join("• " + x["text"].splitlines()[0][:80] + (f" ({x['credit']})" if x.get("credit") else "") for x in removed)
+            tg("sendMessage", chat_id=_chat_id(), text=f"⚠️ פוסטים שהוסרו או הוסתרו בפייסבוק ({len(removed)}):\n{names}\nייתכן דיווח זכויות יוצרים או הפרת תקנון.")
+        recent = [x for x in st.get("removals", []) if time.time() - x < 86400]
+        st["removals"] = recent
+        if len(recent) >= 2 and not st.get("no_source_images_until", 0) > time.time():
+            st["no_source_images_until"] = time.time() + 3 * 86400
+            tg("sendMessage", chat_id=_chat_id(), text="🛡 שני פוסטים הוסרו ב-24 שעות: כיביתי אוטומטית תמונות מהמקור ל-3 ימים (נשארים צילום חופשי, תמונה כללית מטושטשת וכרטיס).")
+    except Exception as e:  # noqa: BLE001
+        print("health check failed:", type(e).__name__, str(e)[:120])
 
 
 def publish_queue(st):
@@ -1091,26 +1151,37 @@ def main():
     elif mode in ("run", "sample"):
         if mode == "sample":
             os.environ["SAMPLE"] = "1"  # מתעלם מ"נראו כבר" ובודק 72 שעות אחורה
-        process_updates(st)
+        _STATE_REF["st"] = st
+        started = time.time()
+        loops = 0
         try:
-            publish_approved(st)
-            publish_queue(st)
-            from concurrent.futures import ThreadPoolExecutor
+            while True:
+                loops += 1
+                apply_decision_files(st)
+                process_updates(st)
+                publish_approved(st)
+                publish_queue(st)
+                fb_health(st)
+                from concurrent.futures import ThreadPoolExecutor
 
-            topics = [tp for tp in load_topics() if not os.environ.get("ONLY_TOPIC") or tp == os.environ["ONLY_TOPIC"]]
+                topics = [tp for tp in load_topics() if not os.environ.get("ONLY_TOPIC") or tp == os.environ["ONLY_TOPIC"]]
 
-            def one(topic):
-                t0 = time.time()
-                try:
-                    fetch_and_propose(st, topic)
-                except Exception as e:  # noqa: BLE001
-                    print(f"[{topic}] failed:", type(e).__name__, str(e)[:200])
-                print(f"[{topic}] took {int(time.time() - t0)}s")
+                def one(topic):
+                    t0 = time.time()
+                    try:
+                        fetch_and_propose(st, topic)
+                    except Exception as e:  # noqa: BLE001
+                        print(f"[{topic}] failed:", type(e).__name__, str(e)[:200])
+                    print(f"[{topic}] took {int(time.time() - t0)}s")
 
-            with ThreadPoolExecutor(max_workers=len(topics) or 1) as ex:
-                list(ex.map(one, topics))  # הנושאים רצים במקביל
-            with STATE_LOCK:
-                checkpoint(st)
+                with ThreadPoolExecutor(max_workers=len(topics) or 1) as ex:
+                    list(ex.map(one, topics))  # הנושאים רצים במקביל
+                with STATE_LOCK:
+                    checkpoint(st)
+                # סריקה חוזרת באותה ריצה כדי שלא יהיו פערים בין ריצות (עד כ-5 דקות לריצה)
+                if mode == "sample" or time.time() - started > 200 or loops >= 4:
+                    break
+                time.sleep(30)
         finally:
             save_state(st)
         return
