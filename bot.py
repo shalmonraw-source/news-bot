@@ -949,6 +949,20 @@ def build_posts(cands, topic="aviation", st=None):
     picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, CHEAP_MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
         picks = [pk for pk in picks if pk["traffic"] >= (2 if topic == "aviation" else 3) or pk["urgency"] >= 4 or topic == "explain"]
+    if os.environ.get("SAMPLE") != "1" and st is not None:
+        sp = _spend_state()
+        hr = datetime.now(timezone.utc).hour + datetime.now(timezone.utc).minute / 60
+        pace = _budget() * min(1.0, (hr + 3) / 24)  # קצב הוצאה: לא שורפים את כל התקציב בבוקר
+        backlog = len(st.get("pending", {}))
+        keep_p = []
+        for pk in picks:
+            hot = int(pk["urgency"]) >= 4 and int(pk["traffic"]) >= 4
+            if not hot and sp is not None and sp["usd"] >= pace:
+                print("skip (pacing):", cands[pk["idxs"][0]]["title"][:50]); continue
+            if not hot and backlog >= 30:
+                print("skip (pending backlog):", cands[pk["idxs"][0]]["title"][:50]); continue
+            keep_p.append(pk)
+        picks = keep_p
     review = (REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS) + '\n\nחיסכון: אם הטיוטה תקינה ואין מה לתקן, החזר {"issues":[],"text":""} בלי להעתיק אותה. החזר טקסט מלא רק אם תיקנת בו משהו.'
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -957,7 +971,7 @@ def build_posts(cands, topic="aviation", st=None):
             if not any(cands[i].get("has_body") for i in pk["idxs"]) and max(len(cands[i]["summary"]) for i in pk["idxs"]) < 160:
                 print("skip thin story (no article body, short summary):", cands[pk["idxs"][0]]["title"][:60])
                 continue
-            wmodel = WRITER_MODEL if (pk["traffic"] >= 5 and topic in ("security", "aviation", "politics")) else MODEL  # Opus רק לסיפורים החזקים באמת
+            wmodel = WRITER_MODEL if (pk["traffic"] >= 5 and topic in ("security", "aviation", "politics")) else (MODEL if pk["traffic"] >= 4 or pk["urgency"] >= 4 else CHEAP_MODEL)  # סונט רק לחזקים; השאר הייקו  # Opus רק לסיפורים החזקים באמת
             if topic in ("facts", "abroad") and os.environ.get("GEMINI_API_KEY"):  # ניסוי חיסכון: ידיעות קלות נכתבות בגמיני, אותן הוראות. אם נכשל, חוזרים ל-Claude
                 w = cheap_json(WRITE_BY[topic], material, CHEAP_MODEL, 6000)  # גימיני אם זמין, אחרת הייקו
                 print(f"[{topic}] written via gemini-or-haiku path")
@@ -968,7 +982,7 @@ def build_posts(cands, topic="aviation", st=None):
                 draft = w["_raw"].strip()  # המודל החזיר טקסט חופשי
             if not draft:
                 continue
-            rmodel = MODEL if topic in ("security", "aviation", "politics") else CHEAP_MODEL  # ביקורת עובדות: סונט לנושאים רגישים, הייקו לקלים
+            rmodel = MODEL if (topic in ("security", "aviation", "politics") and pk["traffic"] >= 4) else CHEAP_MODEL  # ביקורת עובדות: סונט לנושאים רגישים, הייקו לקלים
             rev = soft_json(review, f"חומר גלם:\n{material}\n\nטיוטה:\n{draft}", rmodel, 6000)
             text = (rev.get("text") or draft).strip()
             if rev.get("issues"):
