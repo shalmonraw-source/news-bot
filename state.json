@@ -3387,6 +3387,19 @@
    "credit": "תמונה: thenationalnews.com",
    "urgency": 4,
    "ts": 1793924851.1693032
+  },
+  "f4b5c39a96": {
+   "text": "על פי דיווחים פלסטיניים: שלושה נהרגו בתקיפה במחנה אל-שאטי בעזה\n\nלפי דיווחים, תקיפה אווירית ישראלית פגעה ביום חמישי בערב בקבוצת פלסטינים סמוך לכיכר השהידים במחנה הפליטים אל-שאטי, מערבית לעיר עזה. לדברי מקורות מקומיים, שלושה בני אדם נהרגו וכמה נוספים נפצעו.\n\nמוקדם יותר דווח על חמישה הרוגים ברחבי הרצועה מתקיפות וירי, ובהם אישה וילד בן 12.\n\nלפי משרד הבריאות בעזה, מאז אוקטובר 2023 נהרגו ברצועה לפחות 74,618 פלסטינים, ויותר מ-175 אלף נפצעו.",
+   "links": [
+    "https://www.middleeasteye.net/live-blog/live-blog-update/israeli-air-strike-refugee-camp-kills-three-palestinians-gaza",
+    "https://www.middleeasteye.net/live-blog/live-blog-update/israeli-air-strike-refugee-camp-kills-three-palestinians-gaza"
+   ],
+   "severity": "medium",
+   "topic": "security",
+   "image": "images/f4b5c39a96.jpg",
+   "credit": "תמונה: middleeasteye.net",
+   "urgency": 4,
+   "ts": 1793924859.4282155
   }
  },
  "approved": [
@@ -4100,7 +4113,7 @@
   "count": {
    "abroad": 1,
    "facts": 2,
-   "security": 3,
+   "security": 4,
    "aviation": 2,
    "politics": 2
   },
@@ -4798,12 +4811,16 @@
   {
    "ts": 1793924833.5894775,
    "line": "איראן טוענת לסדרת פיצוצים באזור מצר הורמוז, בעוד המגעים מתעצמים."
+  },
+  {
+   "ts": 1793924853.9863706,
+   "line": "על פי דיווחים פלסטיניים: שלושה נהרגו בתקיפה במחנה אל-שאטי בעזה"
   }
  ],
  "last_fb_ts": 1793924590.443376,
  "spend": {
   "date": "2026-11-06",
-  "usd": 0.5327,
+  "usd": 0.5627,
   "v": 2
  }
 }
