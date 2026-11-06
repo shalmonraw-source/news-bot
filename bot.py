@@ -948,7 +948,7 @@ def build_posts(cands, topic="aviation", st=None):
     extra = ("\n\nידיעות שכבר נשלחו ב-48 השעות האחרונות. אל תבחר שוב אירוע זהה, גם אם הכתבות שונות, אלא רק אם יש התפתחות מהותית חדשה:\n" + "\n".join("- " + s for s in sent[-40:])) if sent else ""
     picks = parse_picks(cheap_json(SELECT_BY[topic] + TRAFFIC_RULE, "\n\n".join(lines) + extra, CHEAP_MODEL, 2000), len(cands))
     if os.environ.get("SAMPLE") != "1":  # חיסכון: ידיעות בטראפיק נמוך לא נכתבות בכלל (אלא אם מתפרצות)
-        picks = [pk for pk in picks if pk["traffic"] >= 3 or pk["urgency"] >= 4 or topic == "explain"]
+        picks = [pk for pk in picks if pk["traffic"] >= (2 if topic == "aviation" else 3) or pk["urgency"] >= 4 or topic == "explain"]
     review = (REVIEW_SYSTEM if topic == "aviation" else REVIEW_NEWS) + '\n\nחיסכון: אם הטיוטה תקינה ואין מה לתקן, החזר {"issues":[],"text":""} בלי להעתיק אותה. החזר טקסט מלא רק אם תיקנת בו משהו.'
     posts = []
     for pk in picks[:MAX_POSTS_PER_RUN]:
@@ -977,9 +977,7 @@ def build_posts(cands, topic="aviation", st=None):
             pt = (pol.get("text") or "").strip()
             if len(pt) >= 0.7 * len(text):  # הגנה: ליטוש שקיצץ הרבה מדי נזרק
                 text = pt
-            if OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|אבו עלי|אקספרס|פורסם באתר|על פי הדיווח ב", text):
-                fx = soft_json('הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ערוץ הטלגרם Y"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה") נשארים. אל תשנה שום עובדה אחרת ואל תקצר. החזר JSON: {"text":"..."}', text, CHEAP_MODEL, 6000)
-                text = (fx.get("text") or text).strip()
+            text = scrub_outlets(text)
             posts.append({**pk, "text": clean_hebrew(text).replace("\n", "\n\n", 1) if "\n\n" not in clean_hebrew(text) else clean_hebrew(text)})
         except Exception as e:  # noqa: BLE001
             print("story failed:", type(e).__name__, str(e)[:200])
@@ -1499,14 +1497,31 @@ def queue_ttl_hours(it):
     return 6 if u >= 4 else 18 if u == 3 else 36
 
 
-OUTLET = re.compile(r"(לפי|דיווח ב|פורסם ב|ציטט|אמר ל)[-\s״\"]*(אל[- ]?מוניטור|אקסיוס|רויטרס|CNN|וול סטריט|יורוניוז|Popular Science|פוליטיקו|גרדיאן|ניו יורק טיימס|וושינגטון פוסט|ביביסי|BBC|אל ג׳זירה|סקיי|ynet|וואלה|מעריב|הארץ|ג׳רוזלם פוסט|טיימס אוף ישראל|AP|בלומברג|Bloomberg|Politico|Axios|Reuters|Haaretz|JNS|Middle East Eye|The War Zone|Space\.com|New Scientist|Phys\.org|Ars Technica)", re.I)
+OUTLET = re.compile(r"(?<![\u0590-\u05FFA-Za-z])[בלמוהש]{0,2}[-־]?(?:אל[-־ ]?מוניטור|אקסיוס|רויטרס|CNN|וול סטריט ג[׳']ורנל|יורוניוז|פוליטיקו|גרדיאן|ניו יורק טיימס|וושינגטון פוסט|ביביסי|BBC|אל[-־ ]?ג[׳']זירה|אל[-־ ]?ערביה|אל[-־ ]?אחבאר|סקיי ניוז|ynet|וואלה|מעריב|הארץ|ג[׳']רוזלם פוסט|טיימס אוף ישראל|ישראל היום|חדשות 12|חדשות 13|ערוץ 12|ערוץ 13|i24|בלומברג|Bloomberg|Politico|Axios|Reuters|Haaretz|JNS|Euronews|ThePrint|Middle East Eye|The War Zone|Space\.com|New Scientist|Phys\.org|Ars Technica|אנאדולו|יונהפ|א[-־ ]?נהאר|צות אל[-־ ]?אמאראת|סוכנות הידיעות|שינחואה|Xinhua|NHK|TASS|טאס|AFP|(?-i:AP|DW|RT))(?![\\u0590-\\u05FFA-Za-z])", re.I)
+
+
+SCRUB_PROMPT = 'הסר מהפוסט כל אזכור של שם אתר, כלי תקשורת, סוכנות ידיעות, ערוץ טלגרם או עיתונאי כמקור לידיעה (למשל "כך דווח ב...", "לפי X", "ציטט X", "על פי X", "שדבריו צוטטו ב-X"). נסח במקומם "על פי דיווחים" או כתוב את העובדה ישירות. גורם רשמי או צד מעורב ("מסר צה״ל", "אמר ראש הממשלה", "מסר משרד ההגנה") נשארים. אל תשנה שום עובדה אחרת, ואל תקצר. החזר JSON: {"text":"..."}'
+
+
+def scrub_outlets(text):
+    """מסיר אזכורי כלי תקשורת מגוף הפוסט (הייקו). אם התוצאה קצרה מדי או נכשלה, מחזיר את המקור."""
+    if not (OUTLET.search(text) or re.search(r"כך דווח|ערוץ הטלגרם|פורסם באתר", text)):
+        return text
+    fx = soft_json(SCRUB_PROMPT, text, CHEAP_MODEL, 6000)
+    t2 = (fx.get("text") or "").strip()
+    return t2 if len(t2) >= 0.7 * len(text) else text
 
 
 def expire_queue(st):
-    old = [x for x in st["queue"] if OUTLET.search(x.get("text", ""))]
-    if old:
-        st["queue"] = [x for x in st["queue"] if x not in old]
-        print("queue: dropped items crediting outlets:", len(old))
+    fixed = 0
+    for x in st["queue"]:
+        if OUTLET.search(x.get("text", "")):
+            nt = scrub_outlets(x["text"])
+            if nt != x["text"]:
+                x["text"] = nt
+                fixed += 1
+    if fixed:
+        print("queue: scrubbed outlet credits in", fixed, "items")
     keep, dropped = [], []
     now = time.time()
     for it in st["queue"]:
