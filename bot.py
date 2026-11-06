@@ -1217,7 +1217,9 @@ def mirror_to_channel(item):
         if item.get("image") and os.path.exists(item["image"]):
             with open(item["image"], "rb") as f:
                 requests.post(f"https://api.telegram.org/bot{_token()}/sendPhoto", data={"chat_id": ch}, files={"photo": f}, timeout=60)
-        requests.post(f"https://api.telegram.org/bot{_token()}/sendMessage", data={"chat_id": ch, "text": text[:4000], "disable_web_page_preview": "true"}, timeout=30)
+        fbp = load_settings().get("fb_page_url")
+        tail = f"\n\n📘 עוקבים גם בפייסבוק: {fbp}" if fbp and int(hashlib.sha1(text.encode()).hexdigest(), 16) % 3 == 0 else ""  # אחד מכל שלושה
+        requests.post(f"https://api.telegram.org/bot{_token()}/sendMessage", data={"chat_id": ch, "text": (text[:3800] + tail), "disable_web_page_preview": "true"}, timeout=30)
     except Exception as e:  # noqa: BLE001
         print("channel mirror failed:", type(e).__name__)
 
@@ -1259,6 +1261,9 @@ def publish_approved(st):
                 except Exception:  # noqa: BLE001
                     q = ""
                 body = q.strip()  # בלי קישורי מקורות פומביים, כדי שלא יראה שאנחנו מתווכים
+                ch = (load_settings().get("tg_channel") or "").lstrip("@")
+                if ch and body and int(hashlib.sha1(str(fb_id).encode()).hexdigest(), 16) % 4 == 0:
+                    body += f"\n\nעדכונים ראשונים ברגע שהם קורים, גם בטלגרם: t.me/{ch}"  # קידום הדדי, אחד מכל ארבעה פוסטים
                 if body:
                     requests.post(f"https://graph.facebook.com/{FB_VERSION}/{fb_id}/comments", data={"message": body, "access_token": token}, timeout=40)
             except Exception:  # noqa: BLE001
