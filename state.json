@@ -1,44 +1,5 @@
 {
  "seen": [
-  "cd1dbb795abd",
-  "ff9f776de3a2",
-  "42fccc3cfeac",
-  "187fb8b9c099",
-  "be503ab1574b",
-  "176c6dffea9e",
-  "5408516c0c14",
-  "6289430827f7",
-  "9238b358494d",
-  "4790838cf088",
-  "c26cd65c1925",
-  "a003a91e0009",
-  "cfe01f204488",
-  "f4cfe12c5a05",
-  "32aa19af65d3",
-  "630c0ee8d8da",
-  "59455ec82210",
-  "cbeaba9e0d68",
-  "8597b5d61101",
-  "176c6dffea9e",
-  "0de3b185d5f6",
-  "5c43d7e65ec4",
-  "ba0941132fb7",
-  "6f22fc3c6ea8",
-  "4d2c505f9942",
-  "31ebfa9fe1ff",
-  "6e099a7211cf",
-  "2d1889368852",
-  "60ea63147860",
-  "e8a89039174f",
-  "76d3e27c25ae",
-  "4790838cf088",
-  "c26cd65c1925",
-  "a003a91e0009",
-  "95aaab3d2958",
-  "cfe01f204488",
-  "9786bf942493",
-  "f4cfe12c5a05",
-  "077c63a70b7f",
   "44029b165f1b",
   "3fd3a5753ce6",
   "173afc4d474a",
@@ -2999,7 +2960,46 @@
   "6eea775e8445",
   "2037b69b1a5f",
   "23708090426b",
-  "71813182bf38"
+  "71813182bf38",
+  "41286f527e54",
+  "a34d91225e9d",
+  "59216db5e4ec",
+  "f73150ca6f25",
+  "0070a7348144",
+  "4766d13a7260",
+  "725ff2756445",
+  "63548626b097",
+  "eac06c98764d",
+  "a34d91225e9d",
+  "8dd5772eae34",
+  "3224d4c2c7cf",
+  "69b83bdb92ba",
+  "5c87d4c138d3",
+  "d5e31ab59918",
+  "59216db5e4ec",
+  "53071b492409",
+  "f73150ca6f25",
+  "d9a69b685482",
+  "80bde9a4fc29",
+  "3cecbd6b6f25",
+  "1c4e187e8068",
+  "ee3c8562c94c",
+  "fc61fc20d925",
+  "20d8439b62f2",
+  "a4d50482bf3d",
+  "d0f491ae19e6",
+  "b20c71bc3a8b",
+  "5563b5d0ee96",
+  "084e7158ff8f",
+  "c91862b74086",
+  "83c806cd40eb",
+  "5774572c0231",
+  "8a7fb2627774",
+  "5d43cf1c5d43",
+  "4766d13a7260",
+  "0c3d0604efbf",
+  "747f6efc7f66",
+  "c472f3e7371f"
  ],
  "pending": {
   "a489eee8de": {
@@ -4369,6 +4369,22 @@
    "published": true,
    "fb_id": "1322211944302986_122130610167473720",
    "published_at": "2026-11-06T01:37:50+00:00"
+  },
+  {
+   "id": "2e73ce3284",
+   "text": "אישה בת 90 שנפצעה בפיגוע בבונדי נפטרה מפצעיה, כמעט שנה לאחר האירוע.\n\nהאישה נפצעה קשה מירי בחגיגת חנוכה בפארק ארצ'ר שבחוף בונדי, ב-14 בדצמבר 2025, ונפטרה כעת. ההלוויה וטקס האזכרה ייערכו ביום שני.\n\nלפי גורם בכיר בקהילה, היא אושפזה ושוחררה לסירוגין במהלך השנה בשל פצעיה הנרחבים. בפיגוע נהרגו 15 בני אדם נוספים, ובהם ילדה בת 10. שני היורים נורו תוך שבע דקות מתחילת האירוע. אחד מהם, סאג'יד אכרם, נורה למוות בזירה, ובנו, נאווד אכרם, עומד לדין באישומים של טרור ורצח.\n\n⏳ דיווח ראשוני. הפרטים בבדיקה ויעודכנו.",
+   "links": [
+    "https://www.abc.net.au/news/2026-11-06/bondi-terror-attack-survivor-eva-geller-dies-in-hospital/107355644",
+    "https://www.abc.net.au/news/2026-11-06/bondi-terror-attack-toll-rises-injured-survivor-eva-geller-dies/107355644"
+   ],
+   "severity": "high",
+   "image": "images/2e73ce3284.jpg",
+   "credit": "תמונה: abc.net.au",
+   "topic": "security",
+   "urgency": 5,
+   "approved_at": "2026-11-06T02:19:09+00:00",
+   "published": false,
+   "fast": true
   }
  ],
  "offset": 569287812,
@@ -4377,50 +4393,14 @@
   "count": {
    "abroad": 1,
    "facts": 10,
-   "security": 16,
+   "security": 17,
    "aviation": 3,
    "politics": 11
   },
-  "fast": 3,
+  "fast": 4,
   "auto": 2
  },
  "queue": [
-  {
-   "id": "203a235952",
-   "text": "ג׳ושוע וונג נידון בהונג קונג לעשר שנות מאסר נוספות בגין קשירת קשר עם כוחות זרים\n\nלבוש חולצה כחולה ומרכיב משקפיים כהי מסגרת, הנהן ג׳ושוע וונג לעבר תומכיו שישבו ביציע, רגע לפני הקראת גזר הדין. בית המשפט הגבוה בהונג קונג גזר ביום חמישי על הפעיל הדמוקרטי, בן ה-30, עשר שנות מאסר נוספות מכוח חוק הביטחון הלאומי שהטילה בייג׳ינג.\n\nלפי DW, וונג הודה בספטמבר שקשר קשר עם הפעיל הגולה נייתן לאו ועם אחרים כדי לבקש ממדינות זרות להטיל סנקציות על סין ועל הונג קונג. אם נקבע שהעבירה \"חמורה באופייה\", העונש עליה עשוי להגיע למאסר עולם. השופט ויליאם טאם קבע נקודת מוצא של 13 שנה, והפחית אותה לעשר שנים בזכות ההודאה. לפי Euronews, וונג היה אמור להשתחרר בינואר, וכעת נדחה מועד שחרורו לסוף 2036.\n\nלפי AFP, הקונסוליה של ארה״ב בהונג קונג גינתה את גזר הדין ודרשה לשחרר את וונג לאלתר. לפי Euronews, סטיב לי, ניצב במחלקה לביטחון לאומי במשטרת הונג קונג, בירך על ההחלטה.\n\nוונג פרץ לתודעה הציבורית ב-2012, כשהיה בן 15. לפי Euronews, כשיצא מהאולם נופף לתומכיו, וחלקם קראו לעברו: \"נחכה לשחרור שלך\".",
-   "links": [
-    "https://www.scmp.com/news/hong-kong/law-and-crime/article/3373335/joshua-wong-jailed-10-years-over-bid-instigate-sanctions-beijing-hong-kong",
-    "https://www.euronews.com/2026/11/05/hong-kong-democracy-activist-joshua-wong-sentenced-to-10-more-years-for-collusion",
-    "https://www.dw.com/en/hong-kong-democracy-activist-joshua-wong-sentenced-to-10-more-years/a-79859898?maca=en-rss-en-all-1573-rdf"
-   ],
-   "severity": "medium",
-   "topic": "politics",
-   "urgency": 3,
-   "image": "images/203a235952.jpg",
-   "credit": "תמונה: scmp.com",
-   "queued_at": "2026-11-05T08:10:38+00:00",
-   "published": false
-  },
-  {
-   "id": "d123ea9a68",
-   "text": "ואנס תולה את המפלה בבחירות האמצע במלחמה באיראן ובקשרים עם ישראל\n\nסגן נשיא ארה״ב ג׳יי די ואנס הטיל את האחריות להפסד הרפובליקני בבחירות האמצע על המלחמה באיראן. לפי ThePrint ו״הינדוסטאן טיימס״, הוא מנה גם את הקשרים עם ישראל בין הסיבות לכך שהבוחרים העדיפו את הדמוקרטים. ב״פוליטיקו״ דווח שוואנס כתב את הפוסט בעצמו ועדכן את הבית הלבן מראש.\n\nאתר Rediff מתאר את עמדתו כקריאה לסיים את המלחמה ולבחון מחדש את הסיוע לישראל. על פי ״איראן אינטרנשיונל״, הנשיא טראמפ שוקל את צעדו הבא מול טהרן. לפי ״ישראל היום״, טראמפ אמר על המלחמה: ״היא תסתיים כשארצה בכך״.\n\nב״ישראל היום״ מעריכים שזהו ניסיון ראשון של ואנס להיחלץ מצלו של טראמפ ולהציג את עצמו כמנהיג העתידי של התנועה, כשעיניו נשואות לבחירות 2028. ב-ynetnews מעריכים שהפוסט אמור להדליק נורות אזהרה בירושלים, כשעשרה מבקרים חריפים של ישראל נכנסים לקונגרס.",
-   "links": [
-    "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBVdGtTTEc4M1FLYWlCTENzVEs0UjZyTDBWVHNPVVZuZHI5TU5hNmNBMnNTQkpsQTlacnlDaDJ5YUVaUU9kM3BuVnZqaklqdE8wdWc?oc=5",
-    "https://www.israelhayom.co.il/news/world-news/usa/article/21785078",
-    "https://news.google.com/rss/articles/CBMixwFBVV95cUxQUzdaUDVoSGhoZjZfMm9jVzVlOXVIbXdQWVU0MUowczhWOExlNk9XdmoyRGtqOWpPZmQ2VzJPTktmS1RhQVpHUWFtNnZ4YXRwNWVBQkNaVEcxOVVuSWtFekxzRllOWTNqRHhyT3FiV29wMzFER05FSU1UTDVtVWVGWEhQUjhRZWdzSUhSd1ZFenJTR1pnc3JSWWh5UGh6WlU4MEF4OWZXdlFRLXp4TnNkOGpaajRZOGp6TVZLdkhLQWRjSU9KbHJj0gHMAUFVX3lxTE90TFZOSmRRaGtRN3BPUm9UTkJiaTlLU01sNEtUaTg3N2VMMnVfallnUk1mZGZ0NU95b3RueWtRMElPcE13V21mUzZzaDZmdFJLM24zczFQVDRiYTlkOWI2bDNFazN4ZjF4WkFnenFVaklWVG1uTENYeDNTWklyVEFreDZZQk1Ndm1pSHVFbXRpcjhIOEpvNXJvQUh4OEpsclc2OW5nM2lRRFRwZXRXQWgtZ2NxVnRhdTVmYVNabm1ZNVV6aXBfc20tTUxlSg?oc=5",
-    "https://news.google.com/rss/articles/CBMiVkFVX3lxTE9YeEJENzd5bFVjbXdhVHNOSTc1Ty1YVF9Kd2dQN0FvbkEtb1dhTXk3aW5OVERnZ3luRTVxUVkya3RGNW4zbkNnNjY3MzdRcVRMMG5VM19B?oc=5",
-    "https://news.google.com/rss/articles/CBMivgFBVV95cUxPUjltQjBnSERLS3Z3UGNhcDlxV0x0bTdRQU1TOUp1TXRDU3hzUjNTT2NZeVp0ck45Z1dIQlkwRll5a3lfOHZiS1JNekVkbjJ0ODQxLVVqMnVrcGNTVnJISWxtZjctU0h4dll2Qk5ycVJ4TEw5QTJkMGVHQzBtVXRvRnZvWVhxVzZ5Nm51SC1tN0ttTnFNV2hNd3B4Q0tpQUVOU0EzZDBiUTBvQlFSRkJmalhZX2V0bWtUVjJDS0Nn0gHAAUFVX3lxTFBoZ2gwUWNKOTU0dy1fZ2puVnUwS1VoVUNKcGNueFBRTVFPWGxBMjVTRzczeEJGdWVvcW5KVWtLTlVqUmFORy1aU0wtSDhMWGsxWnd2LVIyWUl4MWpDRUY5WkY1QnI5RGhlZ0RPUmE5bTJtRjR1cjRyWUxzWGVISzNoQTlHcUN0SmxBOGI2bWhzQWV3WlVQSWFTVlBuazgwaUFvVkpuTjlKb0ZhbnBOeEJJWFd3NkVXUEt6cXVHTVU2aQ?oc=5",
-    "https://news.google.com/rss/articles/CBMihwJBVV95cUxQdm9GOUFsNG1pcjVBRUo1ZFdqMkV4Zl82UUY4T1p5NGVnRXpmZkkyZUJzdFZ0STFFcTdDWFd3UVMtZzExQkdsWVRscnk1MWl3QlF1NGZRSUpTVlJfS1ZRaV92ci1mclRtZ2FoYW5vX1JDVDdGRC1GNnB6UTN5bWxMRmdWd1VCS1ZyeldsSHlaSFhHNFZSVFQtTHRZZnZsSy1OM0VlV2hHN0JWbnBxeFkxZU04VGRqRnB4SVJXQnBJRDdyNXhWdmRuX2hOOTNVNlQ0NkRITGdJOFhXeGF2QThvZWZHYTdRZzNZNnNCSDdoOXVKVHRKdDNabGFwMF9pT3M4TU9oWVk0TdIBjAJBVV95cUxOOG1mTGdqQUhUZURzUWpCTno3My1Kd2JRQnJHN09mV01UaXFtamZSeGpHRmNoNWlRY2FXSHAwalRCbExBZlpqQ3dBX2VRTWxwRzg5ZGVTZjZBX2FIWTN2TEdGU2hFa3MwSjVlTU00bU9uYm9QR3Q0MTBGOFpJbXJTUVlSMzlwTDBORzdjM2NsVWJQcmhlcHkzaTY4blZKTVJrdFdtc2RNRkYwSTBmMXdpWk14Mlk3SDF1V3NGd2JQXzR0VndkSXhQUGs0MjJqX1lkeHd2RkNRR181MlNBOWpTX3oySzZzSkJQRkk1SWdKSm9LdkpkUzlJX2RqUlRqOGs4OFdESWtfaG1FM0R5?oc=5",
-    "https://news.google.com/rss/articles/CBMilwFBVV95cUxPYUpfZFdUUmtxNVdJN2ExcXo2Q1FvQjRhUGw5Y3pIVVBNX1I0RzRsaTBZZzhJZWlJVVZhUnhyWXoxUVpfS3djbUlKMFlWSXN2WEFGVGdENV9Qdk01bFZ2MU1LUC1wbnV6TDU3T0dNR1lMSnNhbmRtVmJ1SWZDb2U0OW12d1Y0cjQ0OWwyWHhBdkMxbGQ4enNv?oc=5"
-   ],
-   "severity": "medium",
-   "topic": "security",
-   "urgency": 3,
-   "image": "images/d123ea9a68.jpg",
-   "credit": "Noclip / Wikimedia Commons / Public domain",
-   "queued_at": "2026-11-05T08:11:43+00:00",
-   "published": false
-  },
   {
    "id": "d4ad9a48d2",
    "text": "🔐 מחקר: 22,593 קיוביטים יספיקו לפיצוח הצפנת RSA-2048 בשלושה ימים\n\nחלק ניכר מאבטחת הרשת, כולל פעולות בנקאיות, נשען על הצפנת RSA. חוקרים בהובלת חברת המחשוב הקוונטי Alice & Bob מפריז מעריכים שמחשב בעל 22,593 קיוביטים מסוג ״חתול״ יפצח מפתח RSA-2048 בתוך 3.14 ימים. המחקר טרם עבר ביקורת עמיתים.\n\nההצפנה מבוססת על מכפלה של שני מספרים ראשוניים גדולים, שאורכה עד 617 ספרות, ופיצוחה מחייב למצוא אותם. אלגוריתם שור (1994) מאיץ את החישוב מעריכית. קיוביט חתול, הקרוי על שם החתול של שרדינגר, בנוי מפוטונים הלכודים בתיבת מתכת זעירה. הוא מדכא שגיאות היפוך ביט באופן מעריכי, במחיר עלייה לינארית בשגיאות פאזה.\n\nההערכות הולכות ויורדות: לפי קרייג גידני מגוגל ועמיתיו, הן צנחו מ-20 מיליון קיוביטים ב-2019 לפחות ממיליון ב-2025. ב-Alice & Bob עצמה ירדה ההערכה מ-350 אלף ב-2023. ההערכה הנוכחית נמוכה בערך פי 40 מזו של גידני, אך היא נשענת על הנחות משלה בנוגע לשיעורי השגיאה ולתיקונן. לפי החוקרים, עשר מכונות מחוברות ובהן 610,530 קיוביטים יפצחו את ההצפנה בתוך שעה ורבע.\n\nלפיצוח הצפנת העקומים האליפטיים של ביטקוין יידרשו 29,588 קיוביטים ו-61.8 דקות. אלא שלפי החוקרים, בביטקוין נוצר בלוק מדי עשר דקות, וגניבה תחייב לעמוד בפרק הזמן הזה.",
@@ -4571,7 +4551,7 @@
  "slots_done": {
   "2026-11-06": []
  },
- "health_ts": 1793928394.9245589,
+ "health_ts": 1793931412.3509839,
  "followers": [
   {
    "ts": 1793851536,
@@ -4707,6 +4687,10 @@
   },
   {
    "ts": 1793928395,
+   "n": 0
+  },
+  {
+   "ts": 1793931412,
    "n": 0
   }
  ],
@@ -5290,12 +5274,16 @@
   {
    "ts": 1793929612.9400516,
    "line": "קבר סקיתי בסיביר מעיד על שימוש בקנאביס לפני כ-2,800 שנה"
+  },
+  {
+   "ts": 1793931523.2288005,
+   "line": "אישה בת 90 שנפצעה בפיגוע בבונדי נפטרה מפצעיה, כמעט שנה לאחר האירוע."
   }
  ],
  "last_fb_ts": 1793928545.5184622,
  "spend": {
   "date": "2026-11-06",
-  "usd": 1.9133,
+  "usd": 2.0238,
   "v": 2
  }
 }
