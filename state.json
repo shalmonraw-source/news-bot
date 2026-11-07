@@ -4550,7 +4550,8 @@
    "published": true,
    "fast": true,
    "fb_id": "1322211944302986_122130939201473720",
-   "published_at": "2026-11-07T06:07:16+00:00"
+   "published_at": "2026-11-07T06:07:16+00:00",
+   "reeled": true
   }
  ],
  "offset": 569287812,
@@ -4889,7 +4890,8 @@
  "removals": [],
  "jobs": {
   "2026-11-07": [
-   "report"
+   "report",
+   "reel1"
   ]
  },
  "sent_log": [
