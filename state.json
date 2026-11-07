@@ -4520,7 +4520,7 @@
  },
  "queue": [],
  "slots_done": {
-  "2026-11-07": []
+  "2026-11-08": []
  },
  "health_ts": 1794087043.122837,
  "followers": [
@@ -4947,17 +4947,7 @@
  ],
  "removals": [],
  "jobs": {
-  "2026-11-07": [
-   "report",
-   "reel1",
-   "explain1",
-   "follow",
-   "reel2",
-   "explain2",
-   "links",
-   "reel3",
-   "digest"
-  ]
+  "2026-11-08": []
  },
  "sent_log": [
   {
