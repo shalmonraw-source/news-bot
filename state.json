@@ -4468,7 +4468,8 @@
    "published": true,
    "fast": true,
    "fb_id": "1322211944302986_122130928191473720",
-   "published_at": "2026-11-07T05:01:58+00:00"
+   "published_at": "2026-11-07T05:01:58+00:00",
+   "reeled": true
   },
   {
    "id": "b66d53eeef",
@@ -4925,7 +4926,8 @@
    "follow",
    "reel2",
    "explain2",
-   "links"
+   "links",
+   "reel3"
   ]
  },
  "sent_log": [
