@@ -1,9 +1,5 @@
 {
  "seen": [
-  "eee45be64a37",
-  "823b62a844df",
-  "770e7592432d",
-  "8cedea3dc066",
   "64ae16c064bc",
   "522a4b44874b",
   "34a319bccd05",
@@ -2999,7 +2995,11 @@
   "98a6805b713d",
   "644aefd0f206",
   "31de1aa3f616",
-  "da1d60a2dcfe"
+  "da1d60a2dcfe",
+  "85f9260ff09c",
+  "fcecd4e3338c",
+  "8855c2d73dbd",
+  "7bc232c3c020"
  ],
  "pending": {
   "a489eee8de": {
@@ -3424,6 +3424,19 @@
    "credit": "Thomas Wolf , www.foto-tw.de / Wikimedia Commons / CC BY-SA 3.0 de",
    "urgency": 4,
    "ts": 1794013122.1902845
+  },
+  "92dc1c7008": {
+   "text": "טראמפ: „אם הייתי מאפשר לאיראן נשק גרעיני, היום לא הייתה ישראל”\n\nנשיא ארה״ב דונלד טראמפ אמר ביום שישי, בדברים במרכז החלל קנדי של נאס״א בפלורידה, כי אילו היה מתאפשר לאיראן להשיג נשק גרעיני, ישראל לא הייתה קיימת היום. „ישראל הייתה נמחקת מעל פני האדמה”, אמר.\n\nטראמפ אמר זאת כשהגן על המערכה הצבאית שהוא מוביל נגד טהרן, והציג אותה כצעד שמנע מאיראן להגיע ליכולת גרעינית.\n\nמדובר בהצהרתו של הנשיא, ולא בהערכה מודיעינית או בנתון מאומת.",
+   "links": [
+    "https://www.middleeasteye.net/live-blog/live-blog-update/trump-says-there-would-be-no-israel-if-iran-was-allowed-nuclear-weapon",
+    "https://timesofindia.indiatimes.com/world/middle-east/israel-middle-east-wouldnt-exist-today-trump-boasts-of-stopping-irans-nuclear-ambitions/articleshow/135619986.cms"
+   ],
+   "severity": "medium",
+   "topic": "security",
+   "image": "images/92dc1c7008.jpg",
+   "credit": "תמונה: middleeasteye.net",
+   "urgency": 4,
+   "ts": 1794013592.28423
   }
  },
  "approved": [
@@ -4437,7 +4450,7 @@
   "count": {
    "politics": 3,
    "aviation": 1,
-   "security": 4
+   "security": 5
   },
   "fast": 3
  },
@@ -5408,12 +5421,16 @@
   {
    "ts": 1794013144.1374846,
    "line": "תקיפה אמריקאית על גשר רכבת בצפון איראן הובילה לקריאה לפגוע בנמל חיפה. על פי דיווחים, נקראה היום (שבת) לתקוף את נמל חיפה ואת נמל ג'בל עלי באיחוד האמירויות. הקריא"
+  },
+  {
+   "ts": 1794013586.9296331,
+   "line": "טראמפ: „אם הייתי מאפשר לאיראן נשק גרעיני, היום לא הייתה ישראל”"
   }
  ],
  "last_fb_ts": 1794013160.296402,
  "spend": {
   "date": "2026-11-07",
-  "usd": 0.4925,
+  "usd": 0.5138,
   "v": 2
  }
 }
