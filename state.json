@@ -1,19 +1,5 @@
 {
  "seen": [
-  "4292861eaa2f",
-  "c42d1d8eecd9",
-  "6f53b7d9eed6",
-  "b39966b41d02",
-  "a890b867e1fc",
-  "7f0489210cdb",
-  "66037d3c7daf",
-  "fe075828e70c",
-  "ec6a6995b365",
-  "fef27b7b9d34",
-  "18bb0a59786f",
-  "9b8295bb21db",
-  "1962002ce02a",
-  "5a0e3f63852a",
   "a0d00403ad7a",
   "d7d28bbe0aa9",
   "e69d2ba9ad45",
@@ -2999,7 +2985,21 @@
   "32029ba31557",
   "8aea7410dddf",
   "6e88b1c0b07f",
-  "36b73790b3b3"
+  "36b73790b3b3",
+  "173e6894223c",
+  "7762467f7127",
+  "fd82a7aa8a94",
+  "0ad8595742cd",
+  "dc216863bf30",
+  "bc8b087f98f1",
+  "d1fb7c7a214b",
+  "21fd3f863bc0",
+  "296541dcc7fa",
+  "2fde3ff3ffa7",
+  "9f68a8ffe311",
+  "292f79008255",
+  "eb3601261550",
+  "7d0d4ba444ca"
  ],
  "pending": {
   "a489eee8de": {
@@ -3362,19 +3362,6 @@
    "credit": "Jeff Schmaltz, MODIS Land Rapid Response Team, NASA GSFC / Wikimedia Commons / Public domain",
    "urgency": 2,
    "ts": 1793938112.0222645
-  },
-  "92dc1c7008": {
-   "text": "טראמפ: „אם הייתי מאפשר לאיראן נשק גרעיני, היום לא הייתה ישראל”\n\nנשיא ארה״ב דונלד טראמפ אמר ביום שישי, בדברים במרכז החלל קנדי של נאס״א בפלורידה, כי אילו היה מתאפשר לאיראן להשיג נשק גרעיני, ישראל לא הייתה קיימת היום. „ישראל הייתה נמחקת מעל פני האדמה”, אמר.\n\nטראמפ אמר זאת כשהגן על המערכה הצבאית שהוא מוביל נגד טהרן, והציג אותה כצעד שמנע מאיראן להגיע ליכולת גרעינית.\n\nמדובר בהצהרתו של הנשיא, ולא בהערכה מודיעינית או בנתון מאומת.",
-   "links": [
-    "https://www.middleeasteye.net/live-blog/live-blog-update/trump-says-there-would-be-no-israel-if-iran-was-allowed-nuclear-weapon",
-    "https://timesofindia.indiatimes.com/world/middle-east/israel-middle-east-wouldnt-exist-today-trump-boasts-of-stopping-irans-nuclear-ambitions/articleshow/135619986.cms"
-   ],
-   "severity": "medium",
-   "topic": "security",
-   "image": "images/92dc1c7008.jpg",
-   "credit": "תמונה: middleeasteye.net",
-   "urgency": 4,
-   "ts": 1794013592.28423
   },
   "77ab8c8488": {
    "text": "יהדות התורה מברכת על המהפך של ליברמן בגיוס, אך עסקה קואליציונית אינה מובטחת\n\nיו״ר ישראל ביתנו, אביגדור ליברמן, שינה את עמדתו בסוגיית הגיוס, ויהדות התורה מקבלת את המהפך בברכה. על פי דיווחים, ליברמן ניהל במשך חודשים שיחות חשאיות עם המפלגה החרדית. יהדות התורה נמנעה עד כה מלהמליץ על נתניהו.\n\nהמנדט ה-61 המכריע נמצא בידי ש״ס, אך יו״ר המפלגה, אריה דרעי, עדיין מסויג מהצטרפות.",
@@ -5504,7 +5491,7 @@
  "last_fb_ts": 1794022925.3375332,
  "spend": {
   "date": "2026-11-07",
-  "usd": 1.1992,
+  "usd": 1.2015,
   "v": 2
  }
 }
