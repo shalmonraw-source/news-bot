@@ -1,12 +1,5 @@
 {
  "seen": [
-  "3d52da57e396",
-  "beb7c5850bc8",
-  "f7e0ccc81036",
-  "9f39cff7d13f",
-  "e2726d06e0e8",
-  "d0d54cad4d62",
-  "4847acd5b5b9",
   "24c2a51a276f",
   "a79fc5aafec0",
   "c25fc4c18393",
@@ -2999,7 +2992,14 @@
   "d4f32bc717d7",
   "9c2e3f8bf257",
   "f05ba9fbcfd8",
-  "881b0a4aa391"
+  "881b0a4aa391",
+  "d6c63ab3bd6d",
+  "47dbdc3a0e09",
+  "fb321fb05c36",
+  "cb8d8a175a99",
+  "b1a0c8fd9e1b",
+  "7b7b30ea8107",
+  "df63d338a18e"
  ],
  "pending": {
   "a489eee8de": {
@@ -5944,7 +5944,7 @@
  "last_fb_ts": 1794105730.874958,
  "spend": {
   "date": "2026-11-08",
-  "usd": 0.7553,
+  "usd": 0.7563,
   "v": 2
  }
 }
