@@ -4510,7 +4510,8 @@
    "published": true,
    "fast": true,
    "fb_id": "1322211944302986_122131227129473720",
-   "published_at": "2026-11-08T06:37:00+00:00"
+   "published_at": "2026-11-08T06:37:00+00:00",
+   "reeled": true
   },
   {
    "id": "5d851645ed",
@@ -5080,7 +5081,8 @@
    "report",
    "reel1",
    "explain1",
-   "follow"
+   "follow",
+   "reel2"
   ]
  },
  "sent_log": [
