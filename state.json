@@ -4821,7 +4821,8 @@
    "published": true,
    "approved_at": "2026-11-08T07:00:41+00:00",
    "fb_id": "1322211944302986_122131231107473720",
-   "published_at": "2026-11-08T07:00:50+00:00"
+   "published_at": "2026-11-08T07:00:50+00:00",
+   "reeled": true
   }
  ],
  "offset": 569287812,
@@ -5338,7 +5339,8 @@
  "removals": [],
  "jobs": {
   "2026-11-08": [
-   "report"
+   "report",
+   "reel1"
   ]
  },
  "sent_log": [
